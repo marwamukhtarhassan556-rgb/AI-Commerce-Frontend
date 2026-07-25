@@ -328,36 +328,6 @@ BUNDLE_SUGGESTION_SCHEMA: Dict[str, Any] = {
     }
 }
 
-CAMPAIGN_SCHEMA: Dict[str, Any] = {
-    "$jsonSchema": {
-        "bsonType": "object",
-        "required": ["store_id", "customer_id", "cart_details", "status", "recommneded_discount", "maximum_allowed_discount"],
-        "properties": {
-            "store_id": {
-                "bsonType": "string"
-            },
-            "customer_id": {
-                "bsonType": "string"
-            },
-            "cart_details": {
-                "bsonType": "object"
-            },
-            "status": {
-                "enum": ["pending", "sent", "converted", "expired"]
-            },
-            "recommneded_discount": {
-                "bsonType": "string"
-            },
-            "maximum_allowed_discount": {
-                "bsonType": "double"
-            },
-            "coupon_offered": {
-                "bsonType": ["string", "null"]
-            }
-        }
-    }
-}
-
 DASHBOARD_INSIGHT_SCHEMA: Dict[str, Any] = {
     "$jsonSchema": {
         "bsonType": "object",
@@ -457,7 +427,6 @@ VALIDATORS_MAP: Dict[str, Dict[str, Any]] = {
     "prompt_history": PROMPT_HISTORY_SCHEMA,
     "recommendations": RECOMMENDATION_SCHEMA,
     "bundle_suggestions": BUNDLE_SUGGESTION_SCHEMA,
-    "abandoned_cart_campaigns": CAMPAIGN_SCHEMA,
     "dashboard_insights": DASHBOARD_INSIGHT_SCHEMA,
     "ticket_analysis": TICKET_ANALYSIS_SCHEMA,
     "knowledge_jobs": KNOWLEDGE_JOB_SCHEMA,

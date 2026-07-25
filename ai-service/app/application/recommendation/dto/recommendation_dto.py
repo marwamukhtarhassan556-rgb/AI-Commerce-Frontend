@@ -77,3 +77,45 @@ class RecommendationResponse(BaseModel):
     rationale: Optional[str] = None
     total_count: int = 0
     latency_ms: float = 0.0
+
+
+class DiscountInfo(BaseModel):
+    product_id: str
+    product_title: str
+    original_price: Decimal = Decimal("0")
+    discount_pct: float = 0.0
+    discount_amount: Decimal = Decimal("0")
+    price_after_discount: Decimal = Decimal("0")
+
+
+class BundleCandidate(BaseModel):
+    products: List[DiscountInfo] = Field(default_factory=list)
+    total_original: Decimal = Decimal("0")
+    total_discount: Decimal = Decimal("0")
+    total_after_discount: Decimal = Decimal("0")
+    remaining_budget: float = 0.0
+    within_budget: bool = True
+    promo_code: Optional[str] = None
+    rank: int = 0
+
+
+class BundleProductCard(BaseModel):
+    product_id: str
+    title: str
+    original_price: Decimal = Decimal("0")
+    discount_pct: float = 0.0
+    discount_amount: Decimal = Decimal("0")
+    final_price: Decimal = Decimal("0")
+    image_url: Optional[str] = None
+    product_url: Optional[str] = None
+
+
+class BundleResponse(BaseModel):
+    query: str
+    store_id: str
+    customer_id: Optional[str] = None
+    budget: float = 0.0
+    bundles: List[BundleCandidate] = Field(default_factory=list)
+    promo_code: Optional[str] = None
+    rationale: Optional[str] = None
+    latency_ms: float = 0.0

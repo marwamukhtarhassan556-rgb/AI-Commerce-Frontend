@@ -47,10 +47,6 @@ def get_bundle_suggestions_collection():
     return get_collection("bundle_suggestions")
 
 
-def get_abandoned_cart_campaigns_collection():
-    return get_collection("abandoned_cart_campaigns")
-
-
 def get_dashboard_insights_collection():
     return get_collection("dashboard_insights")
 

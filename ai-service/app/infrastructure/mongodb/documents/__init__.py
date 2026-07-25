@@ -1,7 +1,6 @@
 from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument, PyObjectId
 from app.infrastructure.mongodb.documents.business_summary_document import BusinessSummaryDocument
 from app.infrastructure.mongodb.documents.bundle_document import BundleSuggestionDocument
-from app.infrastructure.mongodb.documents.campaign_document import AbandonedCartCampaignDocument
 from app.infrastructure.mongodb.documents.category_document import CategoryDocument
 from app.infrastructure.mongodb.documents.conversation_document import ConversationDocument
 from app.infrastructure.mongodb.documents.dashboard_document import DashboardInsightDocument
@@ -22,7 +21,6 @@ from app.infrastructure.mongodb.documents.ticket_document import TicketAnalysisD
 
 __all__ = [
     "AIRuntimeLogDocument",
-    "AbandonedCartCampaignDocument",
     "BaseMongoDocument",
     "BusinessSummaryDocument",
     "BundleSuggestionDocument",

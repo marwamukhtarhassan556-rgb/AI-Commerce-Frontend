@@ -72,13 +72,8 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("created_at", DESCENDING)])
     ])
     
-    await db["abandoned_cart_campaigns"].create_indexes([
-        IndexModel([("store_id", ASCENDING)]),
-        IndexModel([("customer_id", ASCENDING)]),
-        IndexModel([("status", ASCENDING)]),
-        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
-    ])
-    
+
+
     await db["dashboard_insights"].create_indexes([
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("calculated_at", DESCENDING)])

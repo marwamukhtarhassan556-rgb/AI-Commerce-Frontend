@@ -143,8 +143,15 @@ class ProductDocument(BaseMongoDocument):
     category_id: Optional[str] = None
     audit: AuditInfoModel = Field(default_factory=AuditInfoModel)
     metadata: dict[str, Any] = Field(default_factory=dict)
+    max_discount_pct: float = Field(default=0.0, description="Maximum allowed discount percentage for this product")
+    promo_codes: dict[str, Any] = Field(default_factory=dict, description="Promo codes generated for this product")
 
     def to_entity(self) -> Product:
+        merged_metadata = dict(self.metadata)
+        if self.max_discount_pct:
+            merged_metadata["max_discount_pct"] = self.max_discount_pct
+        if self.promo_codes:
+            merged_metadata["promo_codes"] = self.promo_codes
         return Product(
             id=str(self.id),
             store_id=self.store_id,
@@ -163,7 +170,7 @@ class ProductDocument(BaseMongoDocument):
             seo=self.seo.to_vo(),
             category_id=self.category_id,
             audit=self.audit.to_vo(),
-            metadata=self.metadata,
+            metadata=merged_metadata,
             created_at=self.created_at,
             updated_at=self.updated_at,
             deleted_at=self.deleted_at,
@@ -171,6 +178,9 @@ class ProductDocument(BaseMongoDocument):
 
     @classmethod
     def from_entity(cls, entity: Product) -> "ProductDocument":
+        metadata = dict(entity.metadata)
+        max_discount_pct = float(metadata.pop("max_discount_pct", 0.0))
+        promo_codes = metadata.pop("promo_codes", {})
         return cls(
             _id=entity.id,
             store_id=entity.store_id,
@@ -189,7 +199,9 @@ class ProductDocument(BaseMongoDocument):
             seo=SEOModel.from_vo(entity.seo),
             category_id=entity.category_id,
             audit=AuditInfoModel.from_vo(entity.audit),
-            metadata=entity.metadata,
+            metadata=metadata,
+            max_discount_pct=max_discount_pct,
+            promo_codes=promo_codes,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at,
