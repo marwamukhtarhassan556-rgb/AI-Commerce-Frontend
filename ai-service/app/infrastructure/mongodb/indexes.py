@@ -84,7 +84,9 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("customer_id", ASCENDING)]),
         IndexModel([("priority", ASCENDING)]),
-        IndexModel([("sentiment", ASCENDING)])
+        IndexModel([("sentiment", ASCENDING)]),
+        IndexModel([("status", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
     ])
     
     await db["knowledge_jobs"].create_indexes([

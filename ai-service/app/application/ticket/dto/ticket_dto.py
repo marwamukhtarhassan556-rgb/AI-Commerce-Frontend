@@ -3,22 +3,22 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
 
-class LineItemSchema(BaseModel):
+class LineItemDTO(BaseModel):
     title: str
     quantity: int
     price: float
 
 
-class OrderSchema(BaseModel):
+class OrderDTO(BaseModel):
     id: str
     total_price: float
     currency: str
     financial_status: str
     created_at: datetime
-    line_items: List[LineItemSchema] = Field(default_factory=list)
+    line_items: List[LineItemDTO] = Field(default_factory=list)
 
 
-class CustomerProfileSchema(BaseModel):
+class CustomerProfileDTO(BaseModel):
     id: str
     email: Optional[str] = None
     first_name: Optional[str] = None
@@ -26,20 +26,20 @@ class CustomerProfileSchema(BaseModel):
     phone: Optional[str] = None
 
 
-class ConversationSummarySchema(BaseModel):
+class ConversationSummaryDTO(BaseModel):
     message_count: int
     last_message_at: Optional[datetime] = None
     recent_messages: List[str] = Field(default_factory=list)
 
 
-class TicketCreateSchema(BaseModel):
+class TicketCreateDTO(BaseModel):
     store_id: str
     customer_id: str
     conversation_id: Optional[str] = None
-    messages: List[str] = Field(default_factory=list, max_length=50)
+    messages: List[str] = Field(default_factory=list, description="Conversation messages to analyze")
 
 
-class TicketResponseSchema(BaseModel):
+class TicketDTO(BaseModel):
     id: str
     ticket_id: str
     store_id: str
@@ -53,21 +53,11 @@ class TicketResponseSchema(BaseModel):
     analyzed_at: datetime
     created_at: datetime
     updated_at: datetime
-    customer: Optional[CustomerProfileSchema] = None
-    recent_orders: List[OrderSchema] = Field(default_factory=list)
-    conversation: Optional[ConversationSummarySchema] = None
+
+    customer: Optional[CustomerProfileDTO] = None
+    recent_orders: List[OrderDTO] = Field(default_factory=list)
+    conversation: Optional[ConversationSummaryDTO] = None
 
 
-class TicketListResponseSchema(BaseModel):
-    items: List[TicketResponseSchema]
-    total: int
-    page: int
-    page_size: int
-
-
-class TicketStatusUpdateSchema(BaseModel):
-    status: str = Field(..., pattern=r"^(open|in_progress|resolved|closed)$")
-
-
-class DeleteResponseSchema(BaseModel):
-    success: bool
+class TicketStatusUpdateDTO(BaseModel):
+    status: str

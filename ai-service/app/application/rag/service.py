@@ -11,6 +11,8 @@ from app.application.rag.dto import ChunkReference, Citation, RAGRequest, RAGRes
 from app.application.rag.prompt import build_rag_messages
 from app.application.services.chat_service import ChatService
 from app.application.services.conversation_service import ConversationService
+from app.application.ticket.dto.ticket_dto import TicketCreateDTO
+from app.application.ticket.services.ticket_service import TicketService
 from app.core.ai_settings import ai_settings
 from app.core.model_registry import ModelRegistry
 from app.core.ai_exceptions import ProviderUnavailableException, RateLimitException
@@ -20,6 +22,8 @@ logger = logging.getLogger(__name__)
 
 MAX_CHUNK_CHARS = 2000
 MAX_CHUNKS_IN_CONTEXT = 10
+
+ESCALATION_CONFIDENCE_THRESHOLD = 0.3
 
 
 @dataclass
@@ -42,11 +46,13 @@ class RagOrchestrationService:
         chat_service: ChatService,
         conversation_service: Optional[ConversationService] = None,
         business_summary_repository: Optional[BusinessSummaryRepository] = None,
+        ticket_service: Optional[TicketService] = None,
     ):
         self._retriever = retriever_service
         self._chat = chat_service
         self._conversation_service = conversation_service
         self._summary_repo = business_summary_repository
+        self._ticket_service = ticket_service
 
     async def _prepare_context(self, request: RAGRequest) -> RAGContext:
         model = request.model or ai_settings.DEFAULT_MODEL
@@ -207,7 +213,7 @@ class RagOrchestrationService:
 
         total_latency = (time.perf_counter() - start) * 1000
 
-        return RAGResponse(
+        response = RAGResponse(
             response=response_text,
             citations=citations,
             chunk_references=ctx.chunk_refs,
@@ -219,6 +225,10 @@ class RagOrchestrationService:
             business_summary_version=ctx.business_summary_version,
             conversation_id=request.conversation_id,
         )
+
+        await self._check_escalation(request, response)
+
+        return response
 
     async def answer_stream(self, request: RAGRequest) -> AsyncGenerator[RAGStreamingChunk, None]:
         start = time.perf_counter()
@@ -301,6 +311,40 @@ class RagOrchestrationService:
                 business_summary_version=ctx.business_summary_version,
                 conversation_id=request.conversation_id,
             )
+
+    async def _check_escalation(self, request: RAGRequest, response: RAGResponse) -> None:
+        if not self._ticket_service:
+            return
+        if not request.customer_id or not request.store_id:
+            return
+        if response.confidence_score >= ESCALATION_CONFIDENCE_THRESHOLD:
+            return
+
+        messages_to_analyze = [request.message]
+        if request.conversation_id and self._conversation_service:
+            try:
+                history = await self._conversation_service.get_conversation_history(request.conversation_id)
+                messages_to_analyze = [str(m.content) for m in history] + messages_to_analyze
+            except Exception:
+                logger.warning("Failed to load conversation history for escalation check")
+
+        try:
+            ticket = await self._ticket_service.create_ticket(
+                TicketCreateDTO(
+                    store_id=request.store_id,
+                    customer_id=request.customer_id,
+                    conversation_id=request.conversation_id,
+                    messages=messages_to_analyze,
+                )
+            )
+            logger.info(
+                "Auto-escalated ticket %s for customer %s (confidence=%.2f)",
+                ticket.id,
+                request.customer_id,
+                response.confidence_score,
+            )
+        except Exception as e:
+            logger.warning("Failed to auto-escalate ticket: %s", e, exc_info=True)
 
     def _extract_citations(
         self,

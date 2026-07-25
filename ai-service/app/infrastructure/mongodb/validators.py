@@ -373,6 +373,9 @@ TICKET_ANALYSIS_SCHEMA: Dict[str, Any] = {
             "priority": {
                 "enum": ["low", "medium", "high", "urgent"]
             },
+            "status": {
+                "enum": ["open", "in_progress", "resolved", "closed"]
+            },
             "suggested_response": {
                 "bsonType": "string"
             },

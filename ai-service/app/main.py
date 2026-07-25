@@ -13,6 +13,7 @@ from app.api.knowledge.unified_router import router as knowledge_unified_router
 from app.api.rag.router import router as rag_router
 from app.api.recommendation.router import router as recommendation_router
 from app.api.admin.router import router as admin_router
+from app.api.ticket.router import router as ticket_router
 from app.core.config import settings
 from app.middleware.audit import AuditMiddleware
 from app.middleware.auth import AuthMiddleware
@@ -45,6 +46,7 @@ app.include_router(rag_router)
 app.include_router(recommendation_router)
 app.include_router(admin_router)
 app.include_router(auth_router)
+app.include_router(ticket_router)
 
 
 @app.get("/health/")
