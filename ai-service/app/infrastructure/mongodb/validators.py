@@ -416,6 +416,27 @@ KNOWLEDGE_JOB_SCHEMA: Dict[str, Any] = {
     }
 }
 
+BUNDLE_TRACKING_SCHEMA: Dict[str, Any] = {
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["store_id", "bundle_key", "product_ids", "discount_pct", "total_original", "total_discount", "promo_code", "copy_count", "is_top", "first_copied_at", "last_copied_at"],
+        "properties": {
+            "store_id": {"bsonType": "string"},
+            "bundle_key": {"bsonType": "string"},
+            "product_ids": {"bsonType": "array", "items": {"bsonType": "string"}},
+            "discount_pct": {"bsonType": "double"},
+            "total_original": {"bsonType": "double"},
+            "total_discount": {"bsonType": "double"},
+            "promo_code": {"bsonType": "string"},
+            "copy_count": {"bsonType": "int", "minimum": 1},
+            "is_top": {"bsonType": "bool"},
+            "promoted_at": {"bsonType": ["date", "null"]},
+            "first_copied_at": {"bsonType": "date"},
+            "last_copied_at": {"bsonType": "date"},
+        }
+    }
+}
+
 VALIDATORS_MAP: Dict[str, Dict[str, Any]] = {
     "conversations": CONVERSATION_SCHEMA,
     "messages": MESSAGE_SCHEMA,
@@ -430,6 +451,7 @@ VALIDATORS_MAP: Dict[str, Dict[str, Any]] = {
     "dashboard_insights": DASHBOARD_INSIGHT_SCHEMA,
     "ticket_analysis": TICKET_ANALYSIS_SCHEMA,
     "knowledge_jobs": KNOWLEDGE_JOB_SCHEMA,
+    "bundle_tracking": BUNDLE_TRACKING_SCHEMA,
 }
 
 async def setup_collection_validators(db) -> None:

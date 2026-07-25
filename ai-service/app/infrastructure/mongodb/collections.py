@@ -97,3 +97,7 @@ def get_integration_connections_collection():
 
 def get_entities_collection():
     return get_collection("entities")
+
+
+def get_bundle_tracking_collection():
+    return get_collection("bundle_tracking")

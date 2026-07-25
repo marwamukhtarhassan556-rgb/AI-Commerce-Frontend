@@ -121,6 +121,13 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("store_id", ASCENDING), ("email", ASCENDING)]),
     ])
 
+    await db["bundle_tracking"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("bundle_key", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("is_top", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("copy_count", DESCENDING)]),
+        IndexModel([("last_copied_at", DESCENDING)]),
+    ])
+
     await db["integration_connections"].create_indexes([
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
