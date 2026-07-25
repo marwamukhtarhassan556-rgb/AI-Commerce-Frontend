@@ -110,7 +110,7 @@ class TestMappingEngine:
         )
         item = {"name": "Test"}
         result = engine.apply(item, mapping)
-        assert result.data == {}
+        assert result.data == {"name": "Test"}
         assert result.report.warnings
 
     def test_all_field_types(self, engine: MappingEngine, product_mapping: EntityMapping) -> None:

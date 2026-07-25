@@ -121,13 +121,14 @@ class TestFormatters:
     def test_format_record_unsupported(self):
         data = {"name": "Test"}
         result = format_record("inventory", data)
-        assert result is None
+        assert result is not None
+        assert "Test" in result
 
     def test_get_formatter(self):
         assert get_formatter("product") is not None
         assert get_formatter("order") is not None
         assert get_formatter("customer") is not None
-        assert get_formatter("unknown") is None
+        assert get_formatter("unknown") is not None
 
 
 class TestCommerceKnowledgeBridge:
@@ -195,8 +196,8 @@ class TestCommerceKnowledgeBridge:
             entity_type="inventory",
             records=[{"name": "Test"}],
         )
-        assert len(result.errors) > 0
-        assert "not supported" in result.errors[0]
+        assert result.total_records == 1
+        assert result.total_synced == 1
 
     @pytest.mark.asyncio
     async def test_sync_entity_embedding_failure(self, bridge, mock_llm):

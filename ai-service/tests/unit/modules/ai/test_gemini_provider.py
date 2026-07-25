@@ -74,7 +74,8 @@ async def test_gemini_embeddings(mock_genai_client):
     
     assert response.provider == "gemini"
     assert response.embeddings == [[0.1, 0.2, 0.3]]
-    mock_genai_client.aio.models.embed_content.assert_called_once_with(
-        model="gemini-embedding-001",
-        contents=["hello", "world"]
-    )
+    mock_genai_client.aio.models.embed_content.assert_called_once()
+    call_kwargs = mock_genai_client.aio.models.embed_content.call_args[1]
+    assert call_kwargs["model"] == "gemini-embedding-001"
+    assert call_kwargs["contents"] == ["hello", "world"]
+    assert call_kwargs["config"].output_dimensionality == 768

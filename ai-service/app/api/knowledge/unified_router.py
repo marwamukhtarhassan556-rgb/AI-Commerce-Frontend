@@ -53,6 +53,7 @@ from app.application.knowledge.commands.generate_business_summary_handler import
     GenerateBusinessSummaryHandler,
     RegenerateBusinessSummaryHandler,
 )
+from app.application.knowledge.generation.config import GenerationConfig
 from app.application.knowledge.commands.upload_command import UploadDocumentCommand
 from app.application.knowledge.queries.list_business_summary_history_handler import (
     ListBusinessSummaryHistoryHandler,
@@ -482,11 +483,16 @@ async def generate_summary(
     handler: GenerateBusinessSummaryHandler = Depends(get_generate_handler),
 ) -> BusinessSummaryGenerationResponseSchema:
     try:
+        gen_config = GenerationConfig()
+        if body.model:
+            gen_config.model = body.model
+        if body.temperature is not None:
+            gen_config.temperature = body.temperature
+        if body.max_tokens is not None:
+            gen_config.max_tokens = body.max_tokens
         command = GenerateBusinessSummaryCommand(
             store_id=store_id,
-            model=body.model,
-            temperature=body.temperature,
-            max_tokens=body.max_tokens,
+            config=gen_config,
         )
         result = await handler.handle(command)
         return BusinessSummaryGenerationResponseSchema(**result.model_dump())
@@ -505,11 +511,16 @@ async def regenerate_summary(
     handler: RegenerateBusinessSummaryHandler = Depends(get_regenerate_handler),
 ) -> BusinessSummaryGenerationResponseSchema:
     try:
+        gen_config = GenerationConfig()
+        if body.model:
+            gen_config.model = body.model
+        if body.temperature is not None:
+            gen_config.temperature = body.temperature
+        if body.max_tokens is not None:
+            gen_config.max_tokens = body.max_tokens
         command = RegenerateBusinessSummaryCommand(
             store_id=store_id,
-            model=body.model,
-            temperature=body.temperature,
-            max_tokens=body.max_tokens,
+            config=gen_config,
         )
         result = await handler.handle(command)
         return BusinessSummaryGenerationResponseSchema(**result.model_dump())

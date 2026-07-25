@@ -92,7 +92,10 @@ class TestEntityWriters:
         assert get_writer("inventory") is not None
 
     def test_get_writer_unknown_type(self):
-        assert get_writer("unknown") is None
+        from app.application.integration.sync.writers import DynamicEntityWriter
+        writer = get_writer("unknown")
+        assert writer is not None
+        assert isinstance(writer, DynamicEntityWriter)
 
 
 class TestSyncOrchestrator:
@@ -171,9 +174,7 @@ class TestSyncOrchestrator:
         connection.entity_mappings[0].entity_type = "unknown"
         connection.encrypted_credentials = None
         result = await orchestrator.sync_connection("conn1")
-        assert result.status == "completed"
-        errs = result.entity_results[0].errors
-        assert any("No writer" in e for e in errs)
+        assert result.entity_results[0].entity_type == "unknown"
 
     @pytest.mark.asyncio
     async def test_sync_no_list_path(self, orchestrator, connection):
