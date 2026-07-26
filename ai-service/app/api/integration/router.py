@@ -1,17 +1,31 @@
+import json
 import logging
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
-from app.api.integration.dependencies import get_integration_service, get_sync_orchestrator
+from app.agents.integration.agent import IntegrationMappingAgent
+from app.api.integration.dependencies import (
+    get_integration_agent,
+    get_integration_service,
+    get_integration_workflow,
+    get_sync_orchestrator,
+)
 from app.api.integration.schemas import (
+    AgentParseRequestSchema,
+    AgentParseResponseSchema,
+    AgentSyncRequestSchema,
+    AgentSyncResponseSchema,
     ConnectionResponseSchema,
     CreateConnectionSchema,
     DeleteResponseSchema,
+    FeatureAnalysisSchema,
     PaginatedConnectionResponseSchema,
     ParseSpecRequestSchema,
     ParseSpecResponseSchema,
     SyncRequestSchema,
     SyncResponseSchema,
+    UnsupportedFeatureSchema,
     UpdateCredentialsSchema,
     UpdateMappingsSchema,
 )
@@ -35,6 +49,7 @@ from app.domain.integration.exceptions import (
     InvalidMappingException,
     InvalidSpecException,
 )
+from app.workflows.integration.graph import IntegrationWorkflow
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +82,109 @@ async def parse_spec(
         )
         result = await service.parse_spec(dto)
         return ParseSpecResponseSchema(**result.model_dump())
+    except Exception as exc:
+        _handle_exception(exc)
+
+
+@router.post("/schemas/agent-parse", response_model=AgentParseResponseSchema, status_code=status.HTTP_200_OK)
+async def agent_parse_spec(
+    payload: AgentParseRequestSchema,
+    request: Request,
+    agent: IntegrationMappingAgent = Depends(get_integration_agent),
+) -> AgentParseResponseSchema:
+    try:
+        store_id = getattr(request.state, "store_id", "default")
+        org_id = getattr(request.state, "tenant_id", "default")
+
+        report, error, capabilities = await agent.analyze(
+            raw_spec=payload.raw_spec,
+            platform_name=payload.platform_name,
+            store_id=store_id,
+            organization_id=org_id,
+        )
+
+        if error or report is None:
+            return AgentParseResponseSchema(
+                platform_name=payload.platform_name,
+                base_url="",
+                api_version="",
+                errors=[error] if error else ["Failed to analyze specification"],
+                user_friendly_error=error or "Unable to process this API specification.",
+            )
+
+        return AgentParseResponseSchema(
+            platform_name=report.platform_name,
+            base_url=report.base_url,
+            api_version=report.api_version,
+            entities=[e.model_dump() for e in report.entities],
+            feature_analysis=FeatureAnalysisSchema(
+                supported_features=report.feature_analysis.supported_features,
+                partially_supported=report.feature_analysis.partially_supported,
+                unsupported_features=[
+                    UnsupportedFeatureSchema(
+                        feature_name=f.feature_name,
+                        description=f.description,
+                        reason=f.reason,
+                        impact=f.impact,
+                        user_message=f.user_message,
+                    )
+                    for f in report.feature_analysis.unsupported_features
+                ],
+                notes=report.feature_analysis.notes,
+            ),
+            capabilities=capabilities or {},
+            warnings=report.warnings,
+            errors=report.errors,
+        )
+    except Exception as exc:
+        _handle_exception(exc)
+
+
+@router.post("/agent-sync", response_model=AgentSyncResponseSchema, status_code=status.HTTP_200_OK)
+async def agent_sync(
+    payload: AgentSyncRequestSchema,
+    request: Request,
+    workflow: IntegrationWorkflow = Depends(get_integration_workflow),
+) -> AgentSyncResponseSchema:
+    try:
+        organization_id = getattr(request.state, "tenant_id", payload.store_id)
+
+        result = await workflow.run(
+            raw_spec=payload.raw_spec,
+            platform_name=payload.platform_name,
+            store_id=payload.store_id,
+            organization_id=organization_id,
+            credentials=payload.credentials,
+            connection_name=payload.name,
+            auto_sync=payload.auto_sync,
+        )
+
+        response = AgentSyncResponseSchema(
+            connection_id=result.connection_id,
+            mapping_report=result.mapping_report.model_dump() if result.mapping_report else None,
+            capabilities=result.capabilities,
+            sync_result=result.sync_result,
+            feature_analysis=FeatureAnalysisSchema(
+                supported_features=result.mapping_report.feature_analysis.supported_features,
+                partially_supported=result.mapping_report.feature_analysis.partially_supported,
+                unsupported_features=[
+                    UnsupportedFeatureSchema(
+                        feature_name=f.feature_name,
+                        description=f.description,
+                        reason=f.reason,
+                        impact=f.impact,
+                        user_message=f.user_message,
+                    )
+                    for f in result.mapping_report.feature_analysis.unsupported_features
+                ],
+                notes=result.mapping_report.feature_analysis.notes,
+            ) if result.mapping_report else None,
+            error=result.error,
+            user_friendly_error=result.user_friendly_error,
+            started_at=result.started_at.isoformat(),
+            completed_at=result.completed_at.isoformat() if result.completed_at else None,
+        )
+        return response
     except Exception as exc:
         _handle_exception(exc)
 

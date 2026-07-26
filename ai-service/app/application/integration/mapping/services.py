@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Optional
+from typing import Any, Optional
 from bson import ObjectId
 
 from app.application.integration.discovery.endpoint_classifier import EndpointClassifier
@@ -42,32 +42,13 @@ from app.domain.integration.value_objects.entity_mapping import EntityMapping
 from app.domain.integration.value_objects.field_mapping import FieldMapping
 from app.domain.integration.value_objects.pagination_config import PaginationConfig
 from app.infrastructure.security.key_manager import KeyManager
-from app.application.integration.openapi.parser import OpenApiParser
-from app.application.integration.openapi.resolver import RefResolver
-from app.application.integration.openapi.validator import SpecValidator
-from app.domain.integration.entities.integration_connection import (
-    ConnectionStatus,
-    IntegrationConnection,
-)
-from app.domain.integration.exceptions import (
-    DuplicateConnectionException,
-    IntegrationConnectionNotFoundException,
-)
-from app.domain.integration.repositories.integration_connection_repository import (
-    IntegrationConnectionRepository,
-)
-from app.domain.integration.value_objects.auth_config import AuthConfig
-from app.domain.integration.value_objects.entity_mapping import EntityMapping
-from app.domain.integration.value_objects.field_mapping import FieldMapping
-from app.domain.integration.value_objects.pagination_config import PaginationConfig
-from app.infrastructure.security.key_manager import KeyManager
+from app.agents.integration.agent import IntegrationMappingAgent
+from app.agents.integration.schemas import IntegrationMappingReport
 
 logger = logging.getLogger(__name__)
 
 
 class IntegrationApplicationService:
-    """Orchestrates parsing, discovery, mapping suggestions, and connection management."""
-
     def __init__(
         self,
         repository: IntegrationConnectionRepository,
@@ -87,6 +68,7 @@ class IntegrationApplicationService:
         self._field_suggester = field_suggester or FieldSuggester()
         self._mapping_suggestor = mapping_suggestor or MappingSuggestor()
         self._key_manager = key_manager or KeyManager()
+        self._agent = IntegrationMappingAgent()
 
     async def parse_spec(self, request: ParseSpecRequestDTO) -> ParseSpecResponseDTO:
         integration_schema = self._parser.parse(
@@ -171,6 +153,20 @@ class IntegrationApplicationService:
             suggested_mappings=suggested_entity_mappings,
             warnings=report.warnings,
             errors=report.errors,
+        )
+
+    async def parse_spec_with_agent(
+        self,
+        raw_spec: Any,
+        platform_name: str,
+        store_id: str,
+        organization_id: str,
+    ) -> tuple[Optional[IntegrationMappingReport], Optional[str], Optional[dict]]:
+        return await self._agent.analyze(
+            raw_spec=raw_spec,
+            platform_name=platform_name,
+            store_id=store_id,
+            organization_id=organization_id,
         )
 
     async def create_connection(self, data: ConnectionCreateDTO) -> ConnectionResponseDTO:

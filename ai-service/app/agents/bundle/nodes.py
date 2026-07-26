@@ -81,6 +81,12 @@ async def handle_promo_node(
     state: BundleState,
     promo_service: PromoCodeService,
 ) -> Dict[str, Any]:
+    capabilities = state.get("store_capabilities") or {}
+
+    if not capabilities.get("has_promo_codes", True):
+        logger.info("Store %s does not support promo codes; skipping promo generation.", state["store_id"])
+        return {"promo_code": None}
+
     selected = state.get("selected", [])
     if not selected:
         return {"promo_code": None}

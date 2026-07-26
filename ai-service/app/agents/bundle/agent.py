@@ -40,7 +40,10 @@ def route_after_bundles(state: BundleState) -> str:
 
 
 def route_after_select(state: BundleState) -> str:
-    return "handle_promo"
+    capabilities = state.get("store_capabilities") or {}
+    if capabilities.get("has_promo_codes", True):
+        return "handle_promo"
+    return "format_response"
 
 
 def route_after_promo(state: BundleState) -> str:
@@ -89,7 +92,7 @@ class BundleSuggestionAgent:
         workflow.add_conditional_edges(
             "select_best",
             route_after_select,
-            {"handle_promo": "handle_promo"},
+            {"handle_promo": "handle_promo", "format_response": "format_response"},
         )
         workflow.add_conditional_edges(
             "handle_promo",
@@ -117,6 +120,7 @@ class BundleSuggestionAgent:
         query: str,
         store_id: str,
         customer_id: Optional[str] = None,
+        store_capabilities: Optional[Dict[str, bool]] = None,
     ) -> BundleResponse:
         start = time.perf_counter()
 
@@ -133,6 +137,7 @@ class BundleSuggestionAgent:
             "promo_code": None,
             "response": None,
             "error": None,
+            "store_capabilities": store_capabilities or {},
         }
 
         result = await self._graph.ainvoke(initial_state)

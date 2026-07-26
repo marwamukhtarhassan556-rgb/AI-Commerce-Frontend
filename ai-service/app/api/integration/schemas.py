@@ -158,3 +158,56 @@ class SyncResponseSchema(BaseModel):
 
 class DeleteResponseSchema(BaseModel):
     success: bool
+
+
+class AgentParseRequestSchema(BaseModel):
+    platform_name: str = Field(..., description="Name of the platform (e.g., Shopify, WooCommerce)")
+    raw_spec: Any = Field(..., description="OpenAPI/Swagger specification (JSON object, YAML string, or raw dict)")
+
+
+class UnsupportedFeatureSchema(BaseModel):
+    feature_name: str
+    description: str
+    reason: str
+    impact: str
+    user_message: str
+
+
+class FeatureAnalysisSchema(BaseModel):
+    supported_features: list[str] = Field(default_factory=list)
+    partially_supported: list[str] = Field(default_factory=list)
+    unsupported_features: list[UnsupportedFeatureSchema] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class AgentParseResponseSchema(BaseModel):
+    platform_name: str
+    base_url: str
+    api_version: str
+    entities: list[dict] = Field(default_factory=list, description="Discovered entities with field mappings")
+    feature_analysis: FeatureAnalysisSchema = Field(default_factory=FeatureAnalysisSchema)
+    capabilities: dict[str, bool] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    user_friendly_error: Optional[str] = None
+
+
+class AgentSyncRequestSchema(BaseModel):
+    platform_name: str = Field(..., description="Name of the platform")
+    raw_spec: Any = Field(..., description="OpenAPI/Swagger specification")
+    store_id: str = Field(..., description="Store ID for the integration")
+    name: Optional[str] = Field(default=None, description="Optional connection name")
+    credentials: Optional[dict[str, str]] = Field(default=None, description="API credentials (tokens, keys)")
+    auto_sync: bool = Field(default=True, description="Run sync automatically after mapping")
+
+
+class AgentSyncResponseSchema(BaseModel):
+    connection_id: Optional[str] = None
+    mapping_report: Optional[dict] = None
+    capabilities: Optional[dict[str, bool]] = None
+    sync_result: Optional[dict] = None
+    feature_analysis: Optional[FeatureAnalysisSchema] = None
+    error: Optional[str] = None
+    user_friendly_error: Optional[str] = None
+    started_at: str
+    completed_at: Optional[str] = None

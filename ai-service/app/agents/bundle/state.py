@@ -20,3 +20,4 @@ class BundleState(TypedDict):
     promo_code: Optional[str]
     response: Optional[BundleResponse]
     error: Optional[str]
+    store_capabilities: Optional[Dict[str, bool]]
