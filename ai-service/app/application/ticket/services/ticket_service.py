@@ -117,7 +117,7 @@ class TicketService:
         return self._to_dto(created, customer, orders, conversation)
 
     async def get_ticket(self, ticket_id: str) -> Optional[TicketDTO]:
-        entity = await self._ticket_repo.find_by_id(ticket_id)
+        entity = await self._ticket_repo.find_by_ticket_id(ticket_id)
         if entity is None:
             return None
 

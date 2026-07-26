@@ -52,8 +52,6 @@ class IntegrationSchema:
 class OpenApiParser:
     """Parses an OpenAPI/Swagger spec dictionary into a canonical IntegrationSchema."""
 
-    MIN_ENDPOINTS = 1
-
     def parse(self, spec: dict, platform_name: str) -> IntegrationSchema:
         if not isinstance(spec, dict):
             raise InvalidSpecException("Spec must be a JSON object (dict).")
@@ -71,6 +69,7 @@ class OpenApiParser:
         base_url = self._extract_base_url_v3(spec)
         api_version = spec.get("openapi", "3.0.0")
         endpoints = self._extract_paths(spec.get("paths", {}), spec)
+        endpoints.extend(self._extract_webhooks(spec))
         schemas = self._extract_components_schemas_v3(spec)
         auth_methods = self._extract_security_schemes_v3(spec)
         return IntegrationSchema(
@@ -129,14 +128,41 @@ class OpenApiParser:
         for path, methods in paths.items():
             if not isinstance(methods, dict):
                 continue
+            path_params = methods.get("parameters", []) if isinstance(methods, dict) else []
             for method, details in methods.items():
+                if method.upper() not in ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"):
+                    continue
+                operation_params = details.get("parameters", [])
+                all_params = path_params + operation_params
+                response_schema_ref = self._extract_response_schema_ref(details)
+                result.append(
+                    EndpointSchema(
+                        path=path,
+                        method=method,
+                        operation_id=details.get("operationId"),
+                        parameters=all_params,
+                        response_schema_ref=response_schema_ref,
+                        summary=details.get("summary"),
+                    )
+                )
+        return result
+
+    def _extract_webhooks(self, spec: dict) -> list[EndpointSchema]:
+        result: list[EndpointSchema] = []
+        webhooks = spec.get("webhooks", {})
+        if not isinstance(webhooks, dict):
+            return result
+        for name, webhook in webhooks.items():
+            if not isinstance(webhook, dict):
+                continue
+            for method, details in webhook.items():
                 if method.upper() not in ("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"):
                     continue
                 parameters = details.get("parameters", [])
                 response_schema_ref = self._extract_response_schema_ref(details)
                 result.append(
                     EndpointSchema(
-                        path=path,
+                        path=f"/webhooks/{name}",
                         method=method,
                         operation_id=details.get("operationId"),
                         parameters=parameters,

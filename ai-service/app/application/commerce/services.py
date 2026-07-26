@@ -13,6 +13,7 @@ from app.application.commerce.dto.commerce_dto import (
     InventoryCreateDTO,
     InventoryDTO,
     InventoryUpdateDTO,
+    LineItemDTO,
     MoneyDTO,
     OrderCreateDTO,
     OrderDTO,
@@ -111,9 +112,25 @@ class ProductService:
                 if field == "images":
                     setattr(entity, field, [Image(**img) for img in value])
                 elif field == "variants":
-                    setattr(entity, field, [Variant(id=_new_id(), **v) for v in value])
+                    existing_ids = {v.id for v in entity.variants}
+                    new_variants = []
+                    for v in value:
+                        v_id = v.get("id")
+                        if v_id and v_id in existing_ids:
+                            new_variants.append(Variant(id=v_id, **{k: vv for k, vv in v.items() if k != "id"}))
+                        else:
+                            new_variants.append(Variant(id=_new_id(), **{k: vv for k, vv in v.items() if k != "id"}))
+                    setattr(entity, field, new_variants)
                 elif field == "options":
-                    setattr(entity, field, [ProductOption(id=_new_id(), **o) for o in value])
+                    existing_ids = {o.id for o in entity.options}
+                    new_options = []
+                    for o in value:
+                        o_id = o.get("id")
+                        if o_id and o_id in existing_ids:
+                            new_options.append(ProductOption(id=o_id, **{k: vv for k, vv in o.items() if k != "id"}))
+                        else:
+                            new_options.append(ProductOption(id=_new_id(), **{k: vv for k, vv in o.items() if k != "id"}))
+                    setattr(entity, field, new_options)
                 elif field == "seo" and value is not None:
                     setattr(entity, field, SEO(**value))
                 else:
@@ -325,7 +342,14 @@ class OrderService:
             external_id=entity.external_id,
             customer_id=entity.customer_id,
             customer_email=entity.customer_email,
-            line_items=[],
+            line_items=[LineItemDTO(
+                id=li.id,
+                variant_id=li.variant_id,
+                product_id=li.product_id,
+                title=li.title,
+                quantity=li.quantity,
+                price=MoneyDTO(amount=str(li.price.amount), currency=li.price.currency) if hasattr(li.price, "amount") else MoneyDTO(amount="0", currency="USD"),
+            ) for li in (entity.line_items or [])],
             financial_status=entity.financial_status,
             fulfillment_status=entity.fulfillment_status,
             currency=entity.currency,
@@ -400,8 +424,20 @@ class InventoryService:
         items = await self.repository.find_low_stock(store_id, threshold)
         return [self._to_dto(item) for item in items]
 
-    async def bulk_update(self, items: list[InventoryUpdateDTO]) -> int:
-        return 0
+    async def bulk_update(self, store_id: str, items: list[InventoryUpdateDTO]) -> int:
+        count = 0
+        for item in items:
+            existing = await self.repository.find_many({"store_id": store_id})
+            if existing:
+                entity = existing[0]
+                updates = item.model_dump(exclude_unset=True)
+                for field, value in updates.items():
+                    if value is not None:
+                        setattr(entity, field, value)
+                entity.audit.updated_at = datetime.now(UTC)
+                await self.repository.update(entity)
+                count += 1
+        return count
 
     @staticmethod
     def _to_dto(entity: Inventory) -> InventoryDTO:

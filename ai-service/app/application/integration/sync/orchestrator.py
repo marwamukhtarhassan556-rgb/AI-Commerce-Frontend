@@ -186,7 +186,8 @@ class SyncOrchestrator:
                 config=pagination_config,
                 max_pages=100,
             ):
-                entity_result.total_fetched += 1
+                page_items = page.data if isinstance(page.data, list) else [page.data] if page.data else []
+                entity_result.total_fetched += len(page_items)
                 await self._process_page(
                     page=page,
                     connection=connection,

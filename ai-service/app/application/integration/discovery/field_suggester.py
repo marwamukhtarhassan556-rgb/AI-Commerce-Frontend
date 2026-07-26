@@ -1,32 +1,13 @@
 import logging
+import re
 from dataclasses import dataclass, field
 from typing import Optional
 
+from app.application.integration.discovery.synonyms import COMMON_SYNONYMS
+
 logger = logging.getLogger(__name__)
 
-SYNONYM_MAP: dict[str, list[str]] = {
-    "title": ["name", "headline", "label", "product_name", "item_name"],
-    "description": ["desc", "body_html", "body", "summary", "details", "description_html"],
-    "price": ["cost", "amount", "unit_price", "sale_price", "price_amount", "regular_price"],
-    "sku": ["sku", "barcode", "upc", "ean", "isbn", "code"],
-    "inventory_quantity": ["stock", "quantity", "inventory", "qty", "stock_level", "available_quantity"],
-    "weight": ["mass", "weight_grams", "weight_ounces"],
-    "image": ["images", "photo", "picture", "thumbnail", "image_url", "featured_image"],
-    "tags": ["tag", "labels", "category_ids"],
-    "vendor": ["brand", "manufacturer", "supplier", "seller"],
-    "product_type": ["type", "category", "product_category", "item_type"],
-    "handle": ["slug", "url_handle", "permalink", "custom_url"],
-    "external_id": ["id", "source_id", "origin_id", "remote_id", "legacy_id"],
-    "email": ["e_mail", "mail", "email_address", "contact_email"],
-    "phone": ["telephone", "phone_number", "tel", "mobile", "cell"],
-    "first_name": ["firstname", "given_name", "forename", "fname"],
-    "last_name": ["lastname", "surname", "family_name", "lname"],
-    "total": ["total_price", "order_total", "grand_total", "total_amount"],
-    "subtotal": ["subtotal_price", "sub_total", "subtotal_amount"],
-    "currency": ["currency_code", "currency_iso", "monetary_currency"],
-    "notes": ["note", "comment", "customer_note", "internal_note"],
-    "status": ["state", "order_status", "fulfillment_status", "shipping_status"],
-}
+SYNONYM_MAP: dict[str, list[str]] = {k: sorted(v) for k, v in COMMON_SYNONYMS.items()}
 
 
 @dataclass
@@ -46,6 +27,17 @@ class FieldSuggester:
     EXACT_SCORE = 1.0
     SYNONYM_SCORE = 0.7
     SUBSTRING_SCORE = 0.5
+
+    @staticmethod
+    def _field_tokens(name: str) -> set[str]:
+        parts = re.split(r"[_\s\-]+", name.lower())
+        return {p for p in parts if len(p) > 1}
+
+    @staticmethod
+    def _has_common_token(a: str, b: str) -> bool:
+        tokens_a = FieldSuggester._field_tokens(a)
+        tokens_b = FieldSuggester._field_tokens(b)
+        return bool(tokens_a & tokens_b)
 
     def suggest(
         self, external_fields: set[str], entity_type: str
@@ -79,7 +71,7 @@ class FieldSuggester:
                         best_match = canon
                     continue
 
-                if canon in ext_clean or ext_clean in canon:
+                if self._has_common_token(canon, ext_clean):
                     if self.SUBSTRING_SCORE > best_confidence:
                         best_confidence = self.SUBSTRING_SCORE
                         best_match = canon

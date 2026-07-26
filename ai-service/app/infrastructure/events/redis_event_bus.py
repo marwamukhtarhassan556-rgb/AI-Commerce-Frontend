@@ -25,6 +25,13 @@ class RedisEventBus(EventBus):
         except RedisConnectionError as e:
             logger.error("Redis connection failed during publish: %s", str(e))
             raise
+        finally:
+            handlers = list(self._local_handlers.get(channel, []))
+            for handler in handlers:
+                try:
+                    await handler.handle(event)
+                except Exception as e:
+                    logger.error("Local handler %s failed for event %s: %s", handler, event_type, e)
 
     async def subscribe(self, event_type: type, handler: Any) -> None:
         key = f"{self._prefix}{event_type.__name__}"

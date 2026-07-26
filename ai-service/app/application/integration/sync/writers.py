@@ -69,18 +69,18 @@ class OrderWriter(EntityWriter):
         now = datetime.now(UTC)
         doc = {
             "store_id": store_id,
-            "org_id": org_id,
+            "organization_id": org_id,
             "external_id": external_id,
             "customer_id": data.get("customer_id"),
             "customer_email": data.get("email") or data.get("customer_email"),
             "line_items": data.get("line_items", []),
             "shipping_address": data.get("shipping_address"),
             "billing_address": data.get("billing_address"),
-            "subtotal_price": str(data.get("subtotal", "")) if data.get("subtotal") else None,
-            "total_price": str(data.get("total", "")) if data.get("total") else None,
-            "total_tax": str(data.get("tax", "")) if data.get("tax") else None,
-            "total_discount": str(data.get("discount", "")) if data.get("discount") else None,
-            "shipping_price": str(data.get("shipping_price", "")) if data.get("shipping_price") else None,
+            "subtotal_price": data.get("subtotal"),
+            "total_price": data.get("total"),
+            "total_tax": data.get("tax"),
+            "total_discount": data.get("discount"),
+            "shipping_price": data.get("shipping_price"),
             "financial_status": data.get("financial_status") or data.get("status"),
             "fulfillment_status": data.get("fulfillment_status"),
             "currency": data.get("currency", "USD"),
@@ -135,7 +135,7 @@ class CategoryWriter(EntityWriter):
         now = datetime.now(UTC)
         doc = {
             "store_id": store_id,
-            "org_id": org_id,
+            "organization_id": org_id,
             "external_id": external_id,
             "name": data.get("name", ""),
             "description": data.get("description"),
@@ -163,7 +163,7 @@ class InventoryWriter(EntityWriter):
         now = datetime.now(UTC)
         doc = {
             "store_id": store_id,
-            "org_id": org_id,
+            "organization_id": org_id,
             "external_id": external_id,
             "product_id": data.get("product_id") or data.get("external_id"),
             "variant_id": data.get("variant_id"),
@@ -198,12 +198,13 @@ class DynamicEntityWriter(EntityWriter):
     async def upsert(self, store_id: str, org_id: str, external_id: str, data: dict[str, Any]) -> bool:
         collection = get_entities_collection()
         now = datetime.now(UTC)
+        cleaned_data = {k: v for k, v in data.items() if k not in ("created_at", "updated_at", "deleted_at", "synced_at")}
         doc = {
             "store_id": store_id,
             "organization_id": org_id,
             "entity_type": self._entity_type,
             "external_id": external_id,
-            "data": data,
+            "data": cleaned_data,
             "synced_at": now,
             "updated_at": now,
         }

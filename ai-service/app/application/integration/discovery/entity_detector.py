@@ -1,5 +1,8 @@
 import logging
+import re
 from typing import Optional
+
+from app.application.integration.discovery.synonyms import COMMON_SYNONYMS
 
 logger = logging.getLogger(__name__)
 
@@ -60,24 +63,19 @@ CANONICAL_FIELDS: dict[str, set[str]] = {
         "sort_order",
         "handle",
     },
+    "inventory": {
+        "product_id",
+        "variant_id",
+        "quantity",
+        "available",
+        "committed",
+        "incoming",
+        "location_id",
+        "stock",
+    },
 }
 
-FIELD_SYNONYMS: dict[str, set[str]] = {
-    "title": {"name", "headline", "label"},
-    "price": {"cost", "amount", "unit_price", "sale_price"},
-    "sku": {"sku", "barcode", "upc", "ean", "isbn"},
-    "inventory_quantity": {"stock", "quantity", "inventory", "qty", "stock_level"},
-    "description": {"desc", "body_html", "body", "summary", "details"},
-    "image": {"images", "photo", "picture", "media", "thumbnail"},
-    "email": {"e_mail", "mail", "email_address"},
-    "phone": {"telephone", "phone_number", "tel", "mobile"},
-    "first_name": {"firstname", "given_name", "forename"},
-    "last_name": {"lastname", "surname", "family_name"},
-    "address": {"addresses", "location", "shipping_address", "billing_address"},
-    "tags": {"tag", "labels", "categories", "collections"},
-    "handle": {"slug", "url_handle", "permalink"},
-    "external_id": {"id", "source_id", "origin_id", "remote_id"},
-}
+FIELD_SYNONYMS: dict[str, set[str]] = {k: set(v) for k, v in COMMON_SYNONYMS.items()}
 
 
 class EntityDetectionResult:
@@ -146,12 +144,21 @@ class EntityDetector:
             matched_fields=list(set(best_matched)),
         )
 
+    def _field_tokens(self, name: str) -> set[str]:
+        parts = re.split(r"[_\s\-]+", name.lower())
+        return {p for p in parts if len(p) > 1}
+
+    def _has_common_token(self, a: str, b: str) -> bool:
+        tokens_a = self._field_tokens(a)
+        tokens_b = self._field_tokens(b)
+        return bool(tokens_a & tokens_b)
+
     def _score_field(self, ext_field: str, canonical_set: set[str]) -> tuple[float, Optional[str]]:
         cleaned = ext_field.replace(" ", "_").strip()
         if cleaned in canonical_set:
             return self.EXACT_WEIGHT, cleaned
         for canon in canonical_set:
-            if canon in cleaned or cleaned in canon:
+            if self._has_common_token(canon, cleaned):
                 return self.SUBSTRING_WEIGHT, canon
         for canon in canonical_set:
             synonyms = FIELD_SYNONYMS.get(canon, set())
