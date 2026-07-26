@@ -47,17 +47,15 @@ class TenantContextResolver:
         return self.from_config(config)
 
     def from_jwt(self, token: str) -> TenantContext:
-        """Resolve tenant from an encoded JWT.
+        """Resolve tenant from an encoded JWT using verified decoding.
 
         Expects claims: organization_id, store_id, merchant_id, store_slug.
         Falls back to registry lookup if claims contain a store_slug.
         """
-        import jwt
+        from app.core.security import decode_jwt
 
         try:
-            payload: dict[str, Any] = jwt.decode(
-                token, options={"verify_signature": False},
-            )
+            payload: dict[str, Any] = decode_jwt(token)
         except Exception:
             raise ValueError("Invalid JWT token")
 
@@ -69,6 +67,32 @@ class TenantContextResolver:
                 return self.from_slug(slug)
             raise ValueError("JWT missing organization_id and store_id")
 
+        vector_ns = payload.get("vector_namespace") or store_id
+        return TenantContext(
+            organization_id=org_id,
+            store_id=store_id,
+            merchant_id=payload.get("merchant_id") or payload.get("merchant", ""),
+            integration_id=payload.get("integration_id", ""),
+            store_slug=payload.get("store_slug", ""),
+            language=payload.get("language", "en"),
+            currency=payload.get("currency", "USD"),
+            timezone=payload.get("timezone", "UTC"),
+            knowledge_version=int(payload.get("knowledge_version", 1)),
+            vector_namespace=vector_ns,
+        )
+
+    @staticmethod
+    def from_claims(payload: dict[str, Any]) -> TenantContext:
+        """Resolve tenant from pre-validated JWT claims dict.
+
+        Expects keys: organization_id (or org_id), store_id, merchant_id, store_slug.
+        This is the preferred entry point when the JWT has already been validated
+        by the AuthMiddleware and claims are available via request.state.
+        """
+        org_id = payload.get("organization_id") or payload.get("org_id")
+        store_id = payload.get("store_id")
+        if not org_id or not store_id:
+            raise ValueError("JWT claims missing organization_id and store_id")
         vector_ns = payload.get("vector_namespace") or store_id
         return TenantContext(
             organization_id=org_id,

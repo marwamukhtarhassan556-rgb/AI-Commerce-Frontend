@@ -7,7 +7,9 @@ import logging
 
 from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument
 from app.shared.kernel.entity import Entity
+from app.shared.kernel.aggregate_root import AggregateRoot
 from app.shared.kernel.repository import AsyncRepository
+from app.shared.events.event_bus import EventBus
 from app.core.exceptions import (
     DatabaseValidationException,
     ConcurrencyException,
@@ -22,12 +24,40 @@ EntityType = TypeVar("EntityType", bound=Entity)
 class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, EntityType]):
     """
     Generic MongoDB Repository implementation implementing standard CRUD, 
-    pagination, bulk operations, logging, exception mapping, and transaction sessions.
+    pagination, bulk operations, logging, exception mapping, transaction sessions,
+    and automatic domain event flushing.
     """
 
-    def __init__(self, collection: AsyncIOMotorCollection, doc_class: Type[DocType]):
+    def __init__(
+        self,
+        collection: AsyncIOMotorCollection,
+        doc_class: Type[DocType],
+        event_bus: Optional[EventBus] = None,
+    ):
         self.collection = collection
         self.doc_class = doc_class
+        self._event_bus = event_bus
+
+    async def _flush_domain_events(self, entity: EntityType) -> None:
+        if not self._event_bus:
+            return
+        if not isinstance(entity, AggregateRoot):
+            return
+        events = entity.get_domain_events()
+        if not events:
+            return
+        for event in events:
+            try:
+                await self._event_bus.publish(event)
+            except Exception as e:
+                logger.error(
+                    "Failed to publish event %s from %s: %s",
+                    type(event).__name__,
+                    type(entity).__name__,
+                    str(e),
+                )
+                raise
+        entity.clear_domain_events()
 
     def _handle_db_error(self, e: Exception) -> None:
         """Handle and map PyMongo exceptions to clean architecture domain/infra exceptions."""
@@ -52,6 +82,7 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
             doc = self.doc_class.from_entity(entity)
             data = doc.to_mongo_dict()
             await self.collection.insert_one(data, session=session)
+            await self._flush_domain_events(entity)
             return entity
         except Exception as e:
             self._handle_db_error(e)
@@ -69,6 +100,7 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
                 upsert=True, 
                 session=session
             )
+            await self._flush_domain_events(entity)
             return entity
         except Exception as e:
             self._handle_db_error(e)
@@ -135,6 +167,8 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
         try:
             docs = [self.doc_class.from_entity(e).to_mongo_dict() for e in entities]
             result = await self.collection.insert_many(docs, session=session)
+            for entity in entities:
+                await self._flush_domain_events(entity)
             return len(result.inserted_ids)
         except Exception as e:
             self._handle_db_error(e)
@@ -154,6 +188,8 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
                     ReplaceOne({"_id": ObjectId(e.id)}, data)
                 )
             result = await self.collection.bulk_write(operations, session=session)
+            for entity in entities:
+                await self._flush_domain_events(entity)
             return result.modified_count
         except Exception as e:
             self._handle_db_error(e)

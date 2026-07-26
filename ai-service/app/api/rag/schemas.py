@@ -46,6 +46,7 @@ class RAGChatRequestSchema(BaseModel):
     rerank: bool = False
     language: Optional[str] = None
     knowledge_scope: Optional[str] = None
+    stream: bool = False
 
 
 class RAGChatResponseSchema(BaseModel):

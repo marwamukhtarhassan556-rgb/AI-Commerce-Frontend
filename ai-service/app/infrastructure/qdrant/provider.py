@@ -357,7 +357,11 @@ class QdrantProvider(VectorStore):
                 hnsw_ef=128,
                 exact=False,
             )
+<<<<<<< HEAD
             result = client.query_points(
+=======
+            response = client.query_points(
+>>>>>>> Pre-Integration-Infra
                 collection_name=collection_name,
                 query=vector,
                 query_filter=qdrant_filter,
@@ -372,7 +376,11 @@ class QdrantProvider(VectorStore):
                     score=hit.score,
                     payload=hit.payload or {},
                 )
+<<<<<<< HEAD
                 for hit in result.points
+=======
+                for hit in response.points
+>>>>>>> Pre-Integration-Infra
             ]
         except Exception:
             logger.error(

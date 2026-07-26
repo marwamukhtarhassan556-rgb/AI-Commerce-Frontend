@@ -1,6 +1,7 @@
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 
 from app.api.rag.dependencies import get_rag_service
 from app.api.rag.schemas import RAGChatRequestSchema, RAGChatResponseSchema
@@ -38,4 +39,25 @@ async def rag_chat(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"RAG chat failed: {exc}",
+        )
+
+
+@router.post("/chat/stream")
+async def rag_chat_stream(
+    payload: RAGChatRequestSchema,
+    service: RagOrchestrationService = Depends(get_rag_service),
+) -> StreamingResponse:
+    try:
+        request = RAGRequest(**payload.model_dump())
+
+        async def event_generator():
+            async for chunk in service.answer_stream(request):
+                yield f"data: {chunk.model_dump_json()}\n\n"
+
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+    except Exception as exc:
+        logger.error("RAG stream failed: %s", exc, exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"RAG stream failed: {exc}",
         )

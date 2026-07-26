@@ -11,5 +11,6 @@ class TicketAnalysis(AggregateRoot[str]):
     category: str = Field(..., description="Identified category (e.g. billing, shipping, product_quality)")
     summary: str = Field(..., description="Brief summary of the ticket content")
     priority: str = Field(..., description="Calculated urgency priority (low, medium, high, urgent)")
+    status: str = Field(default="open", description="Ticket status (open, in_progress, resolved, closed)")
     suggested_response: str = Field(..., description="AI suggested answer draft")
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))

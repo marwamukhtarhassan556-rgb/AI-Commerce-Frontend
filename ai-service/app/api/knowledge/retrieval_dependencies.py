@@ -14,7 +14,9 @@ def get_vector_store() -> QdrantProvider:
 
 async def get_provider() -> BaseLLMProvider:
     factory = LLMProviderFactory()
-    return factory.get_provider("openai")
+    from app.core.ai_settings import ai_settings
+    provider_name = ai_settings.DEFAULT_PROVIDER
+    return factory.get_provider(provider_name)
 
 
 def get_reranker(

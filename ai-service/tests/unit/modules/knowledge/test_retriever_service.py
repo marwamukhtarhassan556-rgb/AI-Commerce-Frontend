@@ -21,7 +21,7 @@ class TestRetrievalConfig:
         assert cfg.mmr_lambda == 0.7
         assert cfg.rerank is False
         assert cfg.rerank_top_k == 5
-        assert cfg.embedding_model == "text-embedding-3-small"
+        assert cfg.embedding_model == "gemini-embedding-001"
         assert cfg.collection_prefix == "kb"
 
     def test_custom(self):

@@ -54,3 +54,9 @@ class MongoUnitOfWork:
         if self.session and self.session.in_transaction:
             await self.session.abort_transaction()
             logger.info("MongoDB transaction manually rolled back.")
+
+
+@asynccontextmanager
+async def get_unit_of_work() -> AsyncGenerator[MongoUnitOfWork, None]:
+    async with MongoUnitOfWork() as uow:
+        yield uow

@@ -47,10 +47,6 @@ def get_bundle_suggestions_collection():
     return get_collection("bundle_suggestions")
 
 
-def get_abandoned_cart_campaigns_collection():
-    return get_collection("abandoned_cart_campaigns")
-
-
 def get_dashboard_insights_collection():
     return get_collection("dashboard_insights")
 
@@ -65,3 +61,43 @@ def get_knowledge_jobs_collection():
 
 def get_knowledge_versions_collection():
     return get_collection("knowledge_versions")
+
+
+def get_api_keys_collection():
+    return get_collection("api_keys")
+
+
+def get_audit_logs_collection():
+    return get_collection("audit_logs")
+
+
+def get_products_collection():
+    return get_collection("products")
+
+
+def get_categories_collection():
+    return get_collection("categories")
+
+
+def get_orders_collection():
+    return get_collection("orders")
+
+
+def get_inventory_collection():
+    return get_collection("inventory")
+
+
+def get_customers_collection():
+    return get_collection("customers")
+
+
+def get_integration_connections_collection():
+    return get_collection("integration_connections")
+
+
+def get_entities_collection():
+    return get_collection("entities")
+
+
+def get_bundle_tracking_collection():
+    return get_collection("bundle_tracking")

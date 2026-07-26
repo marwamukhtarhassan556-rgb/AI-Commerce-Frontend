@@ -41,6 +41,22 @@ class RAGRequest(BaseModel):
     rerank: bool = False
     language: Optional[str] = None
     knowledge_scope: Optional[str] = None
+    stream: bool = False
+
+
+class RAGStreamingChunk(BaseModel):
+    type: str = "content"
+    content: Optional[str] = None
+    finish_reason: Optional[str] = None
+    citations: list[Citation] = Field(default_factory=list)
+    chunk_references: list[ChunkReference] = Field(default_factory=list)
+    confidence_score: Optional[float] = None
+    model: Optional[str] = None
+    provider: Optional[str] = None
+    usage: Optional[UsageDTO] = None
+    latency_ms: Optional[float] = None
+    business_summary_version: Optional[int] = None
+    conversation_id: Optional[str] = None
 
 
 class RAGResponse(BaseModel):

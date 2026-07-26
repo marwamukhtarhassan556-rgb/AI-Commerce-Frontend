@@ -39,7 +39,7 @@ class ConversationService:
             messages.append(
                 MessageDTO(
                     role=msg["role"],
-                    content=msg["content"],
+                    content=msg.get("content", ""),
                     name=msg.get("name"),
                     tool_call_id=msg.get("tool_call_id"),
                 )

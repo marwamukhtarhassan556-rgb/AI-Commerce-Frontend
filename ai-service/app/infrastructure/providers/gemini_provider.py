@@ -19,6 +19,7 @@ from app.application.dto.ai_dto import (
     ToolCallDTO,
 )
 from app.core.ai_settings import ai_settings
+from app.infrastructure.security.key_manager import KeyManager
 from app.utils.ai_error_handler import map_provider_exception, execute_with_retry
 from app.utils.token_utils import calculate_cost
 
@@ -32,7 +33,7 @@ class GeminiProvider(BaseLLMProvider):
     """
 
     def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or ai_settings.GEMINI_API_KEY or "mock-key"
+        self.api_key = api_key or KeyManager().get_provider_api_key("gemini") or "mock-key"
         self.client = genai.Client(api_key=self.api_key)
 
     async def _download_image_bytes(self, url: str) -> tuple[bytes, str]:
@@ -213,11 +214,12 @@ class GeminiProvider(BaseLLMProvider):
             config.system_instruction = system_instruction
 
         try:
-            async for chunk in self.client.aio.models.generate_content_stream(
+            stream = await self.client.aio.models.generate_content_stream(
                 model=request.model,
                 contents=contents,
                 config=config,
-            ):
+            )
+            async for chunk in stream:
                 content = ""
                 if chunk.candidates and chunk.candidates[0].content:
                     for part in chunk.candidates[0].content.parts:

@@ -346,7 +346,7 @@ class RetrieverService:
     def _collection_name(self, filters: RetrievalFilters, cfg: RetrievalConfig) -> str:
         if self._tenant:
             return self._tenant.collection_name
-        tenant = filters.organization_id or filters.store_id or "default"
+        tenant = filters.store_id or filters.organization_id or "default"
         return f"{cfg.collection_prefix}_{tenant}"
 
     async def _ensure_collection(self, name: str) -> bool:

@@ -72,13 +72,8 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("created_at", DESCENDING)])
     ])
     
-    await db["abandoned_cart_campaigns"].create_indexes([
-        IndexModel([("store_id", ASCENDING)]),
-        IndexModel([("customer_id", ASCENDING)]),
-        IndexModel([("status", ASCENDING)]),
-        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
-    ])
-    
+
+
     await db["dashboard_insights"].create_indexes([
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("calculated_at", DESCENDING)])
@@ -89,7 +84,9 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("customer_id", ASCENDING)]),
         IndexModel([("priority", ASCENDING)]),
-        IndexModel([("sentiment", ASCENDING)])
+        IndexModel([("sentiment", ASCENDING)]),
+        IndexModel([("status", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
     ])
     
     await db["knowledge_jobs"].create_indexes([
@@ -98,6 +95,46 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("celery_task_id", ASCENDING)], sparse=True),
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("created_at", DESCENDING)]),
+    ])
+
+    await db["products"].create_indexes([
+        IndexModel([("org_id", ASCENDING), ("store_id", ASCENDING), ("external_id", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)]),
+        IndexModel([("title", TEXT)], name="product_title_text"),
+        IndexModel([("store_id", ASCENDING), ("updated_at", DESCENDING)]),
+    ])
+
+    await db["categories"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("external_id", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("parent_id", ASCENDING)]),
+    ])
+
+    await db["orders"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("external_id", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("created_at", DESCENDING)]),
+    ])
+
+    await db["inventory"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("variant_id", ASCENDING)], unique=True),
+    ])
+
+    await db["customers"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("external_id", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("email", ASCENDING)]),
+    ])
+
+    await db["bundle_tracking"].create_indexes([
+        IndexModel([("store_id", ASCENDING), ("bundle_key", ASCENDING)], unique=True),
+        IndexModel([("store_id", ASCENDING), ("is_top", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("copy_count", DESCENDING)]),
+        IndexModel([("last_copied_at", DESCENDING)]),
+    ])
+
+    await db["integration_connections"].create_indexes([
+        IndexModel([("store_id", ASCENDING)]),
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("name", ASCENDING)], unique=True),
+        IndexModel([("platform_name", ASCENDING)]),
     ])
 
     logger.info("Database indexes successfully created.")
