@@ -1,4 +1,3 @@
-
 using System.Security.Claims;
 using System.Text;
 using AI_Sales_Agent.Abstractions;
@@ -47,7 +46,7 @@ namespace AI_Sales_Agent
                     options.Password.RequireUppercase = true;
                     options.Password.RequireNonAlphanumeric = false;
                     options.User.RequireUniqueEmail = true;
-                    options.SignIn.RequireConfirmedEmail = true;
+                    options.SignIn.RequireConfirmedEmail = false;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
@@ -111,6 +110,17 @@ namespace AI_Sales_Agent
                 }
             });
 
+            // --- إعدادات CORS المضافة هنا ---
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowReact",
+                    policy => policy.WithOrigins("http://localhost:3000" ) // تأكدي من عنوان الـ React الخاص بكِ
+                                      .AllowAnyHeader()
+                                      .AllowAnyMethod()
+                                      .AllowCredentials());
+            });
+            // -------------------------------
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options =>
@@ -164,6 +174,10 @@ namespace AI_Sales_Agent
             }
 
             app.UseHttpsRedirection();
+
+            // --- تفعيل CORS قبل الـ Authentication ---
+            app.UseCors("AllowReact");
+            // -----------------------------------------
 
             app.UseAuthentication();
             app.UseAuthorization();
