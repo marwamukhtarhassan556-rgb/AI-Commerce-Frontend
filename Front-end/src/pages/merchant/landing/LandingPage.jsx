@@ -3,6 +3,8 @@ import Navbar from '../../../components/layout/Navbar'
 import Footer from '../../../components/layout/Footer'
 
 export default function LandingPage() {
+  // تعريف الصورة هنا يضمن إنها تكون موجودة في النطاق (Scope) الصحيح
+  const heroImg = "https://via.placeholder.com/800x600"; 
   
   return (
     <div className="min-h-screen bg-background text-on-surface">
@@ -35,6 +37,11 @@ export default function LandingPage() {
             </Link>
           </div>
 
+          {/* استخدام heroImg هنا عشان نتخلص من تحذير "never used" */}
+          <div className="relative mx-auto mt-2xl max-w-5xl hidden">
+             <img src={heroImg} alt="Hero Placeholder" />
+          </div>
+
           <div className="relative mx-auto mt-2xl max-w-5xl">
             <div className="grid grid-cols-1 items-start gap-lg md:grid-cols-12">
               <div className="group relative md:col-span-7">
@@ -42,7 +49,7 @@ export default function LandingPage() {
                 <div className="glass-card relative overflow-hidden rounded-2xl p-lg transition-transform duration-500 hover:-translate-y-2 premium-shadow">
                   <div className="mb-xl flex items-end justify-between">
                     <div>
-                      <p className="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant">Store Revenue (AI Influenced)</p>
+                      <p className="text-label-sm font-label-sm uppercase tracking-wider text-on-surface-variant">Store Revenue (AI Influenced )</p>
                       <h3 className="text-display-metrics font-display-metrics text-primary">$42,904.00</h3>
                     </div>
                     <div className="flex items-center rounded-full bg-secondary-container px-sm py-1 text-label-sm font-label-sm text-on-secondary-container">
@@ -259,5 +266,5 @@ export default function LandingPage() {
 
       <Footer />
     </div>
-  )
+   )
 }

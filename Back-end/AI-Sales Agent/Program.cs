@@ -113,11 +113,14 @@ namespace AI_Sales_Agent
             // --- إعدادات CORS المضافة هنا ---
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowReact",
-                    policy => policy.WithOrigins("http://localhost:3000" ) // تأكدي من عنوان الـ React الخاص بكِ
-                                      .AllowAnyHeader()
-                                      .AllowAnyMethod()
-                                      .AllowCredentials());
+                options.AddPolicy("AllowReactApp",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173", "http://localhost:3000" ) 
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
             });
             // -------------------------------
 
@@ -176,7 +179,7 @@ namespace AI_Sales_Agent
             app.UseHttpsRedirection();
 
             // --- تفعيل CORS قبل الـ Authentication ---
-            app.UseCors("AllowReact");
+            app.UseCors("AllowReactApp");
             // -----------------------------------------
 
             app.UseAuthentication();
