@@ -1,3 +1,5 @@
+window.heroImg = "https://via.placeholder.com/800x600";
+
 import './index.css';
 
 import { StrictMode } from 'react'
