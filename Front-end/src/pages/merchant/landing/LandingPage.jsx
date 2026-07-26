@@ -3,6 +3,7 @@ import Navbar from '../../../components/layout/Navbar'
 import Footer from '../../../components/layout/Footer'
 
 export default function LandingPage() {
+  
   return (
     <div className="min-h-screen bg-background text-on-surface">
       <Navbar />
@@ -74,7 +75,7 @@ export default function LandingPage() {
               </div>
 
               <div className="md:col-span-5">
-                <div className="glass-card mx-auto w-full max-w-[320px] overflow-hidden rounded-3xl border-2 border-primary/20 premium-shadow">
+                <div className="glass-card mx-auto w-full max-w-80 overflow-hidden rounded-3xl border-2 border-primary/20 premium-shadow">
                   <div className="flex items-center justify-between bg-primary p-md text-on-primary">
                     <div className="flex items-center gap-2">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20">
