@@ -35,6 +35,7 @@ class KnowledgeDocument(AggregateRoot[str]):
         default="manual",
         description="Chunking strategy label",
     )
+<<<<<<< HEAD
     processed_text: Optional[str] = Field(
         default=None,
         description="Extracted and normalized text content after processing",
@@ -55,6 +56,8 @@ class KnowledgeDocument(AggregateRoot[str]):
         default=None,
         description="Estimated token count using tiktoken",
     )
+=======
+>>>>>>> feat/auth-integration
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     deleted_at: Optional[datetime] = Field(default=None)

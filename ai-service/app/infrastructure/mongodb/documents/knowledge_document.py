@@ -43,7 +43,20 @@ class DocumentVersionModel(BaseModel):
 class KnowledgeDocumentModel(BaseMongoDocument):
     """MongoDB document model representing a KnowledgeDocument."""
 
+<<<<<<< HEAD
     store_id: str = Field(..., index=True)
+=======
+    organization_id: str = Field(default="", index=True)
+    store_id: str = Field(..., index=True)
+    merchant_id: str = Field(default="")
+    knowledge_version: int = Field(default=1)
+    processing_status: str = Field(default="pending")
+    embedding_status: str = Field(default="pending")
+    summary_status: str = Field(default="pending")
+    checksum: str = Field(default="")
+    document_version: int = Field(default=1)
+    source_type: str = Field(default="manual")
+>>>>>>> feat/auth-integration
     title: str = Field(...)
     description: Optional[str] = None
     source_url: Optional[str] = Field(None)
@@ -53,11 +66,14 @@ class KnowledgeDocumentModel(BaseMongoDocument):
     versions: list[DocumentVersionModel] = Field(default_factory=list)
     current_version: int = Field(default=1, ge=1)
     chunking_strategy: str = Field(default="manual")
+<<<<<<< HEAD
     processed_text: Optional[str] = None
     page_count: Optional[int] = None
     word_count: Optional[int] = None
     char_count: Optional[int] = None
     estimated_tokens: Optional[int] = None
+=======
+>>>>>>> feat/auth-integration
 
     def to_entity(self) -> KnowledgeDocument:
         return KnowledgeDocument(
@@ -72,11 +88,14 @@ class KnowledgeDocumentModel(BaseMongoDocument):
             versions=[version.to_value_object() for version in self.versions],
             current_version=self.current_version,
             chunking_strategy=self.chunking_strategy,
+<<<<<<< HEAD
             processed_text=self.processed_text,
             page_count=self.page_count,
             word_count=self.word_count,
             char_count=self.char_count,
             estimated_tokens=self.estimated_tokens,
+=======
+>>>>>>> feat/auth-integration
             created_at=self.created_at,
             updated_at=self.updated_at,
             deleted_at=self.deleted_at,
@@ -96,11 +115,14 @@ class KnowledgeDocumentModel(BaseMongoDocument):
             versions=[DocumentVersionModel.from_value_object(v) for v in entity.versions],
             current_version=entity.current_version,
             chunking_strategy=entity.chunking_strategy,
+<<<<<<< HEAD
             processed_text=entity.processed_text,
             page_count=entity.page_count,
             word_count=entity.word_count,
             char_count=entity.char_count,
             estimated_tokens=entity.estimated_tokens,
+=======
+>>>>>>> feat/auth-integration
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at,

@@ -7,9 +7,13 @@ import logging
 
 from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument
 from app.shared.kernel.entity import Entity
+<<<<<<< HEAD
 from app.shared.kernel.aggregate_root import AggregateRoot
 from app.shared.kernel.repository import AsyncRepository
 from app.shared.events.event_bus import EventBus
+=======
+from app.shared.kernel.repository import AsyncRepository
+>>>>>>> feat/auth-integration
 from app.core.exceptions import (
     DatabaseValidationException,
     ConcurrencyException,
@@ -24,6 +28,7 @@ EntityType = TypeVar("EntityType", bound=Entity)
 class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, EntityType]):
     """
     Generic MongoDB Repository implementation implementing standard CRUD, 
+<<<<<<< HEAD
     pagination, bulk operations, logging, exception mapping, transaction sessions,
     and automatic domain event flushing.
     """
@@ -58,6 +63,14 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
                 )
                 raise
         entity.clear_domain_events()
+=======
+    pagination, bulk operations, logging, exception mapping, and transaction sessions.
+    """
+
+    def __init__(self, collection: AsyncIOMotorCollection, doc_class: Type[DocType]):
+        self.collection = collection
+        self.doc_class = doc_class
+>>>>>>> feat/auth-integration
 
     def _handle_db_error(self, e: Exception) -> None:
         """Handle and map PyMongo exceptions to clean architecture domain/infra exceptions."""
@@ -82,7 +95,10 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
             doc = self.doc_class.from_entity(entity)
             data = doc.to_mongo_dict()
             await self.collection.insert_one(data, session=session)
+<<<<<<< HEAD
             await self._flush_domain_events(entity)
+=======
+>>>>>>> feat/auth-integration
             return entity
         except Exception as e:
             self._handle_db_error(e)
@@ -100,7 +116,10 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
                 upsert=True, 
                 session=session
             )
+<<<<<<< HEAD
             await self._flush_domain_events(entity)
+=======
+>>>>>>> feat/auth-integration
             return entity
         except Exception as e:
             self._handle_db_error(e)
@@ -167,8 +186,11 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
         try:
             docs = [self.doc_class.from_entity(e).to_mongo_dict() for e in entities]
             result = await self.collection.insert_many(docs, session=session)
+<<<<<<< HEAD
             for entity in entities:
                 await self._flush_domain_events(entity)
+=======
+>>>>>>> feat/auth-integration
             return len(result.inserted_ids)
         except Exception as e:
             self._handle_db_error(e)
@@ -188,8 +210,11 @@ class BaseMongoRepository(AsyncRepository[EntityType, str], Generic[DocType, Ent
                     ReplaceOne({"_id": ObjectId(e.id)}, data)
                 )
             result = await self.collection.bulk_write(operations, session=session)
+<<<<<<< HEAD
             for entity in entities:
                 await self._flush_domain_events(entity)
+=======
+>>>>>>> feat/auth-integration
             return result.modified_count
         except Exception as e:
             self._handle_db_error(e)

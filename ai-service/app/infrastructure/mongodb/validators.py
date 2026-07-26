@@ -328,6 +328,39 @@ BUNDLE_SUGGESTION_SCHEMA: Dict[str, Any] = {
     }
 }
 
+<<<<<<< HEAD
+=======
+CAMPAIGN_SCHEMA: Dict[str, Any] = {
+    "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["store_id", "customer_id", "cart_details", "status", "recommneded_discount", "maximum_allowed_discount"],
+        "properties": {
+            "store_id": {
+                "bsonType": "string"
+            },
+            "customer_id": {
+                "bsonType": "string"
+            },
+            "cart_details": {
+                "bsonType": "object"
+            },
+            "status": {
+                "enum": ["pending", "sent", "converted", "expired"]
+            },
+            "recommneded_discount": {
+                "bsonType": "string"
+            },
+            "maximum_allowed_discount": {
+                "bsonType": "double"
+            },
+            "coupon_offered": {
+                "bsonType": ["string", "null"]
+            }
+        }
+    }
+}
+
+>>>>>>> feat/auth-integration
 DASHBOARD_INSIGHT_SCHEMA: Dict[str, Any] = {
     "$jsonSchema": {
         "bsonType": "object",
@@ -373,9 +406,12 @@ TICKET_ANALYSIS_SCHEMA: Dict[str, Any] = {
             "priority": {
                 "enum": ["low", "medium", "high", "urgent"]
             },
+<<<<<<< HEAD
             "status": {
                 "enum": ["open", "in_progress", "resolved", "closed"]
             },
+=======
+>>>>>>> feat/auth-integration
             "suggested_response": {
                 "bsonType": "string"
             },
@@ -386,6 +422,7 @@ TICKET_ANALYSIS_SCHEMA: Dict[str, Any] = {
     }
 }
 
+<<<<<<< HEAD
 KNOWLEDGE_JOB_SCHEMA: Dict[str, Any] = {
     "$jsonSchema": {
         "bsonType": "object",
@@ -440,6 +477,8 @@ BUNDLE_TRACKING_SCHEMA: Dict[str, Any] = {
     }
 }
 
+=======
+>>>>>>> feat/auth-integration
 VALIDATORS_MAP: Dict[str, Dict[str, Any]] = {
     "conversations": CONVERSATION_SCHEMA,
     "messages": MESSAGE_SCHEMA,
@@ -451,10 +490,16 @@ VALIDATORS_MAP: Dict[str, Dict[str, Any]] = {
     "prompt_history": PROMPT_HISTORY_SCHEMA,
     "recommendations": RECOMMENDATION_SCHEMA,
     "bundle_suggestions": BUNDLE_SUGGESTION_SCHEMA,
+<<<<<<< HEAD
     "dashboard_insights": DASHBOARD_INSIGHT_SCHEMA,
     "ticket_analysis": TICKET_ANALYSIS_SCHEMA,
     "knowledge_jobs": KNOWLEDGE_JOB_SCHEMA,
     "bundle_tracking": BUNDLE_TRACKING_SCHEMA,
+=======
+    "abandoned_cart_campaigns": CAMPAIGN_SCHEMA,
+    "dashboard_insights": DASHBOARD_INSIGHT_SCHEMA,
+    "ticket_analysis": TICKET_ANALYSIS_SCHEMA,
+>>>>>>> feat/auth-integration
 }
 
 async def setup_collection_validators(db) -> None:

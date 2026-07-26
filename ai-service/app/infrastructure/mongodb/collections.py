@@ -47,12 +47,20 @@ def get_bundle_suggestions_collection():
     return get_collection("bundle_suggestions")
 
 
+<<<<<<< HEAD
+=======
+def get_abandoned_cart_campaigns_collection():
+    return get_collection("abandoned_cart_campaigns")
+
+
+>>>>>>> feat/auth-integration
 def get_dashboard_insights_collection():
     return get_collection("dashboard_insights")
 
 
 def get_ticket_analysis_collection():
     return get_collection("ticket_analysis")
+<<<<<<< HEAD
 
 
 def get_knowledge_jobs_collection():
@@ -101,3 +109,5 @@ def get_entities_collection():
 
 def get_bundle_tracking_collection():
     return get_collection("bundle_tracking")
+=======
+>>>>>>> feat/auth-integration

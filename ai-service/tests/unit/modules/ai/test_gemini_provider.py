@@ -67,15 +67,26 @@ async def test_gemini_embeddings(mock_genai_client):
     
     request = EmbeddingRequest(
         input=["hello", "world"],
+<<<<<<< HEAD
         model="gemini-embedding-001"
+=======
+        model="text-embedding-004"
+>>>>>>> feat/auth-integration
     )
     
     response = await provider.embeddings(request)
     
     assert response.provider == "gemini"
     assert response.embeddings == [[0.1, 0.2, 0.3]]
+<<<<<<< HEAD
     mock_genai_client.aio.models.embed_content.assert_called_once()
     call_kwargs = mock_genai_client.aio.models.embed_content.call_args[1]
     assert call_kwargs["model"] == "gemini-embedding-001"
     assert call_kwargs["contents"] == ["hello", "world"]
     assert call_kwargs["config"].output_dimensionality == 768
+=======
+    mock_genai_client.aio.models.embed_content.assert_called_once_with(
+        model="text-embedding-004",
+        contents=["hello", "world"]
+    )
+>>>>>>> feat/auth-integration

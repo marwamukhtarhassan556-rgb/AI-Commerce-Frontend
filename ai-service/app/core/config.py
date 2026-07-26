@@ -16,7 +16,10 @@ class Settings(BaseSettings):
     OPEN_AI_SETTINGS: OpenAISettings = OpenAISettings()
     QDRANT_SETTINGS: QdrantSettings = QdrantSettings()
     REDIS_SETTINGS: RedisSettings = RedisSettings()
+<<<<<<< HEAD
     CORS_ORIGINS: list[str] = ["*"]
+=======
+>>>>>>> feat/auth-integration
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -12,7 +12,10 @@ class TicketAnalysisDocument(BaseMongoDocument):
     category: str = Field(...)
     summary: str = Field(...)
     priority: str = Field(...)
+<<<<<<< HEAD
     status: str = Field(default="open")
+=======
+>>>>>>> feat/auth-integration
     suggested_response: str = Field(...)
     analyzed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -27,7 +30,10 @@ class TicketAnalysisDocument(BaseMongoDocument):
             category=self.category,
             summary=self.summary,
             priority=self.priority,
+<<<<<<< HEAD
             status=self.status,
+=======
+>>>>>>> feat/auth-integration
             suggested_response=self.suggested_response,
             analyzed_at=self.analyzed_at
         )
@@ -44,7 +50,10 @@ class TicketAnalysisDocument(BaseMongoDocument):
             category=entity.category,
             summary=entity.summary,
             priority=entity.priority,
+<<<<<<< HEAD
             status=entity.status,
+=======
+>>>>>>> feat/auth-integration
             suggested_response=entity.suggested_response,
             analyzed_at=entity.analyzed_at
         )

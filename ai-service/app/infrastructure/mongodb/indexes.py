@@ -22,24 +22,45 @@ async def setup_database_indexes(db) -> None:
     ])
     
     await db["knowledge_documents"].create_indexes([
+<<<<<<< HEAD
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("status", ASCENDING)]),
         IndexModel([("title", TEXT)], name="knowledge_doc_title_text")
     ])
     
     await db["knowledge_chunks"].create_indexes([
+=======
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING)]),
+        IndexModel([("status", ASCENDING)]),
+        IndexModel([("title", TEXT)], name="knowledge_doc_title_text"),
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING), ("status", ASCENDING)]),
+    ])
+    
+    await db["knowledge_chunks"].create_indexes([
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING), ("document_id", ASCENDING)]),
+>>>>>>> feat/auth-integration
         IndexModel([("document_id", ASCENDING)]),
         IndexModel([("document_id", ASCENDING), ("chunk_index", ASCENDING)], unique=True),
         IndexModel([("embedding_id", ASCENDING)], sparse=True)
     ])
 
     await db["knowledge_business_summaries"].create_indexes([
+<<<<<<< HEAD
+=======
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
+>>>>>>> feat/auth-integration
         IndexModel([("document_id", ASCENDING)]),
         IndexModel([("document_id", ASCENDING), ("version_number", ASCENDING)]),
         IndexModel([("created_at", DESCENDING)])
     ])
 
     await db["knowledge_uploads"].create_indexes([
+<<<<<<< HEAD
+=======
+        IndexModel([("organization_id", ASCENDING), ("store_id", ASCENDING)]),
+>>>>>>> feat/auth-integration
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("checksum", ASCENDING)], unique=True),
         IndexModel([("status", ASCENDING)]),
@@ -72,8 +93,18 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("created_at", DESCENDING)])
     ])
     
+<<<<<<< HEAD
 
 
+=======
+    await db["abandoned_cart_campaigns"].create_indexes([
+        IndexModel([("store_id", ASCENDING)]),
+        IndexModel([("customer_id", ASCENDING)]),
+        IndexModel([("status", ASCENDING)]),
+        IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
+    ])
+    
+>>>>>>> feat/auth-integration
     await db["dashboard_insights"].create_indexes([
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("calculated_at", DESCENDING)])
@@ -84,6 +115,7 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("store_id", ASCENDING)]),
         IndexModel([("customer_id", ASCENDING)]),
         IndexModel([("priority", ASCENDING)]),
+<<<<<<< HEAD
         IndexModel([("sentiment", ASCENDING)]),
         IndexModel([("status", ASCENDING)]),
         IndexModel([("store_id", ASCENDING), ("status", ASCENDING)])
@@ -137,4 +169,9 @@ async def setup_database_indexes(db) -> None:
         IndexModel([("platform_name", ASCENDING)]),
     ])
 
+=======
+        IndexModel([("sentiment", ASCENDING)])
+    ])
+    
+>>>>>>> feat/auth-integration
     logger.info("Database indexes successfully created.")

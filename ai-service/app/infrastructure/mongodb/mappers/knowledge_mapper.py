@@ -43,11 +43,14 @@ class KnowledgeMapper:
             current_version=entity.current_version,
             chunks=[KnowledgeChunkDTO(**chunk.model_dump()) for chunk in entity.chunks],
             chunking_strategy=entity.chunking_strategy,
+<<<<<<< HEAD
             processed_text=entity.processed_text,
             page_count=entity.page_count,
             word_count=entity.word_count,
             char_count=entity.char_count,
             estimated_tokens=entity.estimated_tokens,
+=======
+>>>>>>> feat/auth-integration
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at,

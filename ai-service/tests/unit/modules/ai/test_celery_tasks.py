@@ -15,7 +15,11 @@ def test_generate_embeddings_task(mock_factory_cls):
     mock_factory_cls.return_value = mock_factory
     
     mock_response = EmbeddingResponse(
+<<<<<<< HEAD
         model="gemini-embedding-001",
+=======
+        model="text-embedding-004",
+>>>>>>> feat/auth-integration
         provider="gemini",
         embeddings=[[0.1, 0.2], [0.3, 0.4]],
         usage=UsageDTO()
@@ -23,7 +27,11 @@ def test_generate_embeddings_task(mock_factory_cls):
     mock_provider.embeddings.return_value = mock_response
     
     # Run task
+<<<<<<< HEAD
     result = generate_embeddings_task(texts=["hello", "world"], model="gemini-embedding-001")
+=======
+    result = generate_embeddings_task(texts=["hello", "world"], model="text-embedding-004")
+>>>>>>> feat/auth-integration
     
     # Assertions
     assert result == [[0.1, 0.2], [0.3, 0.4]]

@@ -9,6 +9,19 @@ from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument
 class BusinessSummaryDocument(BaseMongoDocument):
     """MongoDB document model representing a BusinessSummary."""
 
+<<<<<<< HEAD
+=======
+    organization_id: str = Field(default="", index=True)
+    store_id: str = Field(default="", index=True)
+    merchant_id: str = Field(default="")
+    knowledge_version: int = Field(default=1)
+    processing_status: str = Field(default="pending")
+    embedding_status: str = Field(default="pending")
+    summary_status: str = Field(default="pending")
+    checksum: str = Field(default="")
+    document_version: int = Field(default=1)
+    source_type: str = Field(default="manual")
+>>>>>>> feat/auth-integration
     document_id: str = Field(..., index=True)
     version_number: int = Field(default=1, ge=1)
     title: str = Field(...)

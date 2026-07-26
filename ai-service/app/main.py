@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+<<<<<<< HEAD
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.ai.router import router as ai_router
@@ -17,11 +18,18 @@ from app.api.ticket.router import router as ticket_router
 from app.core.config import settings
 from app.middleware.audit import AuditMiddleware
 from app.middleware.auth import AuthMiddleware
+=======
+
+from app.api.ai.router import router as ai_router
+from app.api.chat.router import router as chat_router
+from app.core.config import settings
+>>>>>>> feat/auth-integration
 from app.middleware.logging import AITracingMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
+<<<<<<< HEAD
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -47,6 +55,13 @@ app.include_router(recommendation_router)
 app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(ticket_router)
+=======
+app.add_middleware(RateLimitMiddleware, limit_per_minute=100)
+app.add_middleware(AITracingMiddleware)
+
+app.include_router(chat_router)
+app.include_router(ai_router)
+>>>>>>> feat/auth-integration
 
 
 @app.get("/health/")

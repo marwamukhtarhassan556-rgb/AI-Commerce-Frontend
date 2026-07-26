@@ -83,6 +83,7 @@ class ModelRegistry:
             context_length=1048576,
             pricing=ModelPricing(prompt_cost_per_1m=0.075, completion_cost_per_1m=0.30)
         ),
+<<<<<<< HEAD
         "gemini-flash-lite-latest": ModelInfo(
             name="gemini-flash-lite-latest",
             provider="gemini",
@@ -90,6 +91,8 @@ class ModelRegistry:
             context_length=1048576,
             pricing=ModelPricing(prompt_cost_per_1m=0.075, completion_cost_per_1m=0.30)
         ),
+=======
+>>>>>>> feat/auth-integration
         "gemini-2.5-pro": ModelInfo(
             name="gemini-2.5-pro",
             provider="gemini",
@@ -97,13 +100,19 @@ class ModelRegistry:
             context_length=2097152,
             pricing=ModelPricing(prompt_cost_per_1m=1.25, completion_cost_per_1m=5.00)
         ),
+<<<<<<< HEAD
         "gemini-2.0-flash": ModelInfo(
             name="gemini-2.0-flash",
+=======
+        "gemini-1.5-flash": ModelInfo(
+            name="gemini-1.5-flash",
+>>>>>>> feat/auth-integration
             provider="gemini",
             capabilities=ModelCapabilities(vision=True, json_mode=True, tool_calling=True, streaming=True),
             context_length=1048576,
             pricing=ModelPricing(prompt_cost_per_1m=0.075, completion_cost_per_1m=0.30)
         ),
+<<<<<<< HEAD
         "gemini-flash-latest-flash": ModelInfo(
             name="gemini-flash-latest-flash",
             provider="gemini",
@@ -113,13 +122,22 @@ class ModelRegistry:
         ),
         "gemini-flash-latest-pro": ModelInfo(
             name="gemini-flash-latest-pro",
+=======
+        "gemini-1.5-pro": ModelInfo(
+            name="gemini-1.5-pro",
+>>>>>>> feat/auth-integration
             provider="gemini",
             capabilities=ModelCapabilities(vision=True, json_mode=True, tool_calling=True, streaming=True),
             context_length=2097152,
             pricing=ModelPricing(prompt_cost_per_1m=1.25, completion_cost_per_1m=5.00)
         ),
+<<<<<<< HEAD
         "gemini-embedding-001": ModelInfo(
             name="gemini-embedding-001",
+=======
+        "text-embedding-004": ModelInfo(
+            name="text-embedding-004",
+>>>>>>> feat/auth-integration
             provider="gemini",
             capabilities=ModelCapabilities(embedding=True, streaming=False),
             context_length=3072,

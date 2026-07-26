@@ -96,6 +96,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         reset_time = 60
         return False, remaining, reset_time
 
+<<<<<<< HEAD
     def _get_rate_limit_key(self, request: Request) -> str:
         tenant_id = getattr(request.state, "tenant_id", None)
         if tenant_id:
@@ -109,10 +110,20 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         rate_limit_key = self._get_rate_limit_key(request)
 
+=======
+    async def dispatch(self, request: Request, call_next) -> Response:
+        # Skip whitelisted paths
+        if request.url.path in self.whitelist_paths:
+            return await call_next(request)
+
+        client_ip = request.client.host if request.client else "unknown-ip"
+        
+>>>>>>> feat/auth-integration
         is_limited = False
         remaining = self.limit_per_minute
         reset_time = 60
 
+<<<<<<< HEAD
         if self.redis:
             try:
                 is_limited, remaining, reset_time = await self._is_rate_limited_redis(rate_limit_key)
@@ -123,6 +134,20 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if is_limited:
             logger.warning(f"RateLimitMiddleware: Rate limit exceeded for key: {rate_limit_key}. Reset in {reset_time}s.")
+=======
+        # Attempt Redis check first
+        if self.redis:
+            try:
+                is_limited, remaining, reset_time = await self._is_rate_limited_redis(client_ip)
+            except Exception:
+                # Fallback to local memory if Redis check raises exception
+                is_limited, remaining, reset_time = self._is_rate_limited_memory(client_ip)
+        else:
+            is_limited, remaining, reset_time = self._is_rate_limited_memory(client_ip)
+
+        if is_limited:
+            logger.warning(f"RateLimitMiddleware: Rate limit exceeded for IP: {client_ip}. Reset in {reset_time}s.")
+>>>>>>> feat/auth-integration
             response = JSONResponse(
                 status_code=429,
                 content={

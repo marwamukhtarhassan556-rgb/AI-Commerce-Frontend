@@ -1,10 +1,16 @@
 from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument, PyObjectId
 from app.infrastructure.mongodb.documents.business_summary_document import BusinessSummaryDocument
 from app.infrastructure.mongodb.documents.bundle_document import BundleSuggestionDocument
+<<<<<<< HEAD
 from app.infrastructure.mongodb.documents.category_document import CategoryDocument
 from app.infrastructure.mongodb.documents.conversation_document import ConversationDocument
 from app.infrastructure.mongodb.documents.dashboard_document import DashboardInsightDocument
 from app.infrastructure.mongodb.documents.inventory_document import InventoryDocument
+=======
+from app.infrastructure.mongodb.documents.campaign_document import AbandonedCartCampaignDocument
+from app.infrastructure.mongodb.documents.conversation_document import ConversationDocument
+from app.infrastructure.mongodb.documents.dashboard_document import DashboardInsightDocument
+>>>>>>> feat/auth-integration
 from app.infrastructure.mongodb.documents.knowledge_chunk_document import KnowledgeChunkDocument
 from app.infrastructure.mongodb.documents.knowledge_document import (
     DocumentMetadataModel,
@@ -12,8 +18,11 @@ from app.infrastructure.mongodb.documents.knowledge_document import (
     KnowledgeDocumentModel,
 )
 from app.infrastructure.mongodb.documents.message_document import MessageDocument
+<<<<<<< HEAD
 from app.infrastructure.mongodb.documents.order_document import OrderDocument
 from app.infrastructure.mongodb.documents.product_document import ProductDocument
+=======
+>>>>>>> feat/auth-integration
 from app.infrastructure.mongodb.documents.prompt_history_document import PromptHistoryDocument
 from app.infrastructure.mongodb.documents.recommendation_document import RecommendationDocument
 from app.infrastructure.mongodb.documents.runtime_log_document import AIRuntimeLogDocument
@@ -21,20 +30,33 @@ from app.infrastructure.mongodb.documents.ticket_document import TicketAnalysisD
 
 __all__ = [
     "AIRuntimeLogDocument",
+<<<<<<< HEAD
     "BaseMongoDocument",
     "BusinessSummaryDocument",
     "BundleSuggestionDocument",
     "CategoryDocument",
+=======
+    "AbandonedCartCampaignDocument",
+    "BaseMongoDocument",
+    "BusinessSummaryDocument",
+    "BundleSuggestionDocument",
+>>>>>>> feat/auth-integration
     "ConversationDocument",
     "DashboardInsightDocument",
     "DocumentMetadataModel",
     "DocumentVersionModel",
+<<<<<<< HEAD
     "InventoryDocument",
     "KnowledgeChunkDocument",
     "KnowledgeDocumentModel",
     "MessageDocument",
     "OrderDocument",
     "ProductDocument",
+=======
+    "KnowledgeChunkDocument",
+    "KnowledgeDocumentModel",
+    "MessageDocument",
+>>>>>>> feat/auth-integration
     "PromptHistoryDocument",
     "PyObjectId",
     "RecommendationDocument",

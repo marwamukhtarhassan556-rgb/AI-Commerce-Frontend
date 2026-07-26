@@ -1,8 +1,13 @@
 from datetime import datetime
+<<<<<<< HEAD
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 
+=======
+from typing import List
+from pydantic import BaseModel
+>>>>>>> feat/auth-integration
 
 class RecommendationDTO(BaseModel):
     id: str
@@ -14,7 +19,10 @@ class RecommendationDTO(BaseModel):
     rationale: str
     created_at: datetime
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> feat/auth-integration
 class BundleSuggestionDTO(BaseModel):
     id: str
     store_id: str
@@ -25,6 +33,7 @@ class BundleSuggestionDTO(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+<<<<<<< HEAD
 
 
 class ProductSpecValue(BaseModel):
@@ -119,3 +128,5 @@ class BundleResponse(BaseModel):
     promo_code: Optional[str] = None
     rationale: Optional[str] = None
     latency_ms: float = 0.0
+=======
+>>>>>>> feat/auth-integration

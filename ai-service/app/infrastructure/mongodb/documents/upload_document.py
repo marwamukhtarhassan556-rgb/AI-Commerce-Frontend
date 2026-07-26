@@ -10,17 +10,35 @@ from app.infrastructure.mongodb.documents.base_document import BaseMongoDocument
 class UploadMetadataModel(BaseMongoDocument):
     """MongoDB document model representing a DocumentUpload."""
 
+<<<<<<< HEAD
+=======
+    organization_id: str = Field(default="", index=True)
+    store_id: str = Field(..., index=True)
+    merchant_id: str = Field(default="")
+    knowledge_version: int = Field(default=1)
+    processing_status: str = Field(default="pending")
+    embedding_status: str = Field(default="pending")
+    summary_status: str = Field(default="pending")
+    checksum: str = Field(..., index=True)
+    document_version: int = Field(default=1)
+    source_type: str = Field(default="manual")
+>>>>>>> feat/auth-integration
     original_filename: str = Field(...)
     stored_filename: str = Field(...)
     file_path: str = Field(...)
     file_size: int = Field(..., ge=0)
     mime_type: str = Field(...)
     extension: str = Field(...)
+<<<<<<< HEAD
     checksum: str = Field(..., index=True)
     content_type: str = Field(default="document")
     uploaded_by: str = Field(...)
     organization_id: str = Field(...)
     store_id: str = Field(..., index=True)
+=======
+    content_type: str = Field(default="document")
+    uploaded_by: str = Field(...)
+>>>>>>> feat/auth-integration
     knowledge_scope: str = Field(default="general")
     status: str = Field(default="uploaded", index=True)
     document_metadata: dict[str, Any] = Field(default_factory=dict)

@@ -16,7 +16,10 @@ from app.application.dto.ai_dto import (
     ToolCallDTO,
 )
 from app.core.ai_settings import ai_settings
+<<<<<<< HEAD
 from app.infrastructure.security.key_manager import KeyManager
+=======
+>>>>>>> feat/auth-integration
 from app.utils.ai_error_handler import map_provider_exception, execute_with_retry
 from app.utils.token_utils import calculate_cost
 
@@ -29,7 +32,11 @@ class MistralProvider(BaseLLMProvider):
     """
 
     def __init__(self, api_key: Optional[str] = None):
+<<<<<<< HEAD
         self.api_key = api_key or KeyManager().get_provider_api_key("mistral") or ""
+=======
+        self.api_key = api_key or ai_settings.MISTRAL_API_KEY
+>>>>>>> feat/auth-integration
         # Mistral uses client wrapper
         self.client = Mistral(
             api_key=self.api_key,

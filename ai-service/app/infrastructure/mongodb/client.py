@@ -16,7 +16,11 @@ class MongoClientManager:
             logger.info("Initializing AsyncIOMotorClient...")
             try:
                 cls._client = AsyncIOMotorClient(
+<<<<<<< HEAD
                     settings.MONGO_SETTINGS.MONGO_URI,
+=======
+                    settings.MONGO_URI,
+>>>>>>> feat/auth-integration
                     serverSelectionTimeoutMS=5000,
                     connectTimeoutMS=5000,
                     socketTimeoutMS=10000,
@@ -25,7 +29,11 @@ class MongoClientManager:
                     maxPoolSize=100,
                     minPoolSize=10
                 )
+<<<<<<< HEAD
                 cls._db = cls._client[settings.MONGO_SETTINGS.MONGO_DB]
+=======
+                cls._db = cls._client[settings.MONGO_DB]
+>>>>>>> feat/auth-integration
                 # Force validation check
                 await cls._client.admin.command("ping")
                 logger.info("Successfully connected and pinged MongoDB database.")
@@ -51,7 +59,11 @@ class MongoClientManager:
         if cls._db is None:
             logger.warning("Database requested before async connect() was executed. Initializing lazily.")
             cls._client = AsyncIOMotorClient(
+<<<<<<< HEAD
                 settings.MONGO_SETTINGS.MONGO_URI,
+=======
+                settings.MONGO_URI,
+>>>>>>> feat/auth-integration
                 serverSelectionTimeoutMS=5000,
                 connectTimeoutMS=5000,
                 socketTimeoutMS=10000,
@@ -60,7 +72,11 @@ class MongoClientManager:
                 maxPoolSize=100,
                 minPoolSize=10
             )
+<<<<<<< HEAD
             cls._db = cls._client[settings.MONGO_SETTINGS.MONGO_DB]
+=======
+            cls._db = cls._client[settings.MONGO_DB]
+>>>>>>> feat/auth-integration
         return cls._db
 
 def get_mongodb():

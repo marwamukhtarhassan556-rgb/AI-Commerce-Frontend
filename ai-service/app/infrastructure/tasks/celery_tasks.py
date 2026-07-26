@@ -7,6 +7,7 @@ from app.infrastructure.providers.factory import LLMProviderFactory
 from app.application.dto.ai_dto import EmbeddingRequest, ChatRequest, MessageDTO
 from app.infrastructure.repositories.conversation_repository import ConversationRepository
 from app.core.model_registry import ModelRegistry
+<<<<<<< HEAD
 from app.domain.knowledge.value_objects.tenant_context import TenantContext
 from app.infrastructure.knowledge.extractors import ExtractorFactory
 from app.infrastructure.mongodb.repositories.knowledge_repository import KnowledgeRepository
@@ -14,6 +15,8 @@ from app.infrastructure.mongodb.collections import get_knowledge_versions_collec
 from app.infrastructure.mongodb.documents.knowledge_version_document import (
     KnowledgeVersionDocument,
 )
+=======
+>>>>>>> feat/auth-integration
 
 logger = logging.getLogger("ai_service")
 
@@ -98,6 +101,7 @@ def summarize_conversation_task(conversation_id: str, model: str = "gpt-4o-mini"
 
     logger.info(f"Triggering background summarization for conversation: {conversation_id}")
     return _run_async(_async_run())
+<<<<<<< HEAD
 
 
 # ---------------------------------------------------------------------------
@@ -280,3 +284,5 @@ def _build_processor(repo: KnowledgeRepository) -> "DocumentProcessor":
         extractor_factory=ExtractorFactory(),
         pipeline=ProcessingPipeline(),
     )
+=======
+>>>>>>> feat/auth-integration

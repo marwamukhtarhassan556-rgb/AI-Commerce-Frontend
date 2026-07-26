@@ -1,5 +1,9 @@
 .env
+<<<<<<< HEAD
 .venv
 phases/
 docs/OPENAPI_INTEGRATION_PLAN.md
 docs/MONGODB_MAPPING.md
+=======
+.venv
+>>>>>>> feat/auth-integration

@@ -28,7 +28,10 @@ class DuplicateUploadException(KnowledgeDomainException):
 
 class FileValidationException(KnowledgeDomainException):
     """Raised when a file fails validation checks."""
+<<<<<<< HEAD
 
 
 class ChunkingException(KnowledgeDomainException):
     """Raised when document chunking fails."""
+=======
+>>>>>>> feat/auth-integration
