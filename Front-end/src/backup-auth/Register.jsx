@@ -6,6 +6,7 @@ import { registerUser, isAuthenticated, getRedirectPathByRole, decodeToken } fro
 const Register = () => {
   const navigate = useNavigate();
   
+  // لو مسجل دخول → redirect للـ Dashboard
   useEffect(() => {
     if (isAuthenticated()) {
       const token = localStorage.getItem('token');
@@ -82,6 +83,7 @@ const Register = () => {
         confirmPassword: formData.confirmPassword,
       });
 
+      // Backend بيرجع: { succeeded, message, errors }
       if (response.succeeded === true) {
         navigate('/signin', { 
           state: { message: response.message || 'Account created successfully! Please verify your email before signing in.' } 
@@ -121,7 +123,7 @@ const Register = () => {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white font-sans antialiased overflow-x-hidden">
       {/* LEFT PANE */}
-      <div className="hidden lg:flex lg:w-1/2 min-w-0 flex-col justify-between p-8 xl:p-12 bg-gradient-to-br from-[#0F0C31] via-[#1A1454] to-[#0A0724] relative overflow-hidden text-white select-none shrink-0 min-h-screen">
+      <div className="hidden lg:flex lg:w-1/2 min-w-0 flex-col justify-between p-8 xl:p-12 bg-linear-to-br from-[#0F0C31] via-[#1A1454] to-[#0A0724] relative overflow-hidden text-white select-none shrink-0 min-h-screen">
         <div 
           className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
@@ -164,7 +166,7 @@ const Register = () => {
               </div>
 
               <div className="relative flex flex-col items-center justify-center">
-                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 border-2 border-indigo-300/40 flex items-center justify-center text-white shadow-xl shadow-purple-500/30">
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 border-2 border-indigo-300/40 flex items-center justify-center text-white shadow-xl shadow-purple-500/30">
                   <Sparkles className="w-7 h-7 text-white" />
                 </div>
                 <span className="text-[10px] font-bold text-indigo-200 mt-2">AI Core</span>

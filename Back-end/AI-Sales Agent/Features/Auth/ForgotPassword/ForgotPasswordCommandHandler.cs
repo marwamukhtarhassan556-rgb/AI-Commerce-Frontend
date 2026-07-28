@@ -51,16 +51,19 @@ namespace AI_Sales_Agent.Features.Auth.ForgotPassword
 
         private string BuildResetUrl(string email, string token)
         {
-            var baseUrl = _configuration["App:BaseUrl"]?.TrimEnd('/');
+            // بيستخدم FrontendUrl لو موجود، ولو مش موجود بيرجع لـ BaseUrl
+            var frontendUrl = _configuration["App:FrontendUrl"]?.TrimEnd('/') 
+                ?? _configuration["App:BaseUrl"]?.TrimEnd('/');
+            
             var encodedEmail = WebUtility.UrlEncode(email);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
-            if (string.IsNullOrWhiteSpace(baseUrl))
+            if (string.IsNullOrWhiteSpace(frontendUrl))
             {
                 return $"/reset-password?email={encodedEmail}&token={encodedToken}";
             }
 
-            return $"{baseUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
+            return $"{frontendUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
         }
     }
 }

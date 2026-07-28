@@ -5,7 +5,6 @@ import RegisterStep2Page from './pages/RegisterStep2';
 import RegisterStep3Page from './pages/RegisterStep3';
 import SignInPage from './pages/SignIn';
 import ForgotPasswordPage from './pages/ForgotPassword';
-import ResetPasswordPage from './pages/ResetPassword';
 import AIDiagnosticPage from './pages/AIDiagnostic';
 import BuildingAssistantPage from './pages/BuildingAssistant';
 import Dashboard from './pages/merchant/dashboard/Dashboard';
@@ -43,11 +42,6 @@ function App() {
         <Route path="/forgot-password" element={
           <PublicRoute>
             <ForgotPasswordPage />
-          </PublicRoute>
-        } />
-        <Route path="/reset-password" element={
-          <PublicRoute>
-            <ResetPasswordPage />
           </PublicRoute>
         } />
 

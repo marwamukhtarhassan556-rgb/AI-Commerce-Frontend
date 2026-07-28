@@ -75,7 +75,7 @@ function RegisterStep3Page() {
             <div className="flex aspect-square items-center justify-center rounded-xl border border-white/20 bg-white/10 p-md backdrop-blur-md">
               <span className="material-symbols-outlined text-3xl">trending_up</span>
             </div>
-            <div className="flex aspect-square translate-y-[-10px] items-center justify-center rounded-xl border border-white/20 bg-white/20 p-md backdrop-blur-md">
+            <div className="flex aspect-square -translate-y-2.5 items-center justify-center rounded-xl border border-white/20 bg-white/20 p-md backdrop-blur-md">
               <span className="material-symbols-outlined text-3xl">auto_awesome</span>
             </div>
             <div className="-translate-x-4 rounded-xl border border-white/20 bg-white/20 p-md backdrop-blur-md">

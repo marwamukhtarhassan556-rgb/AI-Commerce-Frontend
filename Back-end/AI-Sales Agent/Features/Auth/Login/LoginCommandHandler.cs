@@ -37,12 +37,10 @@ namespace AI_Sales_Agent.Features.Auth.Login
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-           /* 
-if (!await _userManager.IsEmailConfirmedAsync(user))
-{
-    throw new UnauthorizedAccessException("Please verify your email before login.");
-}
-*/
+            if (!await _userManager.IsEmailConfirmedAsync(user))
+            {
+                throw new UnauthorizedAccessException("Please verify your email before login.");
+            }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
             if (!result.Succeeded)

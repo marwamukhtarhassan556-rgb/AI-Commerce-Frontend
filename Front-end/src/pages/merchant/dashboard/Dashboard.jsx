@@ -1,5 +1,6 @@
 import Navbar from '../../../components/layout/Navbar'
 import Footer from '../../../components/layout/Footer'
+import LogoutButton from '../../../components/LogoutButton'
 
 const cards = [
   { title: 'Revenue pulse', value: '$84.2K', detail: 'Week over week +18.4%' },
@@ -11,6 +12,12 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <Navbar />
+      
+      {/* Logout Button - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LogoutButton variant="ghost" />
+      </div>
+
       <main className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="rounded-[2rem] border border-white/10 bg-slate-900/70 p-8 shadow-2xl shadow-cyan-950/20">
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">CommerceMind AI dashboard</p>

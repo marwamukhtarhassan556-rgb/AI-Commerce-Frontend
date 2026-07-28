@@ -7,6 +7,7 @@ const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // لو مسجل دخول → redirect للـ Dashboard
   useEffect(() => {
     if (isAuthenticated()) {
       const token = localStorage.getItem('token');
@@ -100,7 +101,7 @@ const SignIn = () => {
   return (
     <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white font-sans antialiased overflow-x-hidden">
       {/* LEFT PANE */}
-      <div className="hidden lg:flex lg:w-1/2 min-w-0 flex-col justify-between p-8 xl:p-12 bg-gradient-to-br from-[#0F0C31] via-[#1A1454] to-[#0A0724] relative overflow-hidden text-white select-none shrink-0 min-h-screen">
+      <div className="hidden lg:flex lg:w-1/2 min-w-0 flex-col justify-between p-8 xl:p-12 bg-linear-to-br from-[#0F0C31] via-[#1A1454] to-[#0A0724] relative overflow-hidden text-white select-none shrink-0 min-h-screen">
         <div 
           className="absolute inset-0 opacity-15 pointer-events-none"
           style={{
