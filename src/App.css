@@ -1,3 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #004ac6;
+  --color-primary-container: #2563eb;
+  --color-primary-fixed: #dbe1ff;
+  --color-surface: #f9f9ff;
+  --color-background: #f9f9ff;
+  --color-surface-container-low: #f0f3ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #dee8ff;
+  --color-surface-container-highest: #d8e3fb;
+  --color-on-surface: #111c2d;
+  --color-on-surface-variant: #434655;
+  --color-outline: #737686;
+  --color-outline-variant: #c3c6d7;
+  --color-secondary: #4648d4;
+  --color-secondary-container: #6063ee;
+  --color-tertiary: #943700;
+  --color-tertiary-fixed: #ffdbcd;
+}
+
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

@@ -1,208 +1,66 @@
 import { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Lock, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, CheckCircle, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
+import './auth.css';
 
-const ResetPassword = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
-  const email = searchParams.get('email');
-
-  const [formData, setFormData] = useState({
-    password: '',
-    confirmPassword: '',
-  });
+export default function ResetPassword() {
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const token = params.get('token') || '';
+  const email = params.get('email') || '';
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (error) setError('');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters.');
-      return;
-    }
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (!token || !email) return setError('This reset link is incomplete. Please request a new one.');
+    if (newPassword.length < 8) return setError('Your new password must contain at least 8 characters.');
+    if (newPassword !== confirmPassword) return setError('The passwords do not match.');
+    setLoading(true); setError('');
     try {
       const response = await api.post('/api/auth/reset-password', {
-        email,
         token,
-        newPassword: formData.password,
-        confirmNewPassword: formData.confirmPassword,
+        email,
+        newPassword,
+        confirmNewPassword: confirmPassword,
       });
-
-      if (response.data.succeeded) {
+      if (response.status === 200 || response.data?.succeeded) {
         setSuccess(true);
-      } else {
-        setError(response.data.message || 'Failed to reset password.');
-      }
+        window.setTimeout(() => navigate('/signin'), 1800);
+      } else setError(response.data?.message || 'Unable to reset the password.');
     } catch (err) {
-      console.error('Reset Password Error:', err);
-      const data = err.response?.data;
-      const message =
-        data?.message ||
-        data?.title ||
-        (data?.errors ? data.errors.join('. ') : null) ||
-        'Failed to reset password. The link may be expired.';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!token || !email) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center p-8">
-          <h2 className="text-2xl font-bold text-red-600 mb-2">Invalid Link</h2>
-          <p className="text-gray-500 mb-4">The password reset link is invalid or expired.</p>
-          <Link to="/forgot-password" className="text-indigo-600 font-semibold hover:underline">
-            Request a new link
-          </Link>
-        </div>
-      </div>
-    );
+      setError(err.response?.data?.message || 'This reset link may have expired. Please request a new link.');
+    } finally { setLoading(false); }
   }
 
-  return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white font-sans antialiased">
-      {/* LEFT PANE */}
-      <div className="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-[#0F0C31] via-[#1A1454] to-[#0A0724] relative overflow-hidden text-white select-none">
-        <div 
-          className="absolute inset-0 opacity-15 pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)`,
-            backgroundSize: '28px 28px'
-          }}
-        />
-        <div className="relative z-10 flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400 shadow-lg backdrop-blur-md">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">CommerceMind AI</span>
-        </div>
+  return <div className="auth-page">
+    <main className="auth-content">
+      <div className="auth-topbar"><Link className="auth-brand" to="/"><b>AI</b>Commerce</Link></div>
+      <section className="auth-card">
+        {success ? <div className="auth-success"><div className="auth-icon"><CheckCircle size={27} /></div><h2>Password updated</h2><p className="auth-subtitle">Your password has been changed. Redirecting you to sign in…</p></div> : <>
+          <div className="auth-icon"><KeyRound size={23} /></div><h1>Create a new password</h1>
+          <p className="auth-subtitle">Choose a strong password with at least 8 characters.</p>
+          {error && <div className="auth-alert" role="alert">{error}</div>}
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <PasswordField id="newPassword" label="New password" value={newPassword} onChange={setNewPassword} show={showPassword} setShow={setShowPassword} />
+            <PasswordField id="confirmPassword" label="Confirm new password" value={confirmPassword} onChange={setConfirmPassword} show={showPassword} setShow={setShowPassword} />
+            <button className="auth-button" disabled={loading} type="submit">{loading ? <><Loader2 size={18} className="animate-spin" /> Updating…</> : 'Reset password'}</button>
+          </form>
+        </>}
+        <footer className="auth-footer"><Link className="auth-link" to="/signin"><ArrowLeft size={16} /> Back to sign in</Link></footer>
+      </section>
+    </main>
+  </div>;
+}
 
-        <div className="relative z-10 max-w-lg my-auto py-12">
-          <h1 className="text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.15] text-white">
-            Create a new secure password.
-          </h1>
-        </div>
-
-        <div className="relative z-10 text-xs text-indigo-200/60 font-medium">
-          Protected by 256-bit SSL encryption.
-        </div>
-      </div>
-
-      {/* RIGHT PANE */}
-      <div className="flex flex-col justify-between p-6 sm:p-12 lg:p-16 bg-white overflow-y-auto">
-        <div className="max-w-md w-full mx-auto my-auto py-6">
-          <div className="mb-8">
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-              Reset Password
-            </h2>
-            <p className="text-sm text-gray-500 mt-2">
-              Enter your new password below.
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
-              {error}
-            </div>
-          )}
-
-          {success ? (
-            <div className="p-6 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-center space-y-4">
-              <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-              <h3 className="text-lg font-bold text-emerald-900">Password Reset!</h3>
-              <p className="text-sm text-emerald-700">
-                Your password has been updated successfully.
-              </p>
-              <Link
-                to="/signin"
-                className="inline-block px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl transition-all shadow-md mt-2"
-              >
-                Sign In
-              </Link>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                  New Password
-                </label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-10 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                  Confirm New Password
-                </label>
-                <div className="relative flex items-center">
-                  <Lock className="absolute left-3.5 w-5 h-5 text-gray-400 pointer-events-none" />
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm placeholder:text-gray-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all shadow-sm"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 px-4 bg-[#3B38D8] hover:bg-[#302CB5] active:bg-[#2824A0] text-white font-bold rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-200 flex items-center justify-center gap-2 text-base disabled:opacity-75 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Resetting...</span>
-                  </>
-                ) : (
-                  <span>Reset Password</span>
-                )}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ResetPassword;
+function PasswordField({ id, label, value, onChange, show, setShow }) {
+  return <div className="auth-field"><label htmlFor={id}>{label}</label><div className="auth-input-wrap">
+    <KeyRound size={18} /><input className="auth-input" id={id} type={show ? 'text' : 'password'} value={value} onChange={(event) => onChange(event.target.value)} required autoComplete={id === 'newPassword' ? 'new-password' : 'new-password'} />
+    <button type="button" className="password-visibility" aria-label={show ? 'Hide password' : 'Show password'} onClick={() => setShow(!show)}>{show ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+  </div></div>;
+}

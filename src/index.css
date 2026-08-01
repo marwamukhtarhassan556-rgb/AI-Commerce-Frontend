@@ -101,6 +101,154 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:root[data-theme='dark'] {
+  --color-surface-container-lowest: #0f172a;
+  --color-surface-container-low: #172033;
+  --color-surface-container: #1d293d;
+  --color-surface-container-high: #26344a;
+  --color-surface-container-highest: #334155;
+  --color-surface: #0f172a;
+  --color-background: #0f172a;
+  --color-on-surface: #e5eefc;
+  --color-on-background: #e5eefc;
+  --color-on-surface-variant: #b9c6d9;
+  --color-outline-variant: #334155;
+  --color-outline: #94a3b8;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.5rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--theme-border, #cbd5e1);
+  border-radius: 0.75rem;
+  background: var(--theme-control-bg, rgba(255, 255, 255, 0.82));
+  color: var(--theme-text, #1e293b);
+  font: 600 0.78rem/1 Inter, sans-serif;
+  cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s, transform .2s;
+}
+
+.theme-toggle:hover { transform: translateY(-1px); }
+
+.global-theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+}
+
+:root[data-theme='dark'] .theme-toggle {
+  --theme-border: #334155;
+  --theme-control-bg: rgba(15, 23, 42, 0.85);
+  --theme-text: #e2e8f0;
+}
+
+/* AICommerce Merchant Core design system */
+:root {
+  --color-primary: #2563eb;
+  --color-primary-container: #1d4ed8;
+  --color-primary-fixed: #dbeafe;
+  --color-on-primary-fixed: #172554;
+  --color-on-primary-fixed-variant: #1e40af;
+  --color-surface: #f9f9ff;
+  --color-background: #f9f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f1f5ff;
+  --color-surface-container: #eef2ff;
+  --color-surface-container-high: #e5edff;
+  --color-surface-container-highest: #dbe5ff;
+  --color-on-surface: #10213f;
+  --color-on-background: #10213f;
+  --color-on-surface-variant: #52627a;
+  --color-outline-variant: #cbd5e1;
+  --color-outline: #70809a;
+  --merchant-card: #ffffff;
+  --merchant-border: #dbe3f0;
+  --merchant-shadow: 0 10px 28px rgba(15, 23, 42, .06);
+}
+
+:root[data-theme='dark'] {
+  --color-primary: #60a5fa;
+  --color-primary-container: #3b82f6;
+  --color-primary-fixed: #0c2347;
+  --color-on-primary-fixed: #dbeafe;
+  --color-on-primary-fixed-variant: #93c5fd;
+  --color-surface: #020617;
+  --color-background: #020617;
+  --color-surface-container-lowest: #081225;
+  --color-surface-container-low: #0b1730;
+  --color-surface-container: #0e1b35;
+  --color-surface-container-high: #12213f;
+  --color-surface-container-highest: #17294a;
+  --color-on-surface: #f1f5f9;
+  --color-on-background: #f1f5f9;
+  --color-on-surface-variant: #b9c6d9;
+  --color-outline-variant: #263a5d;
+  --color-outline: #8ea4c4;
+  --merchant-card: rgba(15, 29, 56, .72);
+  --merchant-border: rgba(148, 163, 184, .19);
+  --merchant-shadow: 0 16px 40px rgba(0, 0, 0, .28);
+}
+
+.global-theme-toggle { top: auto; right: 1.25rem; bottom: 1.25rem; z-index: 110; }
+.global-theme-toggle .theme-toggle { width: 2.75rem; min-height: 2.75rem; padding: 0; justify-content: center; border-radius: 999px; box-shadow: 0 8px 24px rgba(15, 23, 42, .18); }
+.global-theme-toggle .theme-toggle span { display: none; }
+
+.merchant-shell { background: var(--color-surface); color: var(--color-on-surface); }
+.merchant-shell .bg-white { background-color: var(--merchant-card) !important; }
+.merchant-shell .border-slate-200, .merchant-shell .border-slate-100, .merchant-shell .border-gray-200 { border-color: var(--merchant-border) !important; }
+.merchant-shell .text-slate-900, .merchant-shell .text-slate-700, .merchant-shell .text-gray-600, .merchant-shell .text-gray-500 { color: var(--color-on-surface) !important; }
+.merchant-shell .text-slate-500, .merchant-shell .text-slate-400 { color: var(--color-on-surface-variant) !important; }
+.merchant-shell .hover\:bg-slate-50:hover { background-color: var(--color-surface-container-low) !important; }
+.merchant-shell .shadow-sm { box-shadow: var(--merchant-shadow) !important; }
+.merchant-topbar { background: color-mix(in srgb, var(--merchant-card) 92%, transparent) !important; border-color: var(--merchant-border) !important; backdrop-filter: blur(18px); }
+:root[data-theme='dark'] .merchant-shell [class*='rounded-xl'],
+:root[data-theme='dark'] .merchant-shell [class*='rounded-2xl'] { backdrop-filter: blur(16px); }
+
+/* Auth pages: light mode uses the same Merchant Core surface and action colors. */
+:root[data-theme='light'] .auth-themed {
+  background: #f9f9ff !important;
+  color: #10213f;
+}
+:root[data-theme='light'] .auth-themed .auth-panel {
+  background: rgba(255, 255, 255, .9) !important;
+  border-color: #dbe3f0 !important;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, .09) !important;
+}
+:root[data-theme='light'] .auth-themed .auth-panel-footer { background: #f1f5ff !important; border-color: #dbe3f0 !important; }
+:root[data-theme='light'] .signin-themed .text-white,
+:root[data-theme='light'] .auth-panel .text-white,
+:root[data-theme='light'] .auth-register-nav .text-white { color: #10213f !important; }
+:root[data-theme='light'] .signin-themed .text-slate-100,
+:root[data-theme='light'] .signin-themed .text-slate-400,
+:root[data-theme='light'] .signin-themed .text-slate-500,
+:root[data-theme='light'] .auth-panel .text-slate-400,
+:root[data-theme='light'] .auth-panel .text-slate-500 { color: #52627a !important; }
+:root[data-theme='light'] .signin-themed input,
+:root[data-theme='light'] .auth-panel input {
+  background: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #10213f !important;
+}
+:root[data-theme='light'] .signin-themed input::placeholder,
+:root[data-theme='light'] .auth-panel input::placeholder { color: #94a3b8 !important; }
+:root[data-theme='light'] .signin-themed .bg-\[\#020617\],
+:root[data-theme='light'] .signin-themed .bg-black\/30 { background: #ffffff !important; }
+:root[data-theme='light'] .signin-themed .border-slate-700\/80,
+:root[data-theme='light'] .signin-themed .border-slate-800\/80 { border-color: #dbe3f0 !important; }
+:root[data-theme='light'] .register-themed .register-aside {
+  padding: 2rem;
+  border-radius: 1.5rem;
+  color: #fff;
+  background: linear-gradient(145deg, #172554, #2563eb);
+  box-shadow: 0 18px 44px rgba(37, 99, 235, .2);
+}
+:root[data-theme='light'] .register-themed .register-aside .text-slate-300 { color: #dbeafe !important; }
+@media (max-width: 640px) { .global-theme-toggle { right: .8rem; bottom: .8rem; } }
+
 html {
   scroll-behavior: smooth;
 }
