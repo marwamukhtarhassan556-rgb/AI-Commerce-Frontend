@@ -63,7 +63,7 @@ export const categoriesApi = {
 export const ticketsApi = {
   // GET /api/v1/tickets
   list: ({ storeId, status = '', priority = '', sentiment = '', page = 1, pageSize = 20 } = {}) =>
-    api.get('/api/v1/tickets', {
+    aiApi.get('/tickets', {
       params: {
         store_id: storeId,
         page,
@@ -75,18 +75,18 @@ export const ticketsApi = {
     }),
 
   // GET /api/v1/tickets/{id}
-  getById: (ticketId) => api.get(`/api/v1/tickets/${ticketId}`),
+  getById: (ticketId) => aiApi.get(`/tickets/${ticketId}`),
 
   // PATCH /api/v1/tickets/{id}/status
   updateStatus: (ticketId, status, resolutionType) =>
-    api.patch(`/api/v1/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
+    aiApi.patch(`/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
 
   // DELETE /api/v1/tickets/{id}
-  delete: (ticketId) => api.delete(`/api/v1/tickets/${ticketId}`),
+  delete: (ticketId) => aiApi.delete(`/tickets/${ticketId}`),
 
   // GET /api/v1/tickets/metrics/resolution
   getMetrics: (storeId) =>
-    api.get('/api/v1/tickets/metrics/resolution', { params: { store_id: storeId } }),
+    aiApi.get('/tickets/metrics/resolution', { params: { store_id: storeId } }),
 };
 
 // ── Stores ──────────────────────────────────────────────────────────

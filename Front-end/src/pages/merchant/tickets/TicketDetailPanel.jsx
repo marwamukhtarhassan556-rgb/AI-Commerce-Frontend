@@ -1,6 +1,6 @@
 import { Sparkles, Edit, RotateCcw, Send } from 'lucide-react';
 
-export default function TicketDetailPanel({ ticket }) {
+export default function TicketDetailPanel({ ticket, onStatusChange, updatingStatus }) {
   if (!ticket) {
     return (
       <div className="hidden lg:flex lg:col-span-7 items-center justify-center bg-white border border-outline-variant/40 rounded-xl p-8 text-on-surface-variant">
@@ -27,6 +27,13 @@ export default function TicketDetailPanel({ ticket }) {
             <p className="text-[10px] text-outline uppercase font-bold tracking-tight">Lifetime Value</p>
             <p className="text-lg font-bold text-emerald-600">{ticket.lifetimeValue}</p>
           </div>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between border-t border-outline-variant/30 pt-3">
+          <span className="text-xs font-bold uppercase text-outline">Ticket status</span>
+          <select value={ticket.status || 'open'} onChange={(event) => onStatusChange(event.target.value)} disabled={updatingStatus} className="rounded-lg border border-outline-variant/50 bg-white px-3 py-1.5 text-xs font-bold text-on-surface disabled:opacity-50">
+            <option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option>
+          </select>
         </div>
 
         <div className="border-t border-outline-variant/30 pt-3">

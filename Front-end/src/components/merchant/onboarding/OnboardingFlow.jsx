@@ -75,6 +75,7 @@ export default function OnboardingFlow() {
       const token = data.token || data.accessToken;
       if (!token) throw new Error('Login completed without an access token.');
       localStorage.setItem('token', token);
+      if (data.aiToken || data.aiAccessToken) localStorage.setItem('aiToken', data.aiToken || data.aiAccessToken);
       if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
       if (data.role) localStorage.setItem('userRole', data.role);
       setStep(3);

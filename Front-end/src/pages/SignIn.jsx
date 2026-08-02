@@ -41,6 +41,9 @@ const SignIn = () => {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         }
+        if (response.data.aiToken || response.data.aiAccessToken) {
+          localStorage.setItem('aiToken', response.data.aiToken || response.data.aiAccessToken);
+        }
         // التوجيه للوحة التحكم بعد النجاح
         navigate(response.data.storeId || response.data.store_id ? '/merchant/dashboard' : '/onboarding?step=3');
       } else {
