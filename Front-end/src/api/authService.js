@@ -80,18 +80,28 @@ export const loginUser = async (email, password) => {
   const data = response.data;
 
   const token = data.token || data.accessToken;
+  const aiToken = data.aiToken || data.aiAccessToken;
   const refreshToken = data.refreshToken;
   const userId = data.userId;
   const userEmail = data.email || email;
+  const storeId = data.storeId || data.store_id;
 
   const tokenDetails = decodeToken(token);
   const role = tokenDetails?.role || data.role || 'Seller';
 
   if (token) localStorage.setItem('token', token);
+  if (aiToken) localStorage.setItem('aiToken', aiToken);
   if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
   if (role) localStorage.setItem('userRole', role);
   if (userId) localStorage.setItem('userId', userId);
   if (userEmail) localStorage.setItem('userEmail', userEmail);
+  if (storeId) {
+    localStorage.setItem('storeId', storeId);
+    localStorage.setItem('currentStoreId', storeId);
+  } else {
+    localStorage.removeItem('storeId');
+    localStorage.removeItem('currentStoreId');
+  }
 
   return {
     ...data,
@@ -122,9 +132,12 @@ export const forgotPasswordUser = async (email) => {
 // Logout
 export const logoutUser = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('aiToken');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('userRole');
   localStorage.removeItem('userId');
   localStorage.removeItem('userEmail');
+  localStorage.removeItem('storeId');
+  localStorage.removeItem('currentStoreId');
   window.location.href = '/signin';
 };

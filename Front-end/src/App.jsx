@@ -8,13 +8,28 @@ import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
 import AIDiagnosticPage from './pages/AIDiagnostic';
 import BuildingAssistantPage from './pages/BuildingAssistant';
+
+// 👈 استدعاء الـ Onboarding Flow المجمع للشاشات
+import OnboardingFlow from './components/merchant/onboarding/OnboardingFlow';
+
+// Merchant Pages
 import Dashboard from './pages/merchant/dashboard/Dashboard';
+import CatalogPage from './pages/merchant/catalog/CatalogPage';
+import TicketsPage from './pages/merchant/tickets/TicketsPage';
+import StoreSettingsPage from './pages/merchant/store/StoreSettingsPage';
+
+// Layout & Route Wrappers
+import MerchantLayout from './components/layout/MerchantLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
+import ThemeToggle from './components/ui/ThemeToggle';
 
 function App() {
   return (
     <BrowserRouter>
+      <div className="global-theme-toggle">
+        <ThemeToggle />
+      </div>
       <Routes>
         {/* صفحات عامة - أي حد يدخل */}
         <Route path="/" element={<LandingPage />} />
@@ -51,12 +66,8 @@ function App() {
           </PublicRoute>
         } />
 
-        {/* صفحات محتاجة Login */}
-        <Route path="/onboarding" element={
-          <ProtectedRoute>
-            <AIDiagnosticPage />
-          </ProtectedRoute>
-        } />
+        {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
+        <Route path="/onboarding" element={<OnboardingFlow />} />
         <Route path="/diagnostic" element={
           <ProtectedRoute>
             <AIDiagnosticPage />
@@ -68,12 +79,21 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* Dashboards حسب الـ Role */}
-        <Route path="/merchant/dashboard" element={
-          <ProtectedRoute allowedRoles={['seller', 'merchant', 'admin']}>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
+        {/* 🔹 صفحات الـ Merchant المربوطة بالـ Sidebar المشترك 🔹 */}
+        <Route 
+          element={
+            <ProtectedRoute allowedRoles={['seller', 'merchant', 'admin']}>
+              <MerchantLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/merchant/dashboard" element={<Dashboard />} />
+          <Route path="/merchant/catalog" element={<CatalogPage />} />
+          <Route path="/merchant/tickets" element={<TicketsPage />} />
+          <Route path="/merchant/store" element={<StoreSettingsPage />} />
+        </Route>
+
+        {/* باقي الـ Dashboards */}
         <Route path="/admin/dashboard" element={
           <ProtectedRoute allowedRoles={['admin']}>
             <Dashboard />
@@ -85,7 +105,7 @@ function App() {
           </ProtectedRoute>
         } />
 
-        {/* أي مسار غلط → يروح SignIn */}
+        {/* أي مسار غلط ← يروح SignIn */}
         <Route path="*" element={<Navigate to="/signin" replace />} />
       </Routes>
     </BrowserRouter>

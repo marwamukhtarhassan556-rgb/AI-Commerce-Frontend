@@ -33,7 +33,7 @@ function RegisterStep2Page() {
           </div>
           <h1 className="font-headline-md text-headline-md tracking-tight text-white">CommerceMind AI</h1>
         </div>
-        <div className="relative z-10 flex flex-grow flex-col items-center justify-center">
+        <div className="relative z-10 flex grow flex-col items-center justify-center">
           <div className="grid grid-cols-4 gap-md opacity-40">
             {[
               { icon: 'store', delay: '0s' },
