@@ -349,6 +349,27 @@ body {
   min-width: 0;
 }
 
+.checkout-page { display: flex; min-height: 100vh; flex-direction: column; background: radial-gradient(circle at 90% 8%, #dbeafe 0, transparent 24rem), radial-gradient(circle at 8% 92%, #e0e7ff 0, transparent 22rem), #f8faff; color: #0f172a; }
+.checkout-header { display: flex; width: min(100%, 76rem); margin: 0 auto; align-items: center; justify-content: space-between; padding: 1.5rem; }
+.checkout-brand { color: #1d4ed8; font-size: 1.25rem; font-weight: 800; text-decoration: none; }
+.checkout-main { display: grid; flex: 1; place-items: center; padding: 2rem 1rem; }
+.checkout-status-card { width: min(100%, 35rem); padding: clamp(2rem, 6vw, 3.5rem); border: 1px solid #cbd5e1; border-radius: 1.25rem; background: rgba(255, 255, 255, .92); box-shadow: 0 24px 60px rgba(15, 23, 42, .1); backdrop-filter: blur(14px); }
+.checkout-status-card h1 { margin: 1.5rem 0 .75rem; font-size: clamp(2rem, 5vw, 2.7rem); font-weight: 800; letter-spacing: -.03em; }
+.checkout-status-copy { max-width: 28rem; margin: 0 auto; color: #475569; font-size: 1.05rem; line-height: 1.7; }
+.checkout-success-icon, .checkout-cancel-icon { display: grid; width: 6rem; height: 6rem; margin: 0 auto; place-items: center; border-radius: 50%; }
+.checkout-success-icon { background: #86efac; color: #166534; box-shadow: 0 0 0 1rem rgba(134, 239, 172, .2); }
+.checkout-cancel-icon { background: #eef2ff; color: #64748b; }
+.checkout-success-icon svg, .checkout-cancel-icon svg { width: 3rem; height: 3rem; }
+.checkout-details { margin: 2.5rem 0; padding: 1rem 1.5rem; border: 1px solid #dbe3f0; border-radius: .9rem; background: #f8fafc; color: #64748b; }
+.checkout-details > div + div { border-top: 1px solid #e2e8f0; }
+.checkout-details b { color: #0f172a; text-align: right; }
+.checkout-primary-action, .checkout-muted-action, .checkout-secondary-action { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; box-sizing: border-box; width: 100%; min-height: 3.5rem; border-radius: .75rem; font-size: 1rem; font-weight: 700; text-decoration: none; transition: transform .15s, background .15s; }
+.checkout-primary-action { background: #1d4ed8; color: #fff; }
+.checkout-primary-action:hover { background: #1e40af; transform: translateY(-1px); }
+.checkout-muted-action { background: #dbeafe; color: #334155; }
+.checkout-secondary-action { min-height: auto; margin-top: 1rem; color: #1d4ed8; font-size: .9rem; }
+.checkout-footer { padding: 1.5rem; color: #64748b; font-size: .8rem; text-align: center; }
+
 /* A roomier onboarding workspace with a subdued image backdrop. */
 .onboarding-shell {
   position: relative;
@@ -447,6 +468,8 @@ body {
 .integration-connect { width: 100%; min-height: 3.5rem; margin-top: 2rem; border: 0; border-radius: .75rem; background: #e2e8f0; color: #94a3b8; font-weight: 700; cursor: not-allowed; }
 .integration-skip { margin-top: 1rem; border: 0; background: transparent; color: #2563eb; font-size: 1rem; font-weight: 700; cursor: pointer; }
 .integration-skip:hover { text-decoration: underline; }
+.integration-finish { background: #2563eb; color: #fff; cursor: pointer; }
+.integration-finish:hover { background: #1d4ed8; }
 .integration-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid #cbd5e1; }
 .integration-benefits > div { display: grid; min-height: 8rem; place-items: center; align-content: center; gap: .75rem; border-radius: 1rem; background: #f8fafc; color: #64748b; font-weight: 700; }
 .integration-benefits svg { width: 2rem; height: 2rem; color: #94a3b8; }

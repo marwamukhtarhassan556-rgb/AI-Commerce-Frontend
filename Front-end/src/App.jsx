@@ -17,6 +17,9 @@ import Dashboard from './pages/merchant/dashboard/Dashboard';
 import CatalogPage from './pages/merchant/catalog/CatalogPage';
 import TicketsPage from './pages/merchant/tickets/TicketsPage';
 import StoreSettingsPage from './pages/merchant/store/StoreSettingsPage';
+import KnowledgeBasePage from './pages/merchant/knowledge/KnowledgeBasePage';
+import CheckoutSuccessPage from './pages/checkout/CheckoutSuccessPage';
+import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
@@ -68,6 +71,8 @@ function App() {
 
         {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
         <Route path="/onboarding" element={<OnboardingFlow />} />
+        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
         <Route path="/diagnostic" element={
           <ProtectedRoute>
             <AIDiagnosticPage />
@@ -91,6 +96,7 @@ function App() {
           <Route path="/merchant/catalog" element={<CatalogPage />} />
           <Route path="/merchant/tickets" element={<TicketsPage />} />
           <Route path="/merchant/store" element={<StoreSettingsPage />} />
+          <Route path="/merchant/knowledge" element={<KnowledgeBasePage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}

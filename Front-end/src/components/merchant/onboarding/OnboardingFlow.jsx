@@ -3,7 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { BarChart3, Check, CheckCircle2, ChevronLeft, HelpCircle, Loader2, Package, Plug, ShoppingCart, X } from 'lucide-react';
 import api from '../../../api/axiosConfig';
 
-const initialStore = { name: '', description: '', platform: '', shopDomain: '', currency: 'USD', language: 'en', timezone: 'UTC' };
+/* Legacy onboarding step components are retained during the MVP transition. */
+/* eslint-disable no-unused-vars */
+
+function StoreStepCustom({ value, onChange, onSubmit, loading, onBack }) {
+  return <form onSubmit={onSubmit}><Back onClick={onBack} /><div className="mb-6 flex items-start justify-between"><div><h1 className="text-2xl font-bold">Create your store</h1><p className="mt-2 text-sm text-slate-500">Add the details for your custom AI-commerce experience.</p></div><span className="text-xs font-medium text-blue-600">Store Setup: 1 of 2</span></div><div className="space-y-4"><label className="block text-sm font-medium">Store Name<input required name="name" value={value.name} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><label className="block text-sm font-medium">Description<textarea required name="description" rows="3" value={value.description} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><div className="rounded-xl border border-blue-100 bg-blue-50 p-4"><p className="text-sm font-bold text-blue-900">Custom API store</p><p className="mt-1 text-xs leading-5 text-blue-700">You will upload your OpenAPI schema, FAQs, and install the widget from the dashboard after setup.</p></div><input type="hidden" name="platform" value="custom" /><label className="block text-sm font-medium">Website Domain<input required name="shopDomain" placeholder="store.example.com" value={value.shopDomain} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><div className="grid grid-cols-1 gap-4 sm:grid-cols-3"><Select name="currency" label="Currency" value={value.currency} onChange={onChange} options={['USD', 'EGP', 'EUR', 'GBP']} /><Select name="language" label="Language" value={value.language} onChange={onChange} options={['en', 'ar', 'fr']} /><Select name="timezone" label="Timezone" value={value.timezone} onChange={onChange} options={['UTC', 'Africa/Cairo', 'Europe/London']} /></div></div><Button className="mt-6" loading={loading} type="submit">Create Store</Button></form>;
+}
+
+function MvpWelcomeStep({ onBack, onFinish }) {
+  return <div className="integration-step text-center"><div className="text-left"><Back onClick={onBack} /></div><span className="text-xs font-semibold text-blue-600">Store Setup: Complete</span><div className="integration-icon"><CheckCircle2 /></div><h1 className="integration-title">Welcome to AICommerce</h1><p className="integration-copy">Your custom store is ready. From your dashboard, upload an OpenAPI schema and FAQs, then install the widget when it is ready.</p><button type="button" onClick={onFinish} className="integration-connect integration-finish">Open Merchant Dashboard</button><div className="integration-benefits"><div><ShoppingCart /><span>Upload OpenAPI schema</span></div><div><Package /><span>Add FAQs</span></div><div><BarChart3 /><span>Install your widget</span></div></div></div>;
+}
+
+const initialStore = { name: '', description: '', platform: 'custom', shopDomain: '', currency: 'USD', language: 'en', timezone: 'UTC' };
 
 const messageFor = (error, fallback) => {
   const data = error.response?.data;
@@ -97,7 +108,11 @@ export default function OnboardingFlow() {
     try {
       const { data } = await api.post('/api/seller/subscriptions/subscribe', { planId: selectedPlan.id });
       if (String(data?.status).toLowerCase() !== 'active') throw new Error('Subscription was not activated.');
-      setSubscription(data);
+      const params = new URLSearchParams({ plan: data?.planName || selectedPlan.planName || 'Your selected plan' });
+      if (data?.invoiceNumber) params.set('invoice', data.invoiceNumber);
+      if (data?.renewalDate) params.set('renewal', new Date(data.renewalDate).toLocaleDateString());
+      if (data?.invoiceUrl) params.set('invoice_url', data.invoiceUrl);
+      navigate(`/checkout/success?${params.toString()}`);
     } catch (requestError) { setError(messageFor(requestError, 'Could not activate this subscription.')); }
     finally { setLoading(false); }
   };
@@ -130,8 +145,8 @@ export default function OnboardingFlow() {
         {step === 1 && <RegisterStep value={register} onChange={setField(setRegister)} onSubmit={submitRegister} loading={loading} />}
         {step === 2 && <LoginStep value={login} onChange={setField(setLogin)} onSubmit={submitLogin} loading={loading} onBack={back} />}
         {step === 3 && <PlansStep plans={plans} loading={plansLoading || loading} onSelect={openPlan} onBack={back} />}
-        {step === 4 && <StoreStep value={store} onChange={setField(setStore)} onSubmit={submitStore} loading={loading} onBack={back} />}
-        {step === 5 && <IntegrationStep onBack={back} onFinish={() => navigate('/merchant/dashboard')} />}
+        {step === 4 && <StoreStepCustom value={store} onChange={setField(setStore)} onSubmit={submitStore} loading={loading} onBack={back} />}
+        {step === 5 && <MvpWelcomeStep onBack={back} onFinish={() => navigate('/merchant/dashboard')} />}
       </section>
       {selectedPlan && <PlanModal plan={selectedPlan} subscription={subscription} loading={loading} onClose={() => { setSelectedPlan(null); setSubscription(null); setError(''); }} onSubscribe={subscribe} onContinue={() => { setSelectedPlan(null); setSubscription(null); setStep(4); }} />}
     </main>

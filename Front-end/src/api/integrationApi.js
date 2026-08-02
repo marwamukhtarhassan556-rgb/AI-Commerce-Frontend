@@ -142,18 +142,6 @@ export const aiChatApi = {
 };
 
 // ── RAG Chat ────────────────────────────────────────────────────────
-export const ragApi = {
-  // POST /rag/chat  (بدون /api/v1 prefix!)
-  chat: ({ message, storeId, model = 'openai/gpt-4o-mini', topK = 5, stream = false } = {}) =>
-    aiApi.post('/rag/chat'.replace('/api/v1', ''), { // RAG is at root level
-      message,
-      store_id: storeId,
-      model,
-      top_k: topK,
-      stream,
-    }),
-};
-
 // ── Integration & Connections ────────────────────────────────────────
 export const integrationApi = {
   // GET /api/v1/integration/connections

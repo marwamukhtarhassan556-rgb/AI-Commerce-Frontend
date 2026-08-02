@@ -4,6 +4,7 @@ import {
   Package, 
   Store, 
   Ticket, 
+  BookOpen,
   UserCircle 
 } from 'lucide-react';
 
@@ -12,6 +13,7 @@ const navItems = [
   { name: 'Product Catalog', path: '/merchant/catalog', icon: Package },
   { name: 'My Store', path: '/merchant/store', icon: Store },
   { name: 'Tickets', path: '/merchant/tickets', icon: Ticket },
+  { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
 ];
 
 const Sidebar = () => {
