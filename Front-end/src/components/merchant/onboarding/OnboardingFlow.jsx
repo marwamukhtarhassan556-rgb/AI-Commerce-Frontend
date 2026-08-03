@@ -85,10 +85,21 @@ export default function OnboardingFlow() {
       const { data } = await api.post('/api/auth/login', login);
       const token = data.token || data.accessToken;
       if (!token) throw new Error('Login completed without an access token.');
+      const user = data.user || data.profile || {};
+      const firstName = data.firstName || data.first_name || user.firstName || user.first_name || '';
+      const lastName = data.lastName || data.last_name || user.lastName || user.last_name || '';
+      const email = data.email || user.email || login.email;
+
       localStorage.setItem('token', token);
       if (data.aiToken || data.aiAccessToken) localStorage.setItem('aiToken', data.aiToken || data.aiAccessToken);
       if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
       if (data.role) localStorage.setItem('userRole', data.role);
+      localStorage.setItem('merchantProfile', JSON.stringify({
+        firstName,
+        lastName,
+        name: data.name || user.name || [firstName, lastName].filter(Boolean).join(' ') || '',
+        email,
+      }));
       setStep(3);
     } catch (requestError) { setError(messageFor(requestError, 'Invalid email or password.')); }
     finally { setLoading(false); }
@@ -107,12 +118,9 @@ export default function OnboardingFlow() {
     setLoading(true); setError('');
     try {
       const { data } = await api.post('/api/seller/subscriptions/subscribe', { planId: selectedPlan.id });
-      if (String(data?.status).toLowerCase() !== 'active') throw new Error('Subscription was not activated.');
-      const params = new URLSearchParams({ plan: data?.planName || selectedPlan.planName || 'Your selected plan' });
-      if (data?.invoiceNumber) params.set('invoice', data.invoiceNumber);
-      if (data?.renewalDate) params.set('renewal', new Date(data.renewalDate).toLocaleDateString());
-      if (data?.invoiceUrl) params.set('invoice_url', data.invoiceUrl);
-      navigate(`/checkout/success?${params.toString()}`);
+      const checkoutUrl = data?.checkoutUrl || data?.checkout_url || data?.url;
+      if (!checkoutUrl) throw new Error('Could not start the secure Stripe checkout.');
+      window.location.assign(checkoutUrl);
     } catch (requestError) { setError(messageFor(requestError, 'Could not activate this subscription.')); }
     finally { setLoading(false); }
   };

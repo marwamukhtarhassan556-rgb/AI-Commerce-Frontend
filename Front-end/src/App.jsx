@@ -73,6 +73,7 @@ function App() {
         <Route path="/onboarding" element={<OnboardingFlow />} />
         <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
         <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+        <Route path="/checkout/failed" element={<CheckoutCancelPage />} />
         <Route path="/diagnostic" element={
           <ProtectedRoute>
             <AIDiagnosticPage />
