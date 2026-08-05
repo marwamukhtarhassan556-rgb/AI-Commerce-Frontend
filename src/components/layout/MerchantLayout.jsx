@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../merchant/Sidebar';
 import TopBar from '../merchant/TopBar';
+import SubscriptionBanner from '../merchant/subscription/SubscriptionBanner';
 
 export default function MerchantLayout() {
   return (
@@ -15,6 +16,7 @@ export default function MerchantLayout() {
 
         {/* صفحات الداخل تظهر هنا تحت الـ TopBar */}
         <main className="flex-1 overflow-auto pt-16">
+          <SubscriptionBanner />
           <Outlet />
         </main>
       </div>

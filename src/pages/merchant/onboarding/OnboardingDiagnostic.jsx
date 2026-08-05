@@ -59,7 +59,7 @@ export default function OnboardingDiagnostic() {
         </div>
       </div>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-grow flex-col px-4 pb-24 pt-32 md:px-2xl">
+      <main className="mx-auto flex w-full max-w-7xl grow flex-col px-4 pb-24 pt-32 md:px-2xl">
         <section className="mb-xl text-center">
           <div className="mb-md inline-flex items-center gap-xs rounded-full border border-primary/20 bg-primary-container/10 px-md py-xs text-primary">
             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: 'FILL 1' }}>analytics</span>
@@ -149,10 +149,10 @@ export default function OnboardingDiagnostic() {
           </div>
 
           <div className="group relative md:col-span-5">
-            <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-primary to-secondary-fixed opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
+            <div className="absolute -inset-1 rounded-xl bg-linear-to-r from-primary to-secondary-fixed opacity-25 blur transition duration-1000 group-hover:opacity-50 group-hover:duration-200"></div>
             <div className="relative aspect-square overflow-hidden rounded-xl bg-white shadow-xl">
               <img alt="E-commerce analytics dashboard visualization" className="h-full w-full object-cover opacity-90" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU9y8MTmglnNFFyl-6C9XfRs1zBooSm1GcjdJy3Rs0020G7bvC1GqzRGxAiZ8tjnL_ab8M8lxcpPfEw5ShP1_gRE2YQT2TzP-EXMJEk-_uClurBh-nGsOUePun31FvyA3RwKQobn7kcu1iv5sp8i1GwGo8JTyRaFPUpnMElJljrL4EKuyVyThiD6-8VD2ORKi7-H1z_xcJv4hr9I1ZWZ0yLH3aKxYi_5wA5ux6aTTlgbbRXkOLBquhrM-fCHgOm_nX0R6AgfQJtU1q" />
-              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-lg">
+              <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/60 to-transparent p-lg">
                 <div className="text-white">
                   <p className="mb-base text-label-sm font-label-sm uppercase opacity-80">Live Context Engine</p>
                   <p className="text-headline-md font-headline-md">AI Model Calibrated to Your Store Data</p>
@@ -165,7 +165,7 @@ export default function OnboardingDiagnostic() {
         <div className="mt-3xl text-center">
           <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-outline-variant/50 bg-surface-container-low/70 p-6">
             <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high">
-              <div className="h-full rounded-full bg-gradient-to-r from-primary via-indigo-500 to-secondary transition-all duration-300" style={{ width: `${progress}%` }}></div>
+              <div className="h-full rounded-full bg-linear-to-r from-primary via-indigo-500 to-secondary transition-all duration-300" style={{ width: `${progress}%` }}></div>
             </div>
             <div className="text-label-sm font-label-sm uppercase tracking-wider text-primary">{progress}% complete</div>
             <div className="rounded-full border border-primary/20 bg-primary-container/10 px-md py-xs text-body-md font-body-md text-primary">{activeStep}</div>

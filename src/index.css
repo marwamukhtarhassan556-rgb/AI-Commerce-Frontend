@@ -343,3 +343,280 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+.onboarding-plan-modal {
+  width: min(100%, 32rem);
+  min-width: 0;
+}
+
+.checkout-page { display: flex; min-height: 100vh; flex-direction: column; background: radial-gradient(circle at 90% 8%, #dbeafe 0, transparent 24rem), radial-gradient(circle at 8% 92%, #e0e7ff 0, transparent 22rem), #f8faff; color: #0f172a; }
+.checkout-header { display: flex; width: min(100%, 76rem); margin: 0 auto; align-items: center; justify-content: space-between; padding: 1.5rem; }
+.checkout-brand { color: #1d4ed8; font-size: 1.25rem; font-weight: 800; text-decoration: none; }
+.checkout-main { display: grid; flex: 1; place-items: center; padding: 2rem 1rem; }
+.checkout-status-card { width: min(100%, 35rem); padding: clamp(2rem, 6vw, 3.5rem); border: 1px solid #cbd5e1; border-radius: 1.25rem; background: rgba(255, 255, 255, .92); box-shadow: 0 24px 60px rgba(15, 23, 42, .1); backdrop-filter: blur(14px); }
+.checkout-status-card h1 { margin: 1.5rem 0 .75rem; font-size: clamp(2rem, 5vw, 2.7rem); font-weight: 800; letter-spacing: -.03em; }
+.checkout-status-copy { max-width: 28rem; margin: 0 auto; color: #475569; font-size: 1.05rem; line-height: 1.7; }
+.checkout-success-icon, .checkout-cancel-icon { display: grid; width: 6rem; height: 6rem; margin: 0 auto; place-items: center; border-radius: 50%; }
+.checkout-success-icon { background: #86efac; color: #166534; box-shadow: 0 0 0 1rem rgba(134, 239, 172, .2); }
+.checkout-cancel-icon { background: #eef2ff; color: #64748b; }
+.checkout-success-icon svg, .checkout-cancel-icon svg { width: 3rem; height: 3rem; }
+.checkout-details { margin: 2.5rem 0; padding: 1rem 1.5rem; border: 1px solid #dbe3f0; border-radius: .9rem; background: #f8fafc; color: #64748b; }
+.checkout-details > div + div { border-top: 1px solid #e2e8f0; }
+.checkout-details b { color: #0f172a; text-align: right; }
+.checkout-primary-action, .checkout-muted-action, .checkout-secondary-action { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; box-sizing: border-box; width: 100%; min-height: 3.5rem; border-radius: .75rem; font-size: 1rem; font-weight: 700; text-decoration: none; transition: transform .15s, background .15s; }
+.checkout-primary-action { background: #1d4ed8; color: #fff; }
+.checkout-primary-action:hover { background: #1e40af; transform: translateY(-1px); }
+.checkout-muted-action { background: #dbeafe; color: #334155; }
+.checkout-secondary-action { min-height: auto; margin-top: 1rem; color: #1d4ed8; font-size: .9rem; }
+.checkout-footer { padding: 1.5rem; color: #64748b; font-size: .8rem; text-align: center; }
+
+/* A roomier onboarding workspace with a subdued image backdrop. */
+.onboarding-shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #eef4ff;
+}
+
+.onboarding-shell::before {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  content: '';
+  background: linear-gradient(rgba(239, 246, 255, .84), rgba(248, 250, 252, .9)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1800&q=85') center / cover;
+}
+
+.onboarding-shell::after {
+  position: fixed;
+  inset: -2rem;
+  z-index: -1;
+  content: '';
+  background: rgba(226, 232, 240, .12);
+  backdrop-filter: blur(7px);
+}
+
+.onboarding-card {
+  max-width: 64rem !important;
+  min-height: 42rem;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(203, 213, 225, .85);
+  border-radius: 1.75rem;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, .16);
+  backdrop-filter: blur(14px);
+}
+
+.onboarding-plans-card {
+  max-width: 76rem !important;
+}
+
+.onboarding-card form {
+  font-size: 1rem;
+}
+
+.onboarding-card form h1 {
+  font-size: 2rem;
+}
+
+.onboarding-card form input,
+.onboarding-card form select,
+.onboarding-card form textarea {
+  min-height: 3.2rem;
+  font-size: 1rem;
+}
+
+.onboarding-card form textarea {
+  min-height: 7.5rem;
+}
+
+.onboarding-card form button[type='submit'] {
+  min-height: 3.4rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+@media (max-width: 640px) {
+  .onboarding-card {
+    margin: 0;
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+}
+
+.integration-step {
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.integration-icon {
+  display: grid;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 2rem auto 1.5rem;
+  place-items: center;
+  border-radius: 1.25rem;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.integration-icon svg { width: 2.5rem; height: 2.5rem; }
+.integration-title { margin: 0; font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; color: #0f172a; }
+.integration-copy { max-width: 38rem; margin: 1.1rem auto 0; color: #475569; font-size: 1.1rem; line-height: 1.8; }
+.integration-connect { width: 100%; min-height: 3.5rem; margin-top: 2rem; border: 0; border-radius: .75rem; background: #e2e8f0; color: #94a3b8; font-weight: 700; cursor: not-allowed; }
+.integration-skip { margin-top: 1rem; border: 0; background: transparent; color: #2563eb; font-size: 1rem; font-weight: 700; cursor: pointer; }
+.integration-skip:hover { text-decoration: underline; }
+.integration-finish { background: #2563eb; color: #fff; cursor: pointer; }
+.integration-finish:hover { background: #1d4ed8; }
+.integration-benefits { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid #cbd5e1; }
+.integration-benefits > div { display: grid; min-height: 8rem; place-items: center; align-content: center; gap: .75rem; border-radius: 1rem; background: #f8fafc; color: #64748b; font-weight: 700; }
+.integration-benefits svg { width: 2rem; height: 2rem; color: #94a3b8; }
+
+.store-input {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .625rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: .75rem;
+  background: #fff;
+  color: #0f172a;
+  font-size: .875rem;
+  outline: none;
+}
+
+.store-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, .12); }
+.store-primary-button, .store-secondary-button { display: inline-flex; align-items: center; gap: .5rem; border-radius: .75rem; padding: .625rem 1.5rem; font-size: .75rem; font-weight: 700; }
+.store-primary-button { border: 0; background: #2563eb; color: #fff; }
+.store-secondary-button { border: 1px solid #2563eb; background: #fff; color: #2563eb; }
+.store-primary-button:disabled, .store-secondary-button:disabled { cursor: not-allowed; opacity: .5; }
+
+.store-capability-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.store-capability-copy { min-width: 0; max-width: 42rem; }
+.store-capability-eyebrow { display: block; margin-bottom: .45rem; color: #b45309; font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.store-capability-copy h4 { margin: 0; color: var(--color-on-surface); font-size: 1.1rem; font-weight: 800; }
+.store-capability-copy p { max-width: 40rem; margin: .55rem 0 0; color: var(--color-on-surface-variant); font-size: .92rem; line-height: 1.65; }
+.store-capability-toggle { display: inline-flex; align-items: center; gap: .7rem; color: var(--color-on-surface); cursor: pointer; }
+.store-capability-toggle input { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; }
+.store-capability-switch { position: relative; display: inline-block; width: 3.15rem; height: 1.8rem; flex: 0 0 auto; border-radius: 999px; background: #cbd5e1; transition: background .2s ease; }
+.store-capability-switch::after { position: absolute; top: .2rem; left: .2rem; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, .25); content: ''; transition: transform .2s ease; }
+.store-capability-toggle input:checked + .store-capability-switch { background: #2563eb; }
+.store-capability-toggle input:checked + .store-capability-switch::after { transform: translateX(1.35rem); }
+.store-capability-toggle input:focus-visible + .store-capability-switch { outline: 3px solid rgba(37, 99, 235, .25); outline-offset: 3px; }
+.store-capability-toggle:has(input:disabled) { cursor: not-allowed; opacity: .7; }
+.store-capability-toggle.is-saving { cursor: wait; }
+
+@media (max-width: 640px) {
+  .store-capability-row { grid-template-columns: 1fr; padding: 1.25rem; }
+  .store-capability-toggle { justify-self: stretch; }
+}
+
+@media (max-width: 640px) {
+  .integration-benefits { grid-template-columns: 1fr; }
+  .integration-copy { font-size: 1rem; }
+}
+
+/* Keep the onboarding plan selector independent from the app's custom spacing tokens. */
+.onboarding-plan-page > div > .grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.onboarding-plan-page > div > .grid > button {
+  position: relative;
+  display: flex;
+  min-height: 24.5rem;
+  flex-direction: column;
+  padding: 1.75rem;
+  border-color: #dbe3f0;
+  border-radius: .75rem;
+  background: #fff;
+}
+
+.onboarding-plan-page > div > .grid > button:nth-child(2) {
+  border: 2px solid #2563eb;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, .08);
+}
+
+.onboarding-plan-page > div > .grid > button:nth-child(2)::before {
+  content: 'Most Popular';
+  position: absolute;
+  top: -0.85rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: .3rem 1rem;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.onboarding-plan-page > div > .grid > button > div {
+  display: block;
+}
+
+.onboarding-plan-page > div > .grid > button > div > span {
+  display: block;
+  margin-top: .6rem;
+  font-size: 2rem;
+  color: #0f172a;
+}
+
+.onboarding-plan-page > div > .grid > button > ul {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid #cbd5e1;
+}
+
+.onboarding-plan-page > div > .grid > button::after {
+  content: 'View Details';
+  display: grid;
+  place-items: center;
+  width: 100%;
+  margin-top: auto;
+  min-height: 2.8rem;
+  border: 1px solid #2563eb;
+  border-radius: .35rem;
+  color: #1d4ed8;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+.onboarding-plan-page > div > .grid > button:nth-child(2)::after {
+  background: #2563eb;
+  color: #fff;
+}
+
+.onboarding-plan-page > div > .grid > button > p {
+  font-size: 1rem;
+}
+
+.onboarding-plan-page > div > .grid::after {
+  content: 'Scaling with Confidence\A Our infrastructure supports your business at every stage. You can change your plan whenever you need.';
+  grid-column: 1 / -1;
+  min-height: 13rem;
+  padding: 1.5rem;
+  border: 1px solid #dbe3f0;
+  border-radius: .75rem;
+  background: linear-gradient(90deg, rgba(15, 23, 42, .5), rgba(15, 23, 42, .05)), url('https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=80') center / cover;
+  color: #fff;
+  white-space: pre-line;
+  font-size: .95rem;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+  .onboarding-plan-page > div > .grid { grid-template-columns: 1fr; }
+}

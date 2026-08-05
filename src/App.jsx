@@ -9,14 +9,21 @@ import ResetPasswordPage from './pages/ResetPassword';
 import AIDiagnosticPage from './pages/AIDiagnostic';
 import BuildingAssistantPage from './pages/BuildingAssistant';
 
+// 👈 استدعاء الـ Onboarding Flow المجمع للشاشات
+import OnboardingFlow from './components/merchant/onboarding/OnboardingFlow';
+
 // Merchant Pages
 import Dashboard from './pages/merchant/dashboard/Dashboard';
 import CatalogPage from './pages/merchant/catalog/CatalogPage';
 import TicketsPage from './pages/merchant/tickets/TicketsPage';
 import StoreSettingsPage from './pages/merchant/store/StoreSettingsPage';
+import KnowledgeBasePage from './pages/merchant/knowledge/KnowledgeBasePage';
+import CheckoutSuccessPage from './pages/checkout/CheckoutSuccessPage';
+import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
+import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
 
 // Layout & Route Wrappers
-import MerchantLayout from './components/layout/MerchantLayout'; // 👈 استدعاء الـ Layout
+import MerchantLayout from './components/layout/MerchantLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import PublicRoute from './components/PublicRoute';
 import ThemeToggle from './components/ui/ThemeToggle';
@@ -63,12 +70,11 @@ function App() {
           </PublicRoute>
         } />
 
-        {/* صفحات محتاجة Login */}
-        <Route path="/onboarding" element={
-          <ProtectedRoute>
-            <AIDiagnosticPage />
-          </ProtectedRoute>
-        } />
+        {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
+        <Route path="/onboarding" element={<OnboardingFlow />} />
+        <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+        <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
+        <Route path="/checkout/failed" element={<CheckoutCancelPage />} />
         <Route path="/diagnostic" element={
           <ProtectedRoute>
             <AIDiagnosticPage />
@@ -92,14 +98,13 @@ function App() {
           <Route path="/merchant/catalog" element={<CatalogPage />} />
           <Route path="/merchant/tickets" element={<TicketsPage />} />
           <Route path="/merchant/store" element={<StoreSettingsPage />} />
+          <Route path="/merchant/knowledge" element={<KnowledgeBasePage />} />
+          <Route path="/merchant/subscription" element={<SubscriptionDetailsPage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}
-        <Route path="/admin/dashboard" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
+        {/* Legacy admin dashboard was a bare overview page and could surface from browser history. */}
+        <Route path="/admin/dashboard" element={<Navigate to="/merchant/dashboard" replace />} />
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRoles={['user', 'seller', 'merchant', 'admin']}>
             <Dashboard />

@@ -49,6 +49,7 @@ export default function TicketsPage() {
   const [activeTicketId, setActiveTicketId] = useState(null);
   const [loading, setLoading] = useState(Boolean(storeId));
   const [error, setError] = useState(storeId ? '' : 'Select a store before viewing tickets.');
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     if (!storeId) return;
@@ -69,6 +70,18 @@ export default function TicketsPage() {
   const activeTicket = useMemo(() => tickets.find((ticket) => ticket.id === activeTicketId), [tickets, activeTicketId]);
   const resolutionRate = metrics?.resolution_rate ?? 0;
 
+  const updateTicketStatus = async (status) => {
+    if (!activeTicket) return;
+    setUpdatingStatus(true); setError('');
+    try {
+      const resolutionType = status === 'resolved' ? 'human' : status === 'closed' ? 'unresolved' : undefined;
+      const { data } = await ticketsApi.updateStatus(activeTicket.id, status, resolutionType);
+      setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, status }) : ticket));
+    } catch {
+      setError('Ticket status could not be updated. Check your AI service permissions and try again.');
+    } finally { setUpdatingStatus(false); }
+  };
+
   return <div className="p-6 space-y-6">
     {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-error">{error}</p>}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -76,6 +89,6 @@ export default function TicketsPage() {
       <div className="bg-white border border-outline-variant/40 p-5 rounded-xl shadow-sm"><p className="text-xs font-medium text-on-surface-variant">Resolution Rate</p><div className="mt-2 flex items-end gap-2"><span className="text-3xl font-bold text-on-surface">{Number(resolutionRate).toFixed(1)}%</span><span className="mb-1 flex items-center text-emerald-600 text-xs font-bold"><TrendingUp className="w-3.5 h-3.5 mr-0.5" /> AI + Human</span></div></div>
       <div className="bg-white border border-outline-variant/40 p-5 rounded-xl shadow-sm flex justify-between items-center"><div><p className="text-xs font-medium text-on-surface-variant">AI Resolved</p><div className="mt-2 flex items-center gap-2"><span className="text-3xl font-bold text-on-surface">{metrics?.ai_resolved ?? 0}</span><div className="flex text-amber-400">{[...Array(5)].map((_, index) => <Star key={index} className="w-4 h-4 fill-amber-400" />)}</div></div></div><p className="text-xs text-on-surface-variant">Human: {metrics?.human_resolved ?? 0}</p></div>
     </div>
-    {loading ? <div className="rounded-xl bg-white p-8 text-center text-sm text-on-surface-variant">Loading tickets…</div> : <div className="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]"><TicketList tickets={tickets} activeTicketId={activeTicketId} onSelectTicket={setActiveTicketId} /><TicketDetailPanel ticket={activeTicket} /></div>}
+    {loading ? <div className="rounded-xl bg-white p-8 text-center text-sm text-on-surface-variant">Loading tickets…</div> : <div className="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]"><TicketList tickets={tickets} activeTicketId={activeTicketId} onSelectTicket={setActiveTicketId} /><TicketDetailPanel ticket={activeTicket} onStatusChange={updateTicketStatus} updatingStatus={updatingStatus} /></div>}
   </div>;
 }

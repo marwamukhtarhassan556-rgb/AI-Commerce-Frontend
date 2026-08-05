@@ -4,6 +4,8 @@ import {
   Package, 
   Store, 
   Ticket, 
+  BookOpen,
+  CreditCard,
   UserCircle 
 } from 'lucide-react';
 
@@ -12,11 +14,13 @@ const navItems = [
   { name: 'Product Catalog', path: '/merchant/catalog', icon: Package },
   { name: 'My Store', path: '/merchant/store', icon: Store },
   { name: 'Tickets', path: '/merchant/tickets', icon: Ticket },
+  { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
+  { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
 ];
 
 const Sidebar = () => {
   return (
-    <aside className="fixed h-full w-[280px] left-0 top-0 bg-surface-container-low border-r border-outline-variant z-50 hidden lg:flex flex-col py-6">
+    <aside className="fixed h-full w-70 left-0 top-0 bg-surface-container-low border-r border-outline-variant z-50 hidden lg:flex flex-col py-6">
       {/* Header */}
       <div className="px-6 mb-10">
         <h1 className="text-2xl font-extrabold text-primary">AICommerce</h1>
@@ -51,7 +55,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-3 p-4 rounded-xl bg-surface-container-highest/50">
           <UserCircle className="w-8 h-8 text-primary" />
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-on-surface">Alex Merchant</span>
+            <span className="text-xs font-bold text-on-surface">{(() => { try { const profile = JSON.parse(localStorage.getItem('merchantProfile') || '{}'); return [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.name || profile.email || 'Merchant'; } catch { return 'Merchant'; } })()}</span>
             <span className="text-[10px] uppercase tracking-wider text-outline">Manage Account</span>
           </div>
         </div>

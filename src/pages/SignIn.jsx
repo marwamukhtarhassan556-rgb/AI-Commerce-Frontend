@@ -41,8 +41,25 @@ const SignIn = () => {
         if (response.data.token) {
           localStorage.setItem('token', response.data.token);
         }
+        if (response.data.aiToken || response.data.aiAccessToken) {
+          localStorage.setItem('aiToken', response.data.aiToken || response.data.aiAccessToken);
+        }
+        const storeId = response.data.storeId || response.data.store_id;
+        if (storeId) {
+          localStorage.setItem('storeId', String(storeId));
+          localStorage.setItem('currentStoreId', String(storeId));
+        }
+        const user = response.data.user || response.data.profile || {};
+        localStorage.setItem('merchantProfile', JSON.stringify({
+          firstName: response.data.firstName || response.data.first_name || user.firstName || user.first_name || '',
+          lastName: response.data.lastName || response.data.last_name || user.lastName || user.last_name || '',
+          name: response.data.name || user.name || [response.data.firstName || response.data.first_name || user.firstName || user.first_name || '', response.data.lastName || response.data.last_name || user.lastName || user.last_name || ''].filter(Boolean).join(' ') || '',
+          email: response.data.email || user.email || formData.email,
+        }));
         // التوجيه للوحة التحكم بعد النجاح
-        navigate('/merchant/dashboard');
+        // Replace the sign-in history entry so browser Back cannot expose a stale
+        // dashboard route while the seller is completing onboarding.
+        navigate(storeId ? '/merchant/dashboard' : '/onboarding?step=3', { replace: true });
       } else {
         setError(response.data.message || 'Failed to sign in.');
       }
@@ -72,8 +89,8 @@ const SignIn = () => {
   return (
     <div className="signin-themed auth-themed min-h-screen bg-[#020617] text-slate-100 flex flex-col justify-between items-center relative overflow-hidden font-sans antialiased selection:bg-blue-500 selection:text-white">
       {/* Background Ambient Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-88 bg-blue-600/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-75 h-75 bg-indigo-600/10 blur-[100px] rounded-full pointer-events-none" />
 
       {/* MAIN CONTAINER */}
       <main className="w-full max-w-[440px] px-6 py-12 my-auto relative z-10 flex flex-col items-center animate-fade-in">

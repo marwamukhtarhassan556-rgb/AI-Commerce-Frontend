@@ -63,7 +63,7 @@ export const categoriesApi = {
 export const ticketsApi = {
   // GET /api/v1/tickets
   list: ({ storeId, status = '', priority = '', sentiment = '', page = 1, pageSize = 20 } = {}) =>
-    api.get('/api/v1/tickets', {
+    aiApi.get('/tickets', {
       params: {
         store_id: storeId,
         page,
@@ -75,22 +75,25 @@ export const ticketsApi = {
     }),
 
   // GET /api/v1/tickets/{id}
-  getById: (ticketId) => api.get(`/api/v1/tickets/${ticketId}`),
+  getById: (ticketId) => aiApi.get(`/tickets/${ticketId}`),
 
   // PATCH /api/v1/tickets/{id}/status
   updateStatus: (ticketId, status, resolutionType) =>
-    api.patch(`/api/v1/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
+    aiApi.patch(`/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
 
   // DELETE /api/v1/tickets/{id}
-  delete: (ticketId) => api.delete(`/api/v1/tickets/${ticketId}`),
+  delete: (ticketId) => aiApi.delete(`/tickets/${ticketId}`),
 
   // GET /api/v1/tickets/metrics/resolution
   getMetrics: (storeId) =>
-    api.get('/api/v1/tickets/metrics/resolution', { params: { store_id: storeId } }),
+    aiApi.get('/tickets/metrics/resolution', { params: { store_id: storeId } }),
 };
 
 // ── Stores ──────────────────────────────────────────────────────────
 export const storesApi = {
+  // POST /api/stores
+  create: (data) => api.post('/api/stores', data),
+
   // GET /api/stores
   list: () => api.get('/api/stores'),
 
@@ -106,6 +109,27 @@ export const storesApi = {
 
   // DELETE /api/stores/{id}
   delete: (storeId) => api.delete(`/api/stores/${storeId}`),
+};
+
+export const storeCapabilitiesApi = {
+  get: (storeId) =>
+    api.get(`/api/StoreCapabilities/${storeId}/capabilities`),
+
+  update: ({ storeId, capabilities }) =>
+    api.put('/api/StoreCapabilities/update-capabilities', { storeId, capabilities }, { timeout: 12000 }),
+};
+
+export const subscriptionsApi = {
+  listPlans: () => api.get('/api/admin/plans'),
+  getPlanById: (planId) => api.get(`/api/admin/plans/${planId}`),
+  // Pending backend endpoint. It should describe trial, paid, and expired states
+  // for the logged-in seller; see SubscriptionStatus for the expected fields.
+  getCurrent: () => api.get('/api/seller/subscriptions/current'),
+  getTrialStatus: () => api.get('/api/seller/subscriptions/trial-status'),
+  startFreeTrial: (planId) => api.post('/api/seller/subscriptions/free-trial', { planId }),
+  createCheckoutSession: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
+  subscribe: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
+  cancel: () => api.post('/api/seller/subscriptions/cancel'),
 };
 
 
@@ -134,18 +158,6 @@ export const aiChatApi = {
 };
 
 // ── RAG Chat ────────────────────────────────────────────────────────
-export const ragApi = {
-  // POST /rag/chat  (بدون /api/v1 prefix!)
-  chat: ({ message, storeId, model = 'openai/gpt-4o-mini', topK = 5, stream = false } = {}) =>
-    aiApi.post('/rag/chat'.replace('/api/v1', ''), { // RAG is at root level
-      message,
-      store_id: storeId,
-      model,
-      top_k: topK,
-      stream,
-    }),
-};
-
 // ── Integration & Connections ────────────────────────────────────────
 export const integrationApi = {
   // GET /api/v1/integration/connections

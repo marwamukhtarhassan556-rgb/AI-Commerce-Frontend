@@ -47,6 +47,11 @@ const Register = () => {
       });
 
       if (response.data.succeeded || response.status === 200 || response.status === 201) {
+        localStorage.setItem('merchantProfile', JSON.stringify({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+        }));
         // التوجيه لصفحة تسجيل الدخول أو الـ Dashboard
         navigate('/signin');
       } else {
@@ -73,8 +78,8 @@ const Register = () => {
   return (
     <div className="register-themed auth-themed min-h-screen bg-[#020617] text-slate-100 flex flex-col justify-between relative overflow-hidden font-sans antialiased selection:bg-blue-500 selection:text-white">
       {/* Background Ambient Glows */}
-      <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-blue-600/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-150 h-100 bg-blue-600/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-100 h-100 bg-indigo-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       {/* TOP NAVIGATION */}
       <nav className="auth-register-nav bg-transparent border-b border-slate-800/50 h-16 flex items-center justify-between px-6 sm:px-12 max-w-7xl mx-auto w-full z-10">
@@ -87,7 +92,7 @@ const Register = () => {
       </nav>
 
       {/* MAIN REGISTRATION CONTENT */}
-      <main className="flex-grow flex items-center justify-center py-12 px-6 z-10">
+      <main className="grow flex items-center justify-center py-12 px-6 z-10">
         <div className="grid lg:grid-cols-2 gap-12 max-w-5xl w-full items-center">
           
           {/* LEFT SIDE: VALUE PROPOSITION */}

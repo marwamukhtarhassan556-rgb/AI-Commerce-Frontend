@@ -1,6 +1,26 @@
 import api from './axiosConfig';
 import { jwtDecode } from 'jwt-decode';
 
+const normalizeMerchantProfile = (profile = {}) => {
+  const firstName = profile.firstName || profile.first_name || '';
+  const lastName = profile.lastName || profile.last_name || '';
+  const name = profile.name || [firstName, lastName].filter(Boolean).join(' ') || '';
+  const email = profile.email || profile.userEmail || '';
+
+  return {
+    firstName,
+    lastName,
+    name,
+    email,
+  };
+};
+
+const saveMerchantProfile = (profile = {}) => {
+  const normalizedProfile = normalizeMerchantProfile(profile);
+  localStorage.setItem('merchantProfile', JSON.stringify(normalizedProfile));
+  return normalizedProfile;
+};
+
 // بيفك شفرة التوكين ويطلع الـ Role والبيانات
 export const decodeToken = (token) => {
   if (!token) return null;
@@ -95,9 +115,19 @@ export const loginUser = async (email, password) => {
   if (role) localStorage.setItem('userRole', role);
   if (userId) localStorage.setItem('userId', userId);
   if (userEmail) localStorage.setItem('userEmail', userEmail);
+  const user = data.user || data.profile || {};
+  saveMerchantProfile({
+    firstName: data.firstName || data.first_name || user.firstName || user.first_name || '',
+    lastName: data.lastName || data.last_name || user.lastName || user.last_name || '',
+    name: data.name || user.name || '',
+    email: userEmail,
+  });
   if (storeId) {
     localStorage.setItem('storeId', storeId);
     localStorage.setItem('currentStoreId', storeId);
+  } else {
+    localStorage.removeItem('storeId');
+    localStorage.removeItem('currentStoreId');
   }
 
   return {
@@ -136,5 +166,6 @@ export const logoutUser = () => {
   localStorage.removeItem('userEmail');
   localStorage.removeItem('storeId');
   localStorage.removeItem('currentStoreId');
+  localStorage.removeItem('merchantProfile');
   window.location.href = '/signin';
 };
