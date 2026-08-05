@@ -208,6 +208,15 @@
 :root[data-theme='dark'] .merchant-shell [class*='rounded-xl'],
 :root[data-theme='dark'] .merchant-shell [class*='rounded-2xl'] { backdrop-filter: blur(16px); }
 
+/* Isolated subscription layout: avoid dashboard theme utilities collapsing the details card. */
+.subscription-page { width: min(calc(100% - 2.5rem), 52rem); margin: 2rem auto; color: var(--color-on-surface); }
+.subscription-page__card { display: block; width: 100%; margin-top: 1.75rem; overflow: hidden; border: 1px solid var(--merchant-border); border-radius: 1rem; background: var(--merchant-card); box-shadow: var(--merchant-shadow); }
+.subscription-page__card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--merchant-border); }
+.subscription-page__details { display: block; padding: 0 1.5rem; }
+.subscription-page__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; }
+.subscription-page__row + .subscription-page__row { border-top: 1px solid var(--merchant-border); }
+@media (max-width: 640px) { .subscription-page { width: min(calc(100% - 2rem), 52rem); margin: 1.25rem auto; } .subscription-page__row { align-items: flex-start; flex-direction: column; gap: .35rem; } }
+
 /* Auth pages: light mode uses the same Merchant Core surface and action colors. */
 :root[data-theme='light'] .auth-themed {
   background: #f9f9ff !important;

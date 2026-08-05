@@ -122,9 +122,8 @@ export const storeCapabilitiesApi = {
 export const subscriptionsApi = {
   listPlans: () => api.get('/api/admin/plans'),
   getPlanById: (planId) => api.get(`/api/admin/plans/${planId}`),
-  // Pending backend endpoint. It should describe trial, paid, and expired states
-  // for the logged-in seller; see SubscriptionStatus for the expected fields.
-  getCurrent: () => api.get('/api/seller/subscriptions/current'),
+  // Current seller subscription: plan, status and renewal date.
+  getCurrent: () => api.get('/api/seller/subscriptions/my-subscription'),
   getTrialStatus: () => api.get('/api/seller/subscriptions/trial-status'),
   startFreeTrial: (planId) => api.post('/api/seller/subscriptions/free-trial', { planId }),
   createCheckoutSession: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),

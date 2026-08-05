@@ -1,22 +1,55 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { AlertCircle, CheckCircle2, Clock3, CreditCard, Loader2 } from 'lucide-react';
 import { subscriptionsApi } from '../../../api/integrationApi';
 import { normalizeSubscription } from '../../../components/merchant/subscription/subscriptionStatus';
+
+const formatDate = (value) => {
+  if (!value) return 'Not available yet';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Not available yet';
+  return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+};
 
 export default function SubscriptionDetailsPage() {
   const [subscription, setSubscription] = useState(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    subscriptionsApi.getCurrent().then(({ data }) => setSubscription(normalizeSubscription(data)))
-      .catch(() => setError('Subscription details will appear here once the subscription endpoint is available.'));
+    let active = true;
+    const load = async () => {
+      try {
+        const { data } = await subscriptionsApi.getCurrent();
+        let trialData = {};
+        if (String(data?.status || '').toLowerCase() === 'trial') {
+          try { const response = await subscriptionsApi.getTrialStatus(); trialData = response.data || {}; } catch { /* plan information can still be shown */ }
+        }
+        if (active) setSubscription(normalizeSubscription({ ...data, ...trialData }));
+      } catch {
+        if (active) setError('We could not load your subscription details right now. Please try again shortly.');
+      }
+    };
+    void load();
+    return () => { active = false; };
   }, []);
 
-  return <div className="mx-auto max-w-3xl p-6 sm:p-8"><h1 className="text-3xl font-extrabold">Subscription</h1><p className="mt-2 text-sm text-slate-500">Manage your plan and billing status.</p>
-    <section className="mt-7 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      {error ? <><p className="text-sm text-slate-600">{error}</p><Link to="/onboarding?step=3" className="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white">View plans</Link></> : <dl className="divide-y divide-slate-100"> <Row label="Current plan" value={subscription?.planName || '—'} /><Row label="Status" value={subscription?.status || '—'} /><Row label="Trial days left" value={subscription?.isTrialing ? `${subscription.remainingDays} day(s)` : '—'} /><Row label="Renewal date" value={subscription?.renewDate || subscription?.renewalDate || '—'} /></dl>}
-    </section>
+  if (!subscription && !error) return <div className="flex min-h-[60vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>;
+
+  const isTrial = subscription?.isTrialing;
+  const isExpired = subscription?.isExpired;
+  const renewalDate = formatDate(isTrial ? subscription?.trialEndDate : (subscription?.renewalDate || subscription?.renewDate));
+  const billingLabel = isTrial ? 'Trial ends' : isExpired ? 'Subscription ended' : 'Next billing date';
+  const statusLabel = isTrial ? 'Free trial' : isExpired ? 'Expired' : 'Active subscription';
+
+  return <div className="subscription-page">
+    <div className="flex items-start gap-3"><span className="rounded-xl bg-blue-100 p-3 text-blue-700"><CreditCard className="h-6 w-6" /></span><div><h1 className="text-3xl font-extrabold tracking-tight">Subscription</h1><p className="mt-1 text-sm text-slate-500">Your current plan and billing information.</p></div></div>
+
+    {error ? <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-5 text-sm text-red-700">{error}</div> : <>
+      {isExpired && <div className="mt-7 flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-3"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-700" /><div><h2 className="font-bold text-amber-950">Your trial has ended</h2><p className="mt-1 text-sm text-amber-800">Choose a plan to continue using your store and AI features.</p></div></div><Link to="/onboarding?step=3" className="inline-flex shrink-0 items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700">Choose a plan</Link></div>}
+
+      <section className="subscription-page__card"><div className="subscription-page__card-header"><h2 className="text-lg font-bold">Current subscription</h2><p className="mt-1 text-sm text-slate-500">These details update from your subscription.</p></div><dl className="subscription-page__details"> <Row label="Current plan" value={subscription.planName || '—'} /><Row label="Status" value={<span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${isExpired ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>{isExpired ? <AlertCircle className="h-3.5 w-3.5" /> : <CheckCircle2 className="h-3.5 w-3.5" />}{statusLabel}</span>} /><Row label="Plan price" value={subscription.planPrice != null ? `$${subscription.planPrice} / month` : '—'} />{isTrial && <Row label="Days remaining" value={`${subscription.remainingDays} ${subscription.remainingDays === 1 ? 'day' : 'days'}`} />}<Row label={billingLabel} value={<span className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4 text-slate-400" />{renewalDate}</span>} /></dl></section>
+    </>}
   </div>;
 }
 
-function Row({ label, value }) { return <div className="flex items-center justify-between gap-5 py-4 text-sm"><dt className="text-slate-500">{label}</dt><dd className="font-semibold text-slate-900">{value}</dd></div>; }
+function Row({ label, value }) { return <div className="subscription-page__row"><dt className="text-sm text-slate-500">{label}</dt><dd className="text-sm font-semibold text-slate-900">{value}</dd></div>; }
