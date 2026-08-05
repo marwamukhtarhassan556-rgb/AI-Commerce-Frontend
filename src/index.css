@@ -205,6 +205,12 @@
 .merchant-shell .hover\:bg-slate-50:hover { background-color: var(--color-surface-container-low) !important; }
 .merchant-shell .shadow-sm { box-shadow: var(--merchant-shadow) !important; }
 .merchant-topbar { background: color-mix(in srgb, var(--merchant-card) 92%, transparent) !important; border-color: var(--merchant-border) !important; backdrop-filter: blur(18px); }
+.merchant-store-selector { display: flex; min-width: 9rem; max-width: 13rem; align-items: center; gap: .55rem; border: 1px solid var(--merchant-border); border-radius: .7rem; padding: .35rem .55rem; background: var(--merchant-card); color: var(--color-on-surface); cursor: pointer; transition: background .18s, border-color .18s; }
+.merchant-store-selector:hover { border-color: var(--color-primary); background: var(--color-surface-container-low); }
+.merchant-store-selector__icon { display: grid; width: 1.85rem; height: 1.85rem; flex: none; place-items: center; border-radius: .5rem; background: color-mix(in srgb, var(--color-primary) 13%, transparent); color: var(--color-primary); }
+.merchant-store-selector__label, .merchant-store-selector__name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.merchant-store-selector__label { color: var(--color-on-surface-variant); font-size: .57rem; font-weight: 800; letter-spacing: .08em; line-height: 1.1; text-transform: uppercase; }
+.merchant-store-selector__name { max-width: 8.2rem; margin-top: .1rem; font-size: .78rem; font-weight: 700; line-height: 1.15; }
 :root[data-theme='dark'] .merchant-shell [class*='rounded-xl'],
 :root[data-theme='dark'] .merchant-shell [class*='rounded-2xl'] { backdrop-filter: blur(16px); }
 
@@ -215,6 +221,29 @@
 .subscription-page__details { display: block; padding: 0 1.5rem; }
 .subscription-page__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; }
 .subscription-page__row + .subscription-page__row { border-top: 1px solid var(--merchant-border); }
+.subscription-page__action-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; }
+.subscription-page__action-buttons { display: flex; flex: none; gap: .65rem; }
+.subscription-page__disabled-action, .subscription-page__pay-action, .subscription-page__auto-renew, .subscription-page__cancel-action { flex: none; border-radius: .75rem; padding: .7rem 1rem; font-size: .875rem; font-weight: 700; }
+.subscription-page__disabled-action { border: 1px solid var(--merchant-border); background: var(--color-surface-container-high); color: var(--color-on-surface-variant); cursor: not-allowed; }
+.subscription-page__pay-action { background: #2563eb; color: #fff; text-decoration: none; box-shadow: 0 8px 18px rgba(37, 99, 235, .24); }
+.subscription-page__pay-action:hover { background: #1d4ed8; }
+.subscription-page__auto-renew { background: color-mix(in srgb, #10b981 14%, transparent); color: #047857; }
+.subscription-page__cancel-action { border: 1px solid #fca5a5; background: transparent; color: #dc2626; cursor: pointer; }
+.subscription-page__cancel-action:hover { background: #fef2f2; }
+.subscription-page__change-action { border: 1px solid var(--merchant-border); border-radius: .75rem; padding: .7rem 1rem; color: var(--color-on-surface); font-size: .875rem; font-weight: 700; text-decoration: none; }
+.subscription-page__change-action:hover { border-color: var(--color-primary); background: var(--color-surface-container-low); }
+.subscription-cancel-overlay { position: fixed; z-index: 200; inset: 0; display: grid; place-items: center; padding: 1rem; background: rgba(2, 6, 23, .62); }
+.subscription-cancel-dialog { box-sizing: border-box; width: min(100%, 28rem); padding: 1.75rem; border: 1px solid var(--merchant-border); border-radius: 1rem; background: var(--merchant-card); color: var(--color-on-surface); box-shadow: 0 24px 70px rgba(0, 0, 0, .42); }
+.subscription-cancel-dialog h2 { margin: 0; color: var(--color-on-surface); font-size: 1.25rem; font-weight: 800; }
+.subscription-cancel-dialog p { margin: .75rem 0 0; color: var(--color-on-surface-variant); font-size: .9rem; line-height: 1.65; }
+.subscription-cancel-dialog__actions { display: flex; justify-content: flex-end; gap: .75rem; margin-top: 1.5rem; }
+.subscription-cancel-dialog__keep, .subscription-cancel-dialog__confirm { min-height: 2.75rem; border-radius: .75rem; padding: .65rem 1rem; font-size: .875rem; font-weight: 700; cursor: pointer; }
+.subscription-cancel-dialog__keep { border: 1px solid var(--merchant-border); background: transparent; color: var(--color-on-surface); }
+.subscription-cancel-dialog__confirm { border: 1px solid #dc2626; background: #dc2626; color: #fff; }
+.subscription-cancel-dialog__confirm:hover { background: #b91c1c; }
+.subscription-cancel-dialog__keep:disabled, .subscription-cancel-dialog__confirm:disabled { cursor: not-allowed; opacity: .6; }
+@media (max-width: 480px) { .subscription-cancel-dialog__actions { flex-direction: column-reverse; } .subscription-cancel-dialog__keep, .subscription-cancel-dialog__confirm { width: 100%; } }
+@media (max-width: 640px) { .subscription-page__action-card { align-items: stretch; flex-direction: column; } .subscription-page__action-buttons { flex-direction: column; } .subscription-page__disabled-action, .subscription-page__pay-action, .subscription-page__auto-renew, .subscription-page__change-action { text-align: center; } }
 @media (max-width: 640px) { .subscription-page { width: min(calc(100% - 2rem), 52rem); margin: 1.25rem auto; } .subscription-page__row { align-items: flex-start; flex-direction: column; gap: .35rem; } }
 
 /* Auth pages: light mode uses the same Merchant Core surface and action colors. */
