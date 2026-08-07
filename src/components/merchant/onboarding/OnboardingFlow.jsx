@@ -80,6 +80,14 @@ export default function OnboardingFlow() {
       if (data.aiToken || data.aiAccessToken) localStorage.setItem('aiToken', data.aiToken || data.aiAccessToken);
       if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
       if (data.role) localStorage.setItem('userRole', data.role);
+      const sessionUser = data.user || data.profile || {};
+      const userId = data.userId || data.user_id || sessionUser.id || sessionUser.userId || sessionUser.user_id;
+      const organizationId = data.organizationId || data.organization_id || data.orgId || data.org_id || sessionUser.organizationId || sessionUser.organization_id || sessionUser.orgId || sessionUser.org_id;
+      if (userId) localStorage.setItem('userId', String(userId));
+      else localStorage.removeItem('userId');
+      if (organizationId) localStorage.setItem('organizationId', String(organizationId));
+      else localStorage.removeItem('organizationId');
+      localStorage.removeItem('orgId');
       setStep(3);
     } catch (requestError) { setError(messageFor(requestError, 'Invalid email or password.')); }
     finally { setLoading(false); }

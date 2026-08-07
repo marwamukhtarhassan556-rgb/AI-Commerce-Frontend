@@ -21,6 +21,17 @@ const saveMerchantProfile = (profile = {}) => {
   return normalizedProfile;
 };
 
+const firstDefined = (...values) =>
+  values.find((value) => value !== undefined && value !== null && value !== '');
+
+const saveOrRemove = (key, value) => {
+  if (value === undefined || value === null || value === '') {
+    localStorage.removeItem(key);
+    return;
+  }
+  localStorage.setItem(key, String(value));
+};
+
 // بيفك شفرة التوكين ويطلع الـ Role والبيانات
 export const decodeToken = (token) => {
   if (!token) return null;
@@ -48,7 +59,16 @@ export const decodeToken = (token) => {
       decoded['sub'] ||
       '';
 
-    return { decoded, role, email, userId };
+    const organizationId =
+      decoded.organizationId ||
+      decoded.organization_id ||
+      decoded.orgId ||
+      decoded.org_id ||
+      decoded.tenantId ||
+      decoded.tenant_id ||
+      '';
+
+    return { decoded, role, email, userId, organizationId };
   } catch (err) {
     console.error('JWT decode failed:', err);
     return null;
@@ -102,33 +122,50 @@ export const loginUser = async (email, password) => {
   const token = data.token || data.accessToken;
   const aiToken = data.aiToken || data.aiAccessToken;
   const refreshToken = data.refreshToken;
-  const userId = data.userId;
-  const userEmail = data.email || email;
-  const storeId = data.storeId || data.store_id;
-
   const tokenDetails = decodeToken(token);
+  const aiTokenDetails = decodeToken(aiToken);
+  const user = data.user || data.profile || {};
+  const userId = firstDefined(
+    data.userId,
+    data.user_id,
+    user.id,
+    user.userId,
+    user.user_id,
+    tokenDetails?.userId,
+    aiTokenDetails?.userId,
+  );
+  const organizationId = firstDefined(
+    data.organizationId,
+    data.organization_id,
+    data.orgId,
+    data.org_id,
+    user.organizationId,
+    user.organization_id,
+    user.orgId,
+    user.org_id,
+    tokenDetails?.organizationId,
+    aiTokenDetails?.organizationId,
+  );
+  const userEmail = firstDefined(data.email, user.email, tokenDetails?.email, email);
+  const storeId = firstDefined(data.storeId, data.store_id, user.storeId, user.store_id);
   const role = tokenDetails?.role || data.role || 'Seller';
 
   if (token) localStorage.setItem('token', token);
   if (aiToken) localStorage.setItem('aiToken', aiToken);
   if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
   if (role) localStorage.setItem('userRole', role);
-  if (userId) localStorage.setItem('userId', userId);
-  if (userEmail) localStorage.setItem('userEmail', userEmail);
-  const user = data.user || data.profile || {};
+  saveOrRemove('userId', userId);
+  saveOrRemove('organizationId', organizationId);
+  localStorage.removeItem('orgId');
+  saveOrRemove('userEmail', userEmail);
   saveMerchantProfile({
     firstName: data.firstName || data.first_name || user.firstName || user.first_name || '',
     lastName: data.lastName || data.last_name || user.lastName || user.last_name || '',
     name: data.name || user.name || '',
     email: userEmail,
   });
-  if (storeId) {
-    localStorage.setItem('storeId', storeId);
-    localStorage.setItem('currentStoreId', storeId);
-  } else {
-    localStorage.removeItem('storeId');
-    localStorage.removeItem('currentStoreId');
-  }
+  saveOrRemove('storeId', storeId);
+  saveOrRemove('currentStoreId', storeId);
 
   return {
     ...data,
@@ -163,6 +200,8 @@ export const logoutUser = () => {
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('userRole');
   localStorage.removeItem('userId');
+  localStorage.removeItem('organizationId');
+  localStorage.removeItem('orgId');
   localStorage.removeItem('userEmail');
   localStorage.removeItem('storeId');
   localStorage.removeItem('currentStoreId');
