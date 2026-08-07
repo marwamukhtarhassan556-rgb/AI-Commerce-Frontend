@@ -239,8 +239,16 @@ export const knowledgeApi = {
   },
 
   // GET /api/v1/knowledge-base/documents
-  listDocuments: (storeId, page = 1, pageSize = 20) =>
-    aiApi.get('/knowledge-base/documents', { params: { store_id: storeId, page, page_size: pageSize } }),
+  listDocuments: ({ storeId, organizationId, userId, page = 1, pageSize = 20 }) =>
+    aiApi.get('/knowledge-base/documents', {
+      params: {
+        store_id: storeId,
+        organization_id: organizationId,
+        user_id: userId,
+        page,
+        page_size: pageSize,
+      },
+    }),
 
   // DELETE /api/v1/knowledge-base/documents/{id}
   deleteDocument: (documentId) => aiApi.delete(`/knowledge-base/documents/${documentId}`),

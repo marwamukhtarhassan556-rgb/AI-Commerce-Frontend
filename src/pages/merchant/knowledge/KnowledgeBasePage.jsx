@@ -26,7 +26,7 @@ export default function KnowledgeBasePage() {
     if (!storeId) return;
     setLoading(true); setMessage('');
     try {
-      const { data } = await knowledgeApi.listDocuments(storeId);
+      const { data } = await knowledgeApi.listDocuments({ storeId, organizationId, userId: uploadedBy });
       setDocuments(Array.isArray(data) ? data : data?.items || []);
     } catch (error) { setMessage(errorMessage(error, 'Knowledge-base documents could not be loaded.')); }
     finally { setLoading(false); }
