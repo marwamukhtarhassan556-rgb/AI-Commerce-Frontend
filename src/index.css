@@ -387,6 +387,16 @@ body {
   min-width: 0;
 }
 
+.developer-request-modal {
+  width: min(calc(100vw - 2rem), 36rem);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .25);
+}
+
 .checkout-page { display: flex; min-height: 100vh; flex-direction: column; background: radial-gradient(circle at 90% 8%, #dbeafe 0, transparent 24rem), radial-gradient(circle at 8% 92%, #e0e7ff 0, transparent 22rem), #f8faff; color: #0f172a; }
 .checkout-header { display: flex; width: min(100%, 76rem); margin: 0 auto; align-items: center; justify-content: space-between; padding: 1.5rem; }
 .checkout-brand { color: #1d4ed8; font-size: 1.25rem; font-weight: 800; text-decoration: none; }

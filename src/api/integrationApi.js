@@ -14,14 +14,14 @@ export const dashboardApi = {
     api.get(`/api/v1/dashboard/revenue-growth?storeId=${storeId}`),
 
   getTicketMetrics: (storeId) =>
-    api.get(`/api/v1/tickets/metrics/resolution?store_id=${storeId}`),
+    aiApi.get('/tickets/metrics/resolution', { params: { store_id: storeId } }),
 
   // جلب كل الـ dashboard stats دفعة واحدة
   getOverviewStats: async (storeId) => {
     const [rev, growth, tickets] = await Promise.allSettled([
       api.get(`/api/v1/dashboard/total-revenue?storeId=${storeId}`),
       api.get(`/api/v1/dashboard/revenue-growth?storeId=${storeId}`),
-      api.get(`/api/v1/tickets/metrics/resolution?store_id=${storeId}`),
+      aiApi.get('/tickets/metrics/resolution', { params: { store_id: storeId } }),
     ]);
     return {
       revenue: rev.status === 'fulfilled' ? rev.value.data : null,
@@ -294,5 +294,5 @@ export const recommendationsApi = {
 
 // ── Health Check ─────────────────────────────────────────────────────
 export const healthApi = {
-  check: () => aiApi.get('/health/'.replace('/api/v1', '')),
+  check: () => aiApi.get('/ai/health'),
 };

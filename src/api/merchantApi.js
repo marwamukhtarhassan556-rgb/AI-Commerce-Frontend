@@ -2,7 +2,7 @@ import api from './axiosConfig';
 import axios from 'axios';
 
 // الـ URLs الخاصة بالسيرفرات
-const AI_SERVICE_BASE = import.meta.env.VITE_AI_SERVICE_URL || 'https://aicommerce-ai-service-production.up.railway.app/api/v1';
+const AI_SERVICE_BASE = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai/api/v1';
 
 // Helper لعمل طلبات لخدمة الـ AI مع التوكين
 const aiApi = axios.create({
