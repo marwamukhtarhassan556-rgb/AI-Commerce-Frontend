@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api-ai/(.*)",
-      "destination": "/api/ai/$1"
+      "source": "/api-ai/:path*",
+      "destination": "/api/ai/:path*"
     },
     {
       "source": "/(.*)",
