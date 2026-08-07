@@ -6,6 +6,7 @@ import {
   Ticket, 
   BookOpen,
   CreditCard,
+  Plug,
   UserCircle 
 } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const navItems = [
   { name: 'My Store', path: '/merchant/store', icon: Store },
   { name: 'Tickets', path: '/merchant/tickets', icon: Ticket },
   { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
+  { name: 'Integrations', path: '/merchant/integrations', icon: Plug },
   { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
 ];
 

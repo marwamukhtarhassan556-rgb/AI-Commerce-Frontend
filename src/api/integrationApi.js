@@ -181,6 +181,10 @@ export const integrationApi = {
   parseSchema: (platformName, rawSpec) =>
     aiApi.post('/integration/schemas/parse', { platform_name: platformName, raw_spec: rawSpec }),
 
+  // POST /api/v1/integration/schemas/agent-parse
+  agentParseSchema: (platformName, rawSpec) =>
+    aiApi.post('/integration/schemas/agent-parse', { platform_name: platformName, raw_spec: rawSpec }),
+
   // POST /api/v1/integration/agent-sync (full agent-driven setup)
   agentSync: (data) => aiApi.post('/integration/agent-sync', data),
 };
