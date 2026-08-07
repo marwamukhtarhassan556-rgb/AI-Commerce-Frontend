@@ -31,7 +31,7 @@ export default function OnboardingFlow() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (step !== 3 || plans.length) return undefined;
+    if (step !== 3) return undefined;
     let active = true;
     const load = async () => {
       setPlansLoading(true); setError('');
@@ -64,7 +64,7 @@ export default function OnboardingFlow() {
     };
     void load();
     return () => { active = false; };
-  }, [step, plans.length]);
+  }, [step]);
 
   const submitRegister = async (event) => {
     event.preventDefault();
