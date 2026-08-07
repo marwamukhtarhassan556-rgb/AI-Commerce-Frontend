@@ -125,6 +125,7 @@ export const subscriptionsApi = {
   // Current seller subscription: plan, status and renewal date.
   getCurrent: () => api.get('/api/seller/subscriptions/my-subscription'),
   getTrialStatus: () => api.get('/api/seller/subscriptions/trial-status'),
+  hasUsedFreeTrial: () => api.get('/api/seller/subscriptions/has-used-free-trial'),
   startFreeTrial: (planId) => api.post('/api/seller/subscriptions/free-trial', { planId }),
   createCheckoutSession: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
   subscribe: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
