@@ -26,7 +26,7 @@ export default function KnowledgeBasePage() {
     if (!storeId) return;
     setLoading(true); setMessage('');
     try {
-      const { data } = await knowledgeApi.listDocuments({ storeId, organizationId, userId: uploadedBy });
+      const { data } = await knowledgeApi.listDocuments(storeId);
       setDocuments(Array.isArray(data) ? data : data?.items || []);
     } catch (error) { setMessage(errorMessage(error, 'Knowledge-base documents could not be loaded.')); }
     finally { setLoading(false); }
@@ -41,7 +41,11 @@ export default function KnowledgeBasePage() {
     if (!file || !storeId || !organizationId || !uploadedBy) return;
     setBusy('upload'); setMessage('');
     try {
-      await knowledgeApi.upload(file, { storeId, organizationId, uploadedBy });
+      const { data: uploadedDocument } = await knowledgeApi.upload(file, { storeId, organizationId, uploadedBy });
+      const documentId = uploadedDocument?.document_id || uploadedDocument?.id;
+      const filePath = uploadedDocument?.file_path || uploadedDocument?.storage_path || uploadedDocument?.path;
+      if (!documentId || !filePath) throw new Error('Upload completed without the document metadata required for processing.');
+      await knowledgeApi.processDocument({ documentId, filePath, mimeType: uploadedDocument?.mime_type || file.type });
       await loadDocuments();
       setMessage('Document uploaded. Processing may take a few moments.');
     } catch (error) { setMessage(errorMessage(error, 'Document upload failed.')); }

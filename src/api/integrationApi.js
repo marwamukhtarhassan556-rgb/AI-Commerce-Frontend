@@ -239,19 +239,25 @@ export const knowledgeApi = {
   },
 
   // GET /api/v1/knowledge-base/documents
-  listDocuments: ({ storeId, organizationId, userId, page = 1, pageSize = 20 }) =>
+  listDocuments: (storeId, page = 1, pageSize = 20) =>
     aiApi.get('/knowledge-base/documents', {
-      params: {
-        store_id: storeId,
-        organization_id: organizationId,
-        user_id: userId,
-        page,
-        page_size: pageSize,
-      },
+      params: { store_id: storeId, status: 'active', page, page_size: pageSize },
     }),
 
   // DELETE /api/v1/knowledge-base/documents/{id}
   deleteDocument: (documentId) => aiApi.delete(`/knowledge-base/documents/${documentId}`),
+
+  // POST /api/v1/knowledge-base/process
+  processDocument: ({ documentId, filePath, mimeType }) =>
+    aiApi.post('/knowledge-base/process', {
+      document_id: documentId,
+      file_path: filePath,
+      mime_type: mimeType,
+      also_chunk: true,
+      strategy: 'recursive_character',
+      chunk_size: 1000,
+      overlap: 200,
+    }),
 
   // POST /api/v1/knowledge-base/search
   search: ({ query, storeId, topK = 10, useHybrid = false }) =>
