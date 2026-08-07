@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api-ai/:path*",
-      "destination": "/api/ai/:path*"
+      "destination": "https://aicommerce-ai-service-production.up.railway.app/:path*"
     },
     {
       "source": "/(.*)",
