@@ -167,14 +167,23 @@ export default function OnboardingFlow() {
       const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
+      const authConfig = getConnectionAuthConfig(rawSpec);
       await integrationApi.agentParseSchema(platformName, rawSpec);
-      await integrationApi.createConnection({
+      const { data: connection } = await integrationApi.createConnection({
         store_id: storeId,
         name: `${platformName} connection`,
         platform_name: platformName,
         raw_spec: rawSpec,
-        auth_config: getConnectionAuthConfig(rawSpec),
+        auth_config: authConfig,
       });
+      const connectionId = connection?.id || connection?.connection_id;
+      const accessToken = localStorage.getItem('token');
+      if (!connectionId || !accessToken) throw new Error('The connection was created, but its credentials could not be configured.');
+      await integrationApi.updateConnectionCredentials(connectionId, {
+        auth_config: authConfig,
+        credentials: { Authorization: `Bearer ${accessToken}` },
+      });
+      await integrationApi.syncConnection(connectionId);
       setIntegrationProgress((current) => ({ ...current, schema: true }));
     } catch (requestError) {
       setError(requestError instanceof SyntaxError ? 'Please upload a valid OpenAPI JSON or YAML schema.' : messageFor(requestError, 'Could not analyze the OpenAPI schema.'));
