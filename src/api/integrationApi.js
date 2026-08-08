@@ -178,10 +178,6 @@ export const integrationApi = {
   // DELETE /api/v1/integration/connections/{id}
   deleteConnection: (connectionId) => aiApi.delete(`/integration/connections/${connectionId}`),
 
-  // PUT /api/v1/integration/connections/{id}/credentials
-  updateConnectionCredentials: (connectionId, data) =>
-    aiApi.put(`/integration/connections/${connectionId}/credentials`, data),
-
   // POST /api/v1/integration/connections/{id}/sync
   syncConnection: (connectionId, entityTypes = []) =>
     aiApi.post(`/integration/connections/${connectionId}/sync`, { entity_types: entityTypes }),

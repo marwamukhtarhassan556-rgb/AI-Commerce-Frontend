@@ -14,24 +14,6 @@ const messageFor = (error, fallback) => {
   return validationMessages?.join(' ') || data?.message || data?.title || error.message || fallback;
 };
 
-const getConnectionAuthConfig = (rawSpec) => {
-  const securitySchemes = rawSpec?.components?.securitySchemes || {};
-  const securityName = Object.keys(rawSpec?.security?.[0] || {})[0] || Object.keys(securitySchemes)[0];
-  const scheme = securitySchemes[securityName] || {};
-
-  if (scheme.type === 'http') {
-    return { type: scheme.scheme === 'bearer' ? 'bearer' : 'http', credentials_location: 'header', scheme: scheme.scheme, name: 'Authorization' };
-  }
-  if (scheme.type === 'apiKey') {
-    return { type: 'apiKey', credentials_location: scheme.in || 'header', name: scheme.name || 'X-API-Key' };
-  }
-  if (scheme.type === 'oauth2') {
-    const flowName = Object.keys(scheme.flows || {})[0];
-    return { type: 'oauth2', credentials_location: 'header', flow: flowName || null, token_url: scheme.flows?.[flowName]?.tokenUrl || null };
-  }
-  return { type: 'none', credentials_location: 'header' };
-};
-
 const replacePlaceholderServer = (rawSpec, shopDomain) => {
   const serverUrl = shopDomain?.trim();
   if (!serverUrl || !Array.isArray(rawSpec?.servers)) return rawSpec;
@@ -167,23 +149,17 @@ export default function OnboardingFlow() {
       const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
-      const authConfig = getConnectionAuthConfig(rawSpec);
-      await integrationApi.agentParseSchema(platformName, rawSpec);
-      const { data: connection } = await integrationApi.createConnection({
-        store_id: storeId,
-        name: `${platformName} connection`,
+      const accessToken = localStorage.getItem('token');
+      if (!accessToken) throw new Error('Your session is missing an access token. Please sign in again.');
+      const { data } = await integrationApi.agentSync({
         platform_name: platformName,
         raw_spec: rawSpec,
-        auth_config: authConfig,
-      });
-      const connectionId = connection?.id || connection?.connection_id;
-      const accessToken = localStorage.getItem('token');
-      if (!connectionId || !accessToken) throw new Error('The connection was created, but its credentials could not be configured.');
-      await integrationApi.updateConnectionCredentials(connectionId, {
-        auth_config: authConfig,
+        store_id: storeId,
+        name: `${platformName} connection`,
         credentials: { Authorization: `Bearer ${accessToken}` },
+        auto_sync: true,
       });
-      await integrationApi.syncConnection(connectionId);
+      if (data?.error || data?.user_friendly_error) throw new Error(data.user_friendly_error || data.error);
       setIntegrationProgress((current) => ({ ...current, schema: true }));
     } catch (requestError) {
       setError(requestError instanceof SyntaxError ? 'Please upload a valid OpenAPI JSON or YAML schema.' : messageFor(requestError, 'Could not analyze the OpenAPI schema.'));
