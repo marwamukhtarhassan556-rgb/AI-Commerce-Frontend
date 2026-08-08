@@ -14,6 +14,32 @@ const messageFor = (error, fallback) => {
   return validationMessages?.join(' ') || data?.message || data?.title || error.message || fallback;
 };
 
+const getConnectionAuthConfig = (rawSpec) => {
+  const securitySchemes = rawSpec?.components?.securitySchemes || {};
+  const securityName = Object.keys(rawSpec?.security?.[0] || {})[0] || Object.keys(securitySchemes)[0];
+  const scheme = securitySchemes[securityName] || {};
+
+  if (scheme.type === 'http') {
+    return { type: scheme.scheme === 'bearer' ? 'bearer' : 'http', credentials_location: 'header', scheme: scheme.scheme, name: 'Authorization' };
+  }
+  if (scheme.type === 'apiKey') {
+    return { type: 'apiKey', credentials_location: scheme.in || 'header', name: scheme.name || 'X-API-Key' };
+  }
+  if (scheme.type === 'oauth2') {
+    const flowName = Object.keys(scheme.flows || {})[0];
+    return { type: 'oauth2', credentials_location: 'header', flow: flowName || null, token_url: scheme.flows?.[flowName]?.tokenUrl || null };
+  }
+  return { type: 'none', credentials_location: 'header' };
+};
+
+const replacePlaceholderServer = (rawSpec, shopDomain) => {
+  const serverUrl = shopDomain?.trim();
+  if (!serverUrl || !Array.isArray(rawSpec?.servers)) return rawSpec;
+  const baseUrl = /^https?:\/\//i.test(serverUrl) ? serverUrl : `https://${serverUrl}`;
+  const servers = rawSpec.servers.map((server) => /api\.ecommerce-platform\.com/i.test(server?.url || '') ? { ...server, url: baseUrl } : server);
+  return { ...rawSpec, servers };
+};
+
 export default function OnboardingFlow() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -132,13 +158,23 @@ export default function OnboardingFlow() {
 
   const uploadSchema = async (file) => {
     if (!file) return;
+    const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');
+    if (!storeId) return setError('Create your store before uploading an OpenAPI schema.');
     setIntegrationLoading((current) => ({ ...current, schema: true })); setError('');
     try {
       const source = await file.text();
-      const rawSpec = /\.ya?ml$/i.test(file.name) ? parseYaml(source) : JSON.parse(source);
+      const parsedSpec = /\.ya?ml$/i.test(file.name) ? parseYaml(source) : JSON.parse(source);
+      const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
       await integrationApi.agentParseSchema(platformName, rawSpec);
+      await integrationApi.createConnection({
+        store_id: storeId,
+        name: `${platformName} connection`,
+        platform_name: platformName,
+        raw_spec: rawSpec,
+        auth_config: getConnectionAuthConfig(rawSpec),
+      });
       setIntegrationProgress((current) => ({ ...current, schema: true }));
     } catch (requestError) {
       setError(requestError instanceof SyntaxError ? 'Please upload a valid OpenAPI JSON or YAML schema.' : messageFor(requestError, 'Could not analyze the OpenAPI schema.'));
