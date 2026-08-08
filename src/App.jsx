@@ -6,6 +6,7 @@ import RegisterStep3Page from './pages/RegisterStep3';
 import SignInPage from './pages/SignIn';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
+import VerifyEmailPage from './pages/VerifyEmail';
 import AIDiagnosticPage from './pages/AIDiagnostic';
 import BuildingAssistantPage from './pages/BuildingAssistant';
 
@@ -70,6 +71,7 @@ function App() {
             <ResetPasswordPage />
           </PublicRoute>
         } />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
         <Route path="/onboarding" element={<OnboardingFlow />} />

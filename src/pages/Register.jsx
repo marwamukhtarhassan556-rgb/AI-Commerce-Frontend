@@ -52,8 +52,7 @@ const Register = () => {
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
         }));
-        // التوجيه لصفحة تسجيل الدخول أو الـ Dashboard
-        navigate('/signin');
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
       } else {
         setError(response.data.message || 'Registration failed.');
       }

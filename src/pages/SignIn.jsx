@@ -88,7 +88,9 @@ const SignIn = () => {
         data?.detail ||
         data?.title ||
         'Invalid email or password. Please try again.';
-      setError(message);
+      if (/(verify|verification|confirm).*(email)|(email).*(verify|verification|confirm)/i.test(message)) {
+        navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
+      } else setError(message);
     } finally {
       setLoading(false);
     }
