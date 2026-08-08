@@ -122,6 +122,7 @@ export const storeCapabilitiesApi = {
 export const subscriptionsApi = {
   listPlans: () => api.get('/api/admin/plans'),
   getPlanById: (planId) => api.get(`/api/admin/plans/${planId}`),
+  getDevelopmentPrice: (planId) => api.get(`/api/admin/plans/${planId}/development-price`),
   // Current seller subscription: plan, status and renewal date.
   getCurrent: () => api.get('/api/seller/subscriptions/my-subscription'),
   getTrialStatus: () => api.get('/api/seller/subscriptions/trial-status'),
@@ -130,6 +131,10 @@ export const subscriptionsApi = {
   createCheckoutSession: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
   subscribe: (planId) => api.post('/api/seller/subscriptions/checkout-session', { planId }),
   cancel: () => api.post('/api/seller/subscriptions/cancel'),
+};
+
+export const contactApi = {
+  createDeveloperRequest: (data) => api.post('/api/contact', data),
 };
 
 

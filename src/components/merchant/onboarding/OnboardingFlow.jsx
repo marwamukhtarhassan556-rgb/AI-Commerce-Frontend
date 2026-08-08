@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, ChevronLeft, Code2, Download, FileJson, FileText, HelpCircle, Loader2, Upload, X } from 'lucide-react';
 import { parse as parseYaml } from 'yaml';
 import api from '../../../api/axiosConfig';
-import { integrationApi, knowledgeApi, subscriptionsApi } from '../../../api/integrationApi';
+import { contactApi, integrationApi, knowledgeApi, subscriptionsApi } from '../../../api/integrationApi';
 import { normalizeSubscription } from '../subscription/subscriptionStatus';
 
 const initialStore = { name: '', description: '', platform: 'custom', shopDomain: '', currency: 'USD', language: 'en', timezone: 'UTC' };
@@ -202,7 +202,7 @@ export default function OnboardingFlow() {
       {step === 5 && <IntegrationLayout progress={integrationProgress} loading={integrationLoading} onUploadSchema={uploadSchema} onUploadPolicies={uploadPolicies} onDownloadWidget={downloadWidget} onAskDeveloper={() => setDeveloperModalOpen(true)} onFinish={() => navigate('/merchant/dashboard')} />}
     </section>
     {selectedPlan && <PlanModal plan={selectedPlan} trialStatus={trialStatus} hasUsedFreeTrial={hasUsedFreeTrial} loading={loading} onClose={() => { setSelectedPlan(null); setError(''); }} onStartFreeTrial={startFreeTrial} onCheckout={createCheckoutSession} />}
-    {developerModalOpen && <DeveloperModal plans={plans} onClose={() => setDeveloperModalOpen(false)} />}
+    {developerModalOpen && <DeveloperModal plans={plans} store={store} onClose={() => setDeveloperModalOpen(false)} />}
   </main>;
 }
 
@@ -227,5 +227,34 @@ function SetupCard({ icon: Icon, title, description, complete, children }) { ret
 
 function FilePicker({ accept, loading, label, onChange }) { return <label className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 ${loading ? 'pointer-events-none opacity-60' : ''}`}><Upload className="h-4 w-4" />{loading ? 'Working…' : label}<input className="sr-only" type="file" accept={accept} onChange={(event) => { void onChange(event.target.files?.[0]); event.target.value = ''; }} /></label>; }
 
-function DeveloperModal({ plans, onClose }) { const [submitted, setSubmitted] = useState(false); const submit = (event) => { event.preventDefault(); setSubmitted(true); }; return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div className="developer-request-modal"><button type="button" onClick={onClose} className="float-right rounded p-1 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button><h2 className="text-xl font-bold">Ask for Developer</h2><p className="mt-1 text-sm text-slate-500">Need help connecting your store? Leave your details and our team will contact you.</p><div className="mt-5 rounded-lg bg-slate-50 p-4"><p className="text-sm font-semibold">Plans & prices</p><div className="mt-2 space-y-1 text-sm text-slate-600">{plans.length ? plans.map((plan) => <div key={plan.id} className="flex justify-between gap-4"><span>{plan.planName}</span><b>${plan.planPrice}/mo</b></div>) : <span>Pricing will appear here when the plans service is available.</span>}</div></div>{submitted ? <p className="mt-5 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">Your details are ready. The Telegram delivery will be activated once the backend endpoint is provided.</p> : <form className="mt-5 space-y-3" onSubmit={submit}><div className="grid gap-3 sm:grid-cols-2"><ModalInput name="email" label="Email" type="email" /><ModalInput name="storeName" label="Store name" /><ModalInput name="phone" label="Phone number" /></div><label className="block text-sm font-medium text-slate-700">Preferred contact<select required name="contactPreference" className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"><option value="phone">Phone</option><option value="email">Email</option><option value="other">Other</option></select></label><label className="block text-sm font-medium text-slate-700">Message<textarea required name="message" rows="3" className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><Button type="submit">Send request</Button></form>}</div></div>; }
-function ModalInput({ name, label, type = 'text' }) { return <label className="block text-sm font-medium text-slate-700">{label}<input required name={name} type={type} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label>; }
+function DeveloperModal({ plans, store, onClose }) {
+  const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
+  const [prices, setPrices] = useState({});
+
+  useEffect(() => {
+    let active = true;
+    Promise.allSettled(plans.map((plan) => subscriptionsApi.getDevelopmentPrice(plan.id))).then((results) => {
+      if (!active) return;
+      setPrices(Object.fromEntries(results.map((result, index) => [plans[index].id, result.status === 'fulfilled' ? result.value.data?.developmentPrice : null])));
+    });
+    return () => { active = false; };
+  }, [plans]);
+
+  const submit = async (event) => {
+    event.preventDefault(); setSending(true); setError('');
+    const form = new FormData(event.currentTarget);
+    try {
+      await contactApi.createDeveloperRequest({
+        email: form.get('email'), storeName: form.get('storeName'), storeDescription: store.description || '',
+        message: form.get('message'), phoneNumber: form.get('phoneNumber'), contactPreference: form.get('contactPreference'), notes: '',
+      });
+      setSubmitted(true);
+    } catch (requestError) { setError(messageFor(requestError, 'Could not send your request. Please try again.')); }
+    finally { setSending(false); }
+  };
+
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div className="developer-request-modal"><button type="button" onClick={onClose} className="float-right rounded p-1 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button><h2 className="text-xl font-bold">Ask for Developer</h2><p className="mt-1 text-sm text-slate-500">Need help connecting your store? Leave your details and our team will contact you.</p><div className="mt-5 rounded-lg bg-slate-50 p-4"><p className="text-sm font-semibold">Development price by plan</p><div className="mt-2 space-y-1 text-sm text-slate-600">{plans.length ? plans.map((plan) => <div key={plan.id} className="flex justify-between gap-4"><span>{plan.planName}</span><b>{prices[plan.id] === undefined ? 'Loading…' : prices[plan.id] === null ? 'Unavailable' : `$${prices[plan.id]}`}</b></div>) : <span>Pricing will appear here when plans are available.</span>}</div></div>{submitted ? <p className="mt-5 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">Your request was sent successfully. Our team will contact you soon.</p> : <form className="mt-5 space-y-3" onSubmit={submit}>{error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}<div className="grid gap-3 sm:grid-cols-2"><ModalInput name="email" label="Email" type="email" /><ModalInput name="storeName" label="Store name" defaultValue={store.name} /><ModalInput name="phoneNumber" label="Phone number" /></div><label className="block text-sm font-medium text-slate-700">Preferred contact<select required name="contactPreference" className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5"><option value="phone">Phone</option><option value="email">Email</option><option value="other">Other</option></select></label><label className="block text-sm font-medium text-slate-700">Message<textarea required name="message" rows="3" className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><Button type="submit" loading={sending}>Send request</Button></form>}</div></div>;
+}
+function ModalInput({ name, label, type = 'text', defaultValue = '' }) { return <label className="block text-sm font-medium text-slate-700">{label}<input required name={name} type={type} defaultValue={defaultValue} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label>; }
