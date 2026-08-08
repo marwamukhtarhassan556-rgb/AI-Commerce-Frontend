@@ -18,7 +18,7 @@ const clearSessionAndRedirect = () => {
   if (window.location.pathname !== '/signin') window.location.assign('/signin');
 };
 
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
   const refreshToken = localStorage.getItem('refreshToken');
   if (!refreshToken) throw new Error('No refresh token is available.');
   if (!refreshInFlight) {
