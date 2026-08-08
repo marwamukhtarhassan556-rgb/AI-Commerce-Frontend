@@ -21,6 +21,7 @@ import KnowledgeBasePage from './pages/merchant/knowledge/KnowledgeBasePage';
 import CheckoutSuccessPage from './pages/checkout/CheckoutSuccessPage';
 import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
+import ProfilePage from './pages/merchant/profile/ProfilePage';
 
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
@@ -100,6 +101,7 @@ function App() {
           <Route path="/merchant/store" element={<StoreSettingsPage />} />
           <Route path="/merchant/knowledge" element={<KnowledgeBasePage />} />
           <Route path="/merchant/subscription" element={<SubscriptionDetailsPage />} />
+          <Route path="/merchant/profile" element={<ProfilePage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}

@@ -16,6 +16,7 @@ const navItems = [
   { name: 'Tickets', path: '/merchant/tickets', icon: Ticket },
   { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
   { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
+  { name: 'Profile', path: '/merchant/profile', icon: UserCircle },
 ];
 
 const Sidebar = () => {
@@ -52,13 +53,13 @@ const Sidebar = () => {
 
       {/* User Profile Footer */}
       <div className="mt-auto px-4">
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-surface-container-highest/50">
+        <NavLink to="/merchant/profile" className="flex items-center gap-3 rounded-xl bg-surface-container-highest/50 p-4 transition hover:bg-surface-container-high">
           <UserCircle className="w-8 h-8 text-primary" />
           <div className="flex flex-col">
             <span className="text-xs font-bold text-on-surface">{(() => { try { const profile = JSON.parse(localStorage.getItem('merchantProfile') || '{}'); return [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.name || profile.email || 'Merchant'; } catch { return 'Merchant'; } })()}</span>
             <span className="text-[10px] uppercase tracking-wider text-outline">Manage Account</span>
           </div>
-        </div>
+        </NavLink>
       </div>
     </aside>
   );

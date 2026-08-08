@@ -397,6 +397,47 @@ body {
   box-shadow: 0 24px 60px rgba(15, 23, 42, .25);
 }
 
+.knowledge-document-modal {
+  width: min(calc(100vw - 2rem), 34rem);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, .25);
+}
+
+.knowledge-document-modal--delete {
+  width: min(calc(100vw - 2rem), 28rem);
+}
+
+.knowledge-document-modal { color: #0f172a; }
+.knowledge-document-modal h3 { color: #0f172a !important; }
+.knowledge-document-modal p { color: #64748b !important; }
+.knowledge-document-modal label { color: #334155 !important; }
+.knowledge-document-modal input, .knowledge-document-modal textarea {
+  color: #0f172a !important;
+  background: #fff !important;
+  border-color: #cbd5e1 !important;
+}
+.knowledge-document-modal input::placeholder, .knowledge-document-modal textarea::placeholder { color: #94a3b8 !important; }
+
+:root[data-theme='dark'] .knowledge-document-modal {
+  background: #0f1d38;
+  border: 1px solid #2a426b;
+  color: #f1f5f9;
+}
+:root[data-theme='dark'] .knowledge-document-modal h3 { color: #f8fafc !important; }
+:root[data-theme='dark'] .knowledge-document-modal p { color: #b9c6d9 !important; }
+:root[data-theme='dark'] .knowledge-document-modal label { color: #dbeafe !important; }
+:root[data-theme='dark'] .knowledge-document-modal input,
+:root[data-theme='dark'] .knowledge-document-modal textarea {
+  color: #f8fafc !important;
+  background: #081225 !important;
+  border-color: #2a426b !important;
+}
+:root[data-theme='dark'] .knowledge-document-modal button[type='button'] { color: #cbd5e1 !important; }
+
 .checkout-page { display: flex; min-height: 100vh; flex-direction: column; background: radial-gradient(circle at 90% 8%, #dbeafe 0, transparent 24rem), radial-gradient(circle at 8% 92%, #e0e7ff 0, transparent 22rem), #f8faff; color: #0f172a; }
 .checkout-header { display: flex; width: min(100%, 76rem); margin: 0 auto; align-items: center; justify-content: space-between; padding: 1.5rem; }
 .checkout-brand { color: #1d4ed8; font-size: 1.25rem; font-weight: 800; text-decoration: none; }

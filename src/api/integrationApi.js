@@ -257,6 +257,9 @@ export const knowledgeApi = {
   // DELETE /api/v1/knowledge-base/documents/{id}
   deleteDocument: (documentId) => aiApi.delete(`/knowledge-base/documents/${documentId}`),
 
+  // PUT /api/v1/knowledge-base/documents/{id}
+  updateDocument: (documentId, data) => aiApi.put(`/knowledge-base/documents/${documentId}`, data),
+
   // POST /api/v1/knowledge-base/process
   processDocument: ({ documentId, filePath, mimeType }) =>
     aiApi.post('/knowledge-base/process', {
