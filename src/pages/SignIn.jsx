@@ -36,11 +36,13 @@ const SignIn = () => {
         password: formData.password,
       });
 
-      if (response.data.succeeded || response.data.token) {
+      if (response.data.succeeded || response.data.token || response.data.accessToken) {
         // حفظ الـ token إذا وجد
-        if (response.data.token) {
-          localStorage.setItem('token', response.data.token);
+        const accessToken = response.data.token || response.data.accessToken;
+        if (accessToken) {
+          localStorage.setItem('token', accessToken);
         }
+        if (response.data.refreshToken) localStorage.setItem('refreshToken', response.data.refreshToken);
         if (response.data.aiToken || response.data.aiAccessToken) {
           localStorage.setItem('aiToken', response.data.aiToken || response.data.aiAccessToken);
         }
@@ -56,6 +58,9 @@ const SignIn = () => {
         if (storeId) {
           localStorage.setItem('storeId', String(storeId));
           localStorage.setItem('currentStoreId', String(storeId));
+        } else {
+          localStorage.removeItem('storeId');
+          localStorage.removeItem('currentStoreId');
         }
         const user = response.data.user || response.data.profile || {};
         localStorage.setItem('merchantProfile', JSON.stringify({
