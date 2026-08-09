@@ -74,16 +74,9 @@ function App() {
             <RegisterStep3Page />
           </PublicRoute>
         } />
-        <Route path="/forgot-password" element={
-          <PublicRoute>
-            <ForgotPasswordPage />
-          </PublicRoute>
-        } />
-        <Route path="/reset-password" element={
-          <PublicRoute>
-            <ResetPasswordPage />
-          </PublicRoute>
-        } />
+        {/* Password recovery must stay available even when a previous session exists. */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
 
         {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
