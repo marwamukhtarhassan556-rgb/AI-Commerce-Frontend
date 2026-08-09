@@ -7,7 +7,7 @@ export default function VerifyEmail() {
   const verified = ['success', 'verified'].includes((params.get('status') || '').toLowerCase());
 
   return <div className="auth-page min-h-screen bg-[#020617] px-6 py-12 text-slate-100">
-    <main className="mx-auto flex min-h-[calc(100vh-6rem)] max-w-md items-center justify-center">
+    <main className="mx-auto flex min-h-[calc(100vh-6rem)] w-full max-w-md items-center justify-center">
       <section className="w-full rounded-2xl border border-slate-800 bg-[#0a0e1a]/90 p-8 text-center shadow-2xl backdrop-blur-xl">
         <div className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full ${verified ? 'bg-emerald-500/15 text-emerald-400' : 'bg-blue-500/15 text-blue-400'}`}>
           {verified ? <CheckCircle2 className="h-8 w-8" /> : <Mail className="h-7 w-7" />}
