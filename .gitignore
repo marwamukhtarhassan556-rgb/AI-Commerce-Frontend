@@ -27,3 +27,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+super-admin/
+AI-Commerce-Frontend-main/

@@ -75,17 +75,27 @@ export const decodeToken = (token) => {
   }
 };
 
+export const normalizeRole = (role) => {
+  if (!role) return 'seller';
+  const lowerRole = String(role).toLowerCase().trim();
+
+  if (lowerRole === 'superadmin' || lowerRole === 'super-admin' || lowerRole === 'super_admin') {
+    return 'super-admin';
+  }
+
+  return lowerRole;
+};
+
 // بيرجع المسار حسب الـ Role
 export const getRedirectPathByRole = (role) => {
-  if (!role) return '/merchant/dashboard';
-  const lowerRole = String(role).toLowerCase();
-  if (lowerRole.includes('admin')) {
+  const normalized = normalizeRole(role);
+  if (normalized === 'super-admin') {
     return '/admin/dashboard';
-  } else if (lowerRole.includes('seller') || lowerRole.includes('merchant')) {
-    return '/merchant/dashboard';
-  } else {
-    return '/dashboard';
   }
+  if (normalized === 'seller' || normalized === 'merchant' || normalized === 'admin') {
+    return '/merchant/dashboard';
+  }
+  return '/dashboard';
 };
 
 // بيشيك لو المستخدم مسجل دخول والتوكين لسه صالح
@@ -148,7 +158,7 @@ export const loginUser = async (email, password) => {
   );
   const userEmail = firstDefined(data.email, user.email, tokenDetails?.email, email);
   const storeId = firstDefined(data.storeId, data.store_id, user.storeId, user.store_id);
-  const role = tokenDetails?.role || data.role || 'Seller';
+  const role = normalizeRole(tokenDetails?.role || data.role || 'Seller');
 
   if (token) localStorage.setItem('token', token);
   if (aiToken) localStorage.setItem('aiToken', aiToken);

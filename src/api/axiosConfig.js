@@ -59,8 +59,18 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  const url = config.url || '';
+  const isAuthEndpoint = [
+    '/api/auth/login',
+    '/api/auth/google',
+    '/api/auth/register',
+    '/api/auth/forgot-password',
+  ].some((endpoint) => url.includes(endpoint));
+
   const token = localStorage.getItem('token');
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token && !isAuthEndpoint) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 

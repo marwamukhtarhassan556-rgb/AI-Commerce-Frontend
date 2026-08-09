@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { decodeToken, getRedirectPathByRole, normalizeRole } from '../api/authService';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -69,10 +70,16 @@ const SignIn = () => {
           name: response.data.name || user.name || [response.data.firstName || response.data.first_name || user.firstName || user.first_name || '', response.data.lastName || response.data.last_name || user.lastName || user.last_name || ''].filter(Boolean).join(' ') || '',
           email: response.data.email || user.email || formData.email,
         }));
-        // التوجيه للوحة التحكم بعد النجاح
+        const role = normalizeRole(
+          response.data.role || decodeToken(accessToken)?.role || localStorage.getItem('userRole') || 'seller',
+        );
+        localStorage.setItem('userRole', role);
+        const redirectPath = role === 'super-admin'
+          ? getRedirectPathByRole(role)
+          : (storeId ? '/merchant/dashboard' : '/onboarding?step=3');
         // Replace the sign-in history entry so browser Back cannot expose a stale
         // dashboard route while the seller is completing onboarding.
-        navigate(storeId ? '/merchant/dashboard' : '/onboarding?step=3', { replace: true });
+        navigate(redirectPath, { replace: true });
       } else {
         setError(response.data.message || 'Failed to sign in.');
       }
