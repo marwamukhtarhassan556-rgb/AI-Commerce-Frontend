@@ -65,6 +65,7 @@ api.interceptors.request.use((config) => {
     '/api/auth/google',
     '/api/auth/register',
     '/api/auth/forgot-password',
+    '/api/auth/reset-password',
   ].some((endpoint) => url.includes(endpoint));
 
   const token = localStorage.getItem('token');
