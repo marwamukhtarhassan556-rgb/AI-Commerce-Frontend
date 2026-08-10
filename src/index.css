@@ -497,6 +497,9 @@ body {
   backdrop-filter: blur(14px);
 }
 
+/* The plan selector is the first onboarding step, so it has no previous step. */
+.onboarding-plan-page .onboarding-back { display: none; }
+
 .onboarding-plans-card {
   max-width: 76rem !important;
 }

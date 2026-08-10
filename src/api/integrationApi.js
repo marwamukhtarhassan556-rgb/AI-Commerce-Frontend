@@ -84,6 +84,16 @@ export const ticketsApi = {
   // DELETE /api/v1/tickets/{id}
   delete: (ticketId) => aiApi.delete(`/tickets/${ticketId}`),
 
+  // GET /api/v1/tickets/{ticket_id}/notifications
+  listNotifications: (ticketId, { customerId, unreadOnly = false, limit = 50 } = {}) =>
+    aiApi.get(`/tickets/${ticketId}/notifications`, {
+      params: {
+        ...(customerId && { customer_id: customerId }),
+        unread_only: unreadOnly,
+        limit,
+      },
+    }),
+
   // GET /api/v1/tickets/metrics/resolution
   getMetrics: (storeId) =>
     aiApi.get('/tickets/metrics/resolution', { params: { store_id: storeId } }),
