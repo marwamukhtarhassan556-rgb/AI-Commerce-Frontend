@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import { Camera, KeyRound, Loader2, Save, Store, UserCircle } from 'lucide-react';
 import { profileApi } from '../../../api/profileApi';
 import { resolveProfilePicture, saveMerchantProfile } from '../../../utils/profilePicture';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 
-const errorMessage = (error, fallback) => {
-  const data = error.response?.data;
-  return (Array.isArray(data?.errors) ? data.errors.join(' ') : data?.errors && Object.values(data.errors).flat().join(' ')) || data?.message || data?.title || fallback;
-};
+const errorMessage = (error, fallback) => getUserErrorMessage(error, fallback);
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);

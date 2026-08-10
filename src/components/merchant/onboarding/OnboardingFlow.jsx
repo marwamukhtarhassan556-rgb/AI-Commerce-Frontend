@@ -5,14 +5,11 @@ import { parse as parseYaml } from 'yaml';
 import api, { refreshAccessToken } from '../../../api/axiosConfig';
 import { contactApi, integrationApi, knowledgeApi, subscriptionsApi } from '../../../api/integrationApi';
 import { normalizeSubscription } from '../subscription/subscriptionStatus';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 
 const initialStore = { name: '', description: '', platform: 'custom', shopDomain: '', currency: 'USD', language: 'en', timezone: 'UTC' };
 
-const messageFor = (error, fallback) => {
-  const data = error.response?.data;
-  const validationMessages = data?.errors && Object.values(data.errors).flat().filter(Boolean);
-  return validationMessages?.join(' ') || data?.message || data?.title || error.message || fallback;
-};
+const messageFor = (error, fallback) => getUserErrorMessage(error, fallback);
 
 const replacePlaceholderServer = (rawSpec, shopDomain) => {
   const serverUrl = shopDomain?.trim();

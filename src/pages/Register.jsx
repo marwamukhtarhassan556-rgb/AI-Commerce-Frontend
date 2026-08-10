@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { getUserErrorMessage } from '../utils/errorMessage';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -54,21 +55,11 @@ const Register = () => {
         }));
         navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
       } else {
-        setError(response.data.message || 'Registration failed.');
+        setError(getUserErrorMessage({ response: { data: response.data } }, 'We could not create your account. Please try again.', 'registration'));
       }
     } catch (err) {
       console.error('Registration Error:', err);
-      const data = err.response?.data;
-      const validationErrors = Array.isArray(data?.errors)
-        ? data.errors.join(' ')
-        : Object.values(data?.errors || {}).flat().join(' ');
-      const message =
-        validationErrors ||
-        data?.message ||
-        data?.detail ||
-        data?.title ||
-        'Failed to create account. Please check your details and try again.';
-      setError(message);
+      setError(getUserErrorMessage(err, 'We could not create your account. Please check your details and try again.', 'registration'));
     } finally {
       setLoading(false);
     }

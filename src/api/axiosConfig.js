@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { prepareUserError } from '../utils/errorMessage';
 
 // ─────────────────────────────────────────────
 // 1. BACKEND — ASP.NET Core
@@ -78,6 +79,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
+    prepareUserError(error);
     const isLoginRequest = error.config?.url?.includes('/api/auth/login');
     if (!isLoginRequest) return retryAfterRefresh(error, api);
     return Promise.reject(error);
@@ -111,6 +113,7 @@ aiApi.interceptors.response.use(
   (res) => res,
   async (error) => {
     console.error('[AI Service Error]', error.response?.status, error.response?.data);
+    prepareUserError(error);
     return retryAfterRefresh(error, aiApi);
   }
 );

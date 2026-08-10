@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { decodeToken, getRedirectPathByRole, normalizeRole } from '../api/authService';
+import { getServerErrorText, getUserErrorMessage } from '../utils/errorMessage';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -81,23 +82,14 @@ const SignIn = () => {
         // dashboard route while the seller is completing onboarding.
         navigate(redirectPath, { replace: true });
       } else {
-        setError(response.data.message || 'Failed to sign in.');
+        setError(getUserErrorMessage({ response: { data: response.data } }, 'We could not sign you in. Please try again.', 'login'));
       }
     } catch (err) {
       console.error('Sign In Error:', err);
-      const data = err.response?.data;
-      const validationErrors = Array.isArray(data?.errors)
-        ? data.errors.join(' ')
-        : Object.values(data?.errors || {}).flat().join(' ');
-      const message =
-        validationErrors ||
-        data?.message ||
-        data?.detail ||
-        data?.title ||
-        'Invalid email or password. Please try again.';
-      if (/(verify|verification|confirm).*(email)|(email).*(verify|verification|confirm)/i.test(message)) {
+      const serverMessage = getServerErrorText(err);
+      if (/(verify|verification|confirm).*(email)|(email).*(verify|verification|confirm)/i.test(serverMessage)) {
         navigate(`/verify-email?email=${encodeURIComponent(formData.email.trim())}`);
-      } else setError(message);
+      } else setError(getUserErrorMessage(err, 'The email address or password is incorrect.', 'login'));
     } finally {
       setLoading(false);
     }

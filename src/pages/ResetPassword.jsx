@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { getUserErrorMessage } from '../utils/errorMessage';
 import './auth.css';
 
 export default function ResetPassword() {
@@ -32,9 +33,9 @@ export default function ResetPassword() {
       if (response.status === 200 || response.data?.succeeded) {
         setSuccess(true);
         window.setTimeout(() => navigate('/signin'), 1800);
-      } else setError(response.data?.message || 'Unable to reset the password.');
+      } else setError(getUserErrorMessage({ response: { data: response.data } }, 'We could not reset your password. Please request a new link.', 'password-reset'));
     } catch (err) {
-      setError(err.response?.data?.message || 'This reset link may have expired. Please request a new link.');
+      setError(getUserErrorMessage(err, 'We could not reset your password. Please request a new link.', 'password-reset'));
     } finally { setLoading(false); }
   }
 

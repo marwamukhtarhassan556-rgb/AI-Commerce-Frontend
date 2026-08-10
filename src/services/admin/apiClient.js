@@ -257,6 +257,7 @@ function getFallbackData(path) {
 }
 
 import { refreshAccessToken, forceAdminLogout } from './tokenRefresh';
+import { getUserErrorMessage } from '../../utils/errorMessage';
 
 // Sentinel error so apiRequest can distinguish 401 from other failures.
 class UnauthorizedError extends Error {
@@ -282,11 +283,7 @@ async function parseResponse(response) {
     : await response.text();
 
   if (!response.ok) {
-    const message =
-      typeof payload === 'object' && payload !== null
-        ? payload.message ?? payload.title ?? 'Request failed'
-        : payload || 'Request failed';
-    throw new Error(message);
+    throw new Error(getUserErrorMessage({ response: { status: response.status, data: payload } }, 'We could not complete that request. Please try again.'));
   }
 
   return payload;

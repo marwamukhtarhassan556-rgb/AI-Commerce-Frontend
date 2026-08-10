@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Bot, CheckCircle2, FileText, Pencil, Search, Sparkles, Trash2, Upload, X } from 'lucide-react';
 import { knowledgeApi } from '../../../api/integrationApi';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 
 /* Loading remote knowledge data updates component state from an effect. */
 /* eslint-disable react-hooks/set-state-in-effect */
 
-const errorMessage = (error, fallback) => {
-  if (error.response?.status === 401) return 'AI service authentication failed. Please sign in again after the AI token is configured.';
-  return error.response?.data?.detail || error.response?.data?.message || fallback;
-};
+const errorMessage = (error, fallback) => getUserErrorMessage(error, fallback);
 
 export default function KnowledgeBasePage() {
   const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');

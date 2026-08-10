@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Bot, FileJson2, Loader2, Upload } from 'lucide-react';
 import { integrationApi } from '../../../api/integrationApi';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 
-const getErrorMessage = (error) =>
-  error.response?.data?.detail || error.response?.data?.message || error.message || 'Schema analysis could not be completed.';
+const getErrorMessage = (error) => getUserErrorMessage(error, 'Schema analysis could not be completed.');
 
 export default function IntegrationPage() {
   const [platformName, setPlatformName] = useState('Custom API');

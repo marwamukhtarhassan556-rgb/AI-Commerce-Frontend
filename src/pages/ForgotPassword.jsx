@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, LockKeyhole, Mail } from 'lucide-react';
 import api from '../api/axiosConfig';
+import { getUserErrorMessage } from '../utils/errorMessage';
 import './auth.css';
 
 export default function ForgotPassword() {
@@ -17,9 +18,9 @@ export default function ForgotPassword() {
     try {
       const response = await api.post('/api/auth/forgot-password', { email });
       if (response.status === 200 || response.data?.succeeded) setIsSent(true);
-      else setError(response.data?.message || 'Failed to send the reset link.');
+      else setError(getUserErrorMessage({ response: { data: response.data } }, 'We could not send the reset link. Please try again.'));
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+      setError(getUserErrorMessage(err, 'We could not send the reset link. Please try again.', 'password-reset'));
     } finally { setLoading(false); }
   }
 

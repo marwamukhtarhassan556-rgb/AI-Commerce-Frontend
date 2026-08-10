@@ -5,6 +5,7 @@ import { integrationApi, storesApi, subscriptionsApi, ticketsApi } from '../../a
 import { normalizeSubscription } from './subscription/subscriptionStatus';
 import LogoutButton from '../LogoutButton';
 import { resolveProfilePicture } from '../../utils/profilePicture';
+import { getUserErrorMessage } from '../../utils/errorMessage';
 
 const normalizeStores = (data) => Array.isArray(data) ? data : data?.items || data?.data?.items || data?.data || data?.result?.items || data?.result || [];
 const normalizeTickets = (data) => Array.isArray(data) ? data : data?.items || data?.data?.items || data?.data || [];
@@ -94,7 +95,7 @@ export default function TopBar() {
       window.alert('Sync started successfully.');
     } catch (error) {
       console.error('Sync failed:', error.response?.data || error);
-      window.alert(error.response?.status === 401 ? 'The AI service rejected your session.' : 'Sync failed.');
+      window.alert(getUserErrorMessage(error, 'We could not start the sync. Please try again.'));
     } finally { setIsSyncing(false); }
   };
 
