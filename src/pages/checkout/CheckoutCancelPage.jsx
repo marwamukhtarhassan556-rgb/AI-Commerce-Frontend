@@ -1,0 +1,8 @@
+import { CircleX, Headphones, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export default function CheckoutCancelPage() {
+  return <div className="checkout-page"><header className="checkout-header"><Link to="/" className="checkout-brand">AICommerce Pay</Link><span className="text-sm text-slate-600">Need help?</span></header><main className="checkout-main"><div className="checkout-status-card text-center"><div className="checkout-cancel-icon"><CircleX /></div><h1>Payment Cancelled</h1><p className="checkout-status-copy">It looks like you cancelled the payment process. You can return to the plans and subscribe whenever you’re ready.</p><div className="grid gap-3 text-left sm:grid-cols-2"><Info icon={<LockKeyhole />} title="Your data" value="is fully encrypted" /><Info icon={<Headphones />} title="Help" value="Support is available" /></div><div className="mt-8 grid gap-3 sm:grid-cols-2"><Link to="/onboarding?step=3" className="checkout-primary-action">View plans</Link><Link to="/" className="checkout-muted-action">Back to home</Link></div><p className="mt-7 inline-flex items-center gap-2 text-xs text-slate-500"><ShieldCheck className="h-4 w-4" />No payment was taken</p></div></main><footer className="checkout-footer">AICommerce · Secure subscription checkout</footer></div>;
+}
+
+function Info({ icon, title, value }) { return <div className="flex items-center gap-3 rounded-xl bg-blue-50 p-4"><span className="text-blue-600">{icon}</span><p className="text-sm text-slate-600"><span className="block text-xs text-slate-500">{title}</span><b className="text-slate-900">{value}</b></p></div>; }

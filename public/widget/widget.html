@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Commerce Assistant</title>
+  <link rel="stylesheet" href="widget.css">
+</head>
+<body>
+  <div class="chat-widget">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="avatar-container">
+        <div class="avatar">AI</div>
+        <div class="status-indicator online"></div>
+      </div>
+      <div class="header-info">
+        <h3>AI Assistant</h3>
+        <p>Online · Powered by AI-Commerce</p>
+      </div>
+      <button id="close-btn" class="close-btn" aria-label="Close Chat">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+        </svg>
+      </button>
+    </header>
+
+    <!-- Message Area -->
+    <main id="chat-messages" class="chat-messages">
+      <!-- Initial Welcome Message -->
+      <div class="message system-message">
+        <div class="message-content">
+          Hello! How can I help you today? Ask me about our products, pricing, or shipping!
+        </div>
+        <div class="message-time">Just now</div>
+      </div>
+    </main>
+
+    <!-- Input Footer -->
+    <footer class="chat-footer">
+      <form id="chat-form" class="chat-input-container">
+        <input 
+          type="text" 
+          id="chat-input" 
+          placeholder="Type your message here..." 
+          autocomplete="off"
+          required
+        />
+        <button type="submit" id="send-btn" class="send-btn" aria-label="Send Message">
+          <svg viewBox="0 0 24 24">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </footer>
+  </div>
+
+  <script src="widget.js"></script>
+</body>
+</html>
