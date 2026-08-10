@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { decodeToken, getRedirectPathByRole, normalizeRole } from '../api/authService';
 import { getServerErrorText, getUserErrorMessage } from '../utils/errorMessage';
+import BrandLogo from '../components/BrandLogo';
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -111,12 +112,7 @@ const SignIn = () => {
         
         {/* BRAND HEADER */}
         <div className="mb-8 text-center">
-          <div className="flex items-center justify-center gap-2.5 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-white shadow-lg backdrop-blur-md">
-              <ShoppingBag className="w-6 h-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">AICommerce</h1>
-          </div>
+          <div className="flex items-center justify-center gap-2.5 mb-2"><BrandLogo light /></div>
           <p className="text-sm text-slate-400">Intelligent commerce for modern businesses.</p>
         </div>
 

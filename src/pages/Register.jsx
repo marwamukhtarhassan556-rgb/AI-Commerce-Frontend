@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { getUserErrorMessage } from '../utils/errorMessage';
+import BrandLogo from '../components/BrandLogo';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -73,9 +74,7 @@ const Register = () => {
 
       {/* TOP NAVIGATION */}
       <nav className="auth-register-nav bg-transparent border-b border-slate-800/50 h-16 flex items-center justify-between px-6 sm:px-12 max-w-7xl mx-auto w-full z-10">
-        <Link to="/" className="text-xl font-bold text-white tracking-tight">
-          AICommerce
-        </Link>
+        <Link to="/" aria-label="Navi"><BrandLogo light /></Link>
         <a href="#support" className="text-sm font-medium text-slate-400 hover:text-blue-500 transition-colors">
           Support
         </a>
@@ -94,7 +93,7 @@ const Register = () => {
               Empower your business with AI-driven commerce.
             </h1>
             <p className="text-base text-slate-300 leading-relaxed">
-              Join over 10,000 merchants who use AICommerce to automate billing, optimize inventory, and scale their digital storefronts globally.
+              Join thousands of merchants who use Navi to automate support, optimize inventory, and grow their storefronts.
             </p>
 
             <div className="mt-2 space-y-4">
@@ -237,7 +236,7 @@ const Register = () => {
       <footer className="bg-[#0a0e1a]/80 backdrop-blur-md border-t border-slate-800/80 w-full z-10">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 px-6 sm:px-12 py-8 max-w-7xl mx-auto">
           <div className="col-span-2 md:col-span-1">
-            <div className="text-lg font-bold text-white mb-2">AICommerce</div>
+            <div className="text-lg font-bold text-white mb-2">Navi</div>
             <p className="text-xs text-slate-400">
               The modern operating system for digital commerce.
             </p>
@@ -272,7 +271,7 @@ const Register = () => {
         </div>
         <div className="max-w-7xl mx-auto px-6 sm:px-12 py-4 border-t border-slate-800/50 text-center md:text-left">
           <span className="text-xs text-slate-500">
-            © 2026 AICommerce. All rights reserved.
+            © 2026 Navi. All rights reserved.
           </span>
         </div>
       </footer>

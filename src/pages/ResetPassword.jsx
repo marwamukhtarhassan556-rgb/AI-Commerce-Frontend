@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { getUserErrorMessage } from '../utils/errorMessage';
+import BrandLogo from '../components/BrandLogo';
 import './auth.css';
 
 export default function ResetPassword() {
@@ -41,7 +42,7 @@ export default function ResetPassword() {
 
   return <div className="auth-page">
     <main className="auth-content">
-      <div className="auth-topbar"><Link className="auth-brand" to="/"><b>AI</b>Commerce</Link></div>
+      <div className="auth-topbar"><Link className="auth-brand" to="/"><BrandLogo light /></Link></div>
       <section className="auth-card">
         {success ? <div className="auth-success"><div className="auth-icon"><CheckCircle size={27} /></div><h2>Password updated</h2><p className="auth-subtitle">Your password has been changed. Redirecting you to sign in…</p></div> : <>
           <div className="auth-icon"><KeyRound size={23} /></div><h1>Create a new password</h1>

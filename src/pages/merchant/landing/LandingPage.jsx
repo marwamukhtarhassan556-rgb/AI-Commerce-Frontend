@@ -11,7 +11,7 @@ const steps = [
 ];
 
 const testimonials = [
-  ['Sarah Jenkins', 'CEO, Trendify Collective', 'AICommerce reduced our support ticket volume by 70% in the first month.'],
+  ['Sarah Jenkins', 'CEO, Trendify Collective', 'Navi reduced our support ticket volume by 70% in the first month.'],
   ['Mark Rosetti', 'Ops Director, TechGear', 'The sentiment analysis saved dozens of customers before they reached a human.'],
   ['Leila Ahmed', 'Founder, LuxeGlow', 'Easy integration and a stellar support team. Best investment we made this year.'],
 ];
@@ -30,7 +30,7 @@ export default function LandingPage() {
           </div>
           <div className="relative mx-auto w-full max-w-xl py-8">
             <div className="landing-growth"><span className="text-xs text-on-surface-variant">Real-time growth</span><div className="mt-2 h-2 rounded-full bg-primary/15"><span className="block h-full w-3/4 rounded-full bg-primary" /></div><strong>+142% Revenue</strong></div>
-            <div className="landing-dashboard"><div className="mb-3 flex gap-2"><i className="bg-red-400" /><i className="bg-amber-400" /><i className="bg-emerald-400" /></div><img src="/assets/screenshots/dashboard-preview.svg" alt="AICommerce merchant dashboard preview" /></div>
+            <div className="landing-dashboard"><div className="mb-3 flex gap-2"><i className="bg-red-400" /><i className="bg-amber-400" /><i className="bg-emerald-400" /></div><img src="/assets/screenshots/dashboard-preview.svg" alt="Navi merchant dashboard preview" /></div>
           </div>
         </div>
       </section>

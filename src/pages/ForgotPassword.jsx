@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle, Loader2, LockKeyhole, Mail } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { getUserErrorMessage } from '../utils/errorMessage';
+import BrandLogo from '../components/BrandLogo';
 import './auth.css';
 
 export default function ForgotPassword() {
@@ -26,7 +27,7 @@ export default function ForgotPassword() {
 
   return <div className="auth-page">
     <main className="auth-content">
-      <div className="auth-topbar"><Link className="auth-brand" to="/"><b>AI</b>Commerce</Link></div>
+      <div className="auth-topbar"><Link className="auth-brand" to="/"><BrandLogo light /></Link></div>
       <section className="auth-card">
         {!isSent ? <>
           <div className="auth-icon"><LockKeyhole size={23} /></div>

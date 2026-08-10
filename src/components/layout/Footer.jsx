@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="w-full border-t border-outline-variant bg-surface py-lg">
       <div className="flex w-full flex-col items-center justify-between gap-lg px-lg md:flex-row">
         <div className="mb-sm md:mb-0">
-          <span className="text-headline-md font-headline-md text-primary">CommerceMind AI</span>
+          <BrandLogo />
         </div>
         <p className="order-3 text-label-sm font-label-sm text-on-surface-variant md:order-2">
           © 2024 CommerceMind AI. All rights reserved.
@@ -17,3 +17,4 @@ export default function Footer() {
     </footer>
   )
 }
+import BrandLogo from '../BrandLogo'

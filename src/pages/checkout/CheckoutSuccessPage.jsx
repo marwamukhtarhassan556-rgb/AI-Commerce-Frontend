@@ -21,4 +21,4 @@ export default function CheckoutSuccessPage() {
 }
 
 function Detail({ label, value, strong }) { return <div className="flex items-start justify-between gap-6 py-3"><span>{label}</span><b className={strong ? '' : 'font-medium'}>{value}</b></div>; }
-function CheckoutShell({ children }) { return <div className="checkout-page"><header className="checkout-header"><Link to="/" className="checkout-brand">AICommerce Pay</Link><span className="inline-flex items-center gap-2 text-sm text-slate-600"><ShieldCheck className="h-4 w-4 text-blue-600" />Secure checkout</span></header><main className="checkout-main">{children}</main><footer className="checkout-footer">AICommerce · Secure subscription checkout</footer></div>; }
+function CheckoutShell({ children }) { return <div className="checkout-page"><header className="checkout-header"><Link to="/" className="checkout-brand">Navi Pay</Link><span className="inline-flex items-center gap-2 text-sm text-slate-600"><ShieldCheck className="h-4 w-4 text-blue-600" />Secure checkout</span></header><main className="checkout-main">{children}</main><footer className="checkout-footer">Navi · Secure subscription checkout</footer></div>; }
