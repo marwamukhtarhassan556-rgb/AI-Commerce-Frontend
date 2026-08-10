@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import api from '../api/axiosConfig';
 import { decodeToken, getRedirectPathByRole, normalizeRole } from '../api/authService';
@@ -8,9 +8,10 @@ import BrandLogo from '../components/BrandLogo';
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
   const [formData, setFormData] = useState({
-    email: '',
+    email: params.get('email') || '',
     password: '',
     remember: false,
   });
