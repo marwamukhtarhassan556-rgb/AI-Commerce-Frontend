@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchDashboardOverview } from '../../services/adminService';
+import { fetchDashboardOverview } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminDashboard() {

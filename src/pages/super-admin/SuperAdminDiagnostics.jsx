@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchDiagnostics } from '../../services/adminService';
+import { fetchDiagnostics } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminDiagnostics() {

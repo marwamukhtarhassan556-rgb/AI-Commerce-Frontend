@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchMerchants } from '../../services/adminService';
+import { fetchMerchants } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminMerchants() {

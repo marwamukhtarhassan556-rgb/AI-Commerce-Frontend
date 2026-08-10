@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchFeatures } from '../../services/adminService';
+import { fetchFeatures } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminFeatures() {

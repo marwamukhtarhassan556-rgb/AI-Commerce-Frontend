@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPlanById } from '../../services/adminService';
+import { fetchPlanById } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminPlanDetails() {

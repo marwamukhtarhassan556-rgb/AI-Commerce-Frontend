@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchSubscriptions, fetchPlans } from '../../services/adminService';
+import { fetchSubscriptions, fetchPlans } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminSubscriptions() {

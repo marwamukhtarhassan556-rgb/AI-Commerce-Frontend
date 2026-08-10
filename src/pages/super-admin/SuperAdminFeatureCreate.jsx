@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createFeature } from '../../services/adminService';
+import { createFeature } from '../../services/super-admin/adminService';
 
 function SuperAdminFeatureCreate() {
   const [name, setName] = useState('');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchSettings, updateSettings } from '../../services/adminService';
+import { fetchSettings, updateSettings } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminSettings() {

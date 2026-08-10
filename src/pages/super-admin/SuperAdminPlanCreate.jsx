@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createPlan } from '../../services/adminService';
+import { createPlan } from '../../services/super-admin/adminService';
 
 function SuperAdminPlanCreate() {
   const [planName, setPlanName] = useState('');

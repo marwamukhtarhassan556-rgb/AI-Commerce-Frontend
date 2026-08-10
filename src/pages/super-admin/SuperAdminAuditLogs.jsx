@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchAuditLogs } from '../../services/adminService';
+import { fetchAuditLogs } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminAuditLogs() {
