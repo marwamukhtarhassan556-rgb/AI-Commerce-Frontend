@@ -102,7 +102,7 @@ function App() {
         {/* 🔹 صفحات الـ Merchant المربوطة بالـ Sidebar المشترك 🔹 */}
         <Route 
           element={
-            <ProtectedRoute allowedRoles={['seller', 'merchant', 'admin']}>
+            <ProtectedRoute allowedRoles={['seller', 'merchant', 'admin', 'super-admin']}>
               <MerchantLayout />
             </ProtectedRoute>
           }
@@ -118,6 +118,7 @@ function App() {
 
         {/* Super Admin routes */}
         <Route element={<ProtectedRoute allowedRoles={['super-admin', 'super_admin']}><SuperAdminLayout /></ProtectedRoute>}>
+          <Route path="/admin/profile" element={<ProfilePage />} />
           <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin/diagnostics" element={<SuperAdminDiagnostics />} />
           <Route path="/admin/audit-logs" element={<SuperAdminAuditLogs />} />

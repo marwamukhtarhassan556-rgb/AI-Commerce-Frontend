@@ -1,9 +1,16 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { adminNavItems } from './SuperAdminNav';
+import { resolveProfilePicture } from '../../../utils/profilePicture';
 
 function SuperAdminSidebar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  const adminProfile = (() => {
+    try { return JSON.parse(localStorage.getItem('merchantProfile') || '{}'); } catch { return {}; }
+  })();
+  const adminName = [adminProfile.firstName, adminProfile.lastName].filter(Boolean).join(' ') || adminProfile.name || adminProfile.email || 'Super Admin';
+  const adminInitials = adminName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'SA';
+  const profilePicture = resolveProfilePicture(adminProfile.profilePictureUrl || '');
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -117,23 +124,23 @@ function SuperAdminSidebar() {
 
       {/* ── Footer: Admin Profile & Logout ── */}
       <div className="px-3 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-        <div
-          className="flex items-center gap-3 px-3 py-3 rounded-xl mb-2"
+        <NavLink
+          to="/admin/profile"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl mb-2 transition-all"
           style={{ background: 'rgba(37,99,235,0.08)' }}
         >
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #2563EB, #38BDF8)' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '1rem', color: 'white' }}>
-              admin_panel_settings
-            </span>
+          <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 bg-slate-800 text-white text-xs font-semibold">
+            {profilePicture ? (
+              <img src={profilePicture} alt={adminName} className="w-full h-full object-cover" />
+            ) : (
+              adminInitials
+            )}
           </div>
           <div className="min-w-0">
-            <p style={{ color: 'white', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>Super Admin</p>
+            <p style={{ color: 'white', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>{adminName}</p>
             <p style={{ color: '#64748B', fontSize: '0.65rem', margin: 0 }}>Platform Administrator</p>
           </div>
-        </div>
+        </NavLink>
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"

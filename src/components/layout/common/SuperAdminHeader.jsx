@@ -1,10 +1,19 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ADMIN_AVATAR } from './SuperAdminNav';
 import { fetchAiLiveness } from '../../../api/aiService';
+import { resolveProfilePicture } from '../../../utils/profilePicture';
 
 function SuperAdminHeader({ title, searchPlaceholder = null }) {
   const [liveStatus, setLiveStatus] = useState('checking'); // 'live' | 'offline' | 'checking'
   const [refreshing, setRefreshing] = useState(false);
+  const [adminProfile, setAdminProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('merchantProfile') || '{}'); } catch { return {}; }
+  });
+
+  const adminName = [adminProfile.firstName, adminProfile.lastName].filter(Boolean).join(' ') || adminProfile.name || adminProfile.email || 'Super Admin';
+  const adminInitials = adminName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'SA';
+  const profilePicture = resolveProfilePicture(adminProfile.profilePictureUrl || '');
 
   const checkLiveness = async () => {
     try {
@@ -18,7 +27,14 @@ function SuperAdminHeader({ title, searchPlaceholder = null }) {
   useEffect(() => {
     checkLiveness();
     const interval = setInterval(checkLiveness, 30000);
-    return () => clearInterval(interval);
+    const refreshProfile = () => {
+      try { setAdminProfile(JSON.parse(localStorage.getItem('merchantProfile') || '{}')); } catch { setAdminProfile({}); }
+    };
+    window.addEventListener('merchant-profile-updated', refreshProfile);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('merchant-profile-updated', refreshProfile);
+    };
   }, []);
 
   const handleRefresh = () => {
@@ -141,17 +157,25 @@ function SuperAdminHeader({ title, searchPlaceholder = null }) {
 
         {/* Role badge */}
         <div className="hidden xl:block text-right">
-          <p style={{ color: '#0D1B2A', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>Super Admin</p>
+          <p style={{ color: '#0D1B2A', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>{adminName}</p>
           <p style={{ color: '#64748B', fontSize: '0.65rem', margin: 0 }}>Platform Control</p>
         </div>
 
         {/* Avatar */}
-        <div
-          className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0"
+        <Link
+          to="/admin/profile"
+          className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 block"
           style={{ border: '2px solid rgba(37,99,235,0.4)' }}
+          title="Open profile"
         >
-          <img className="w-full h-full object-cover" src={ADMIN_AVATAR} alt="Admin profile" />
-        </div>
+          {profilePicture ? (
+            <img className="w-full h-full object-cover" src={profilePicture} alt={adminName} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-slate-800 text-white text-xs font-semibold">
+              {adminInitials}
+            </div>
+          )}
+        </Link>
       </div>
     </header>
   );
