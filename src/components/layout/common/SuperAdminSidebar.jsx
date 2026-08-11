@@ -2,7 +2,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { adminNavItems } from './SuperAdminNav';
 import { resolveProfilePicture } from '../../../utils/profilePicture';
 
-function SuperAdminSidebar() {
+function SuperAdminSidebar({ isOpen = false, onClose = null }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const adminProfile = (() => {
@@ -19,33 +19,32 @@ function SuperAdminSidebar() {
 
   return (
     <aside
-      className="h-screen w-64 fixed left-0 top-0 overflow-y-auto flex flex-col z-50"
+      className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 transform overflow-y-auto flex flex-col transition-transform duration-300 shadow-2xl lg:translate-x-0`}
       style={{
         background: 'linear-gradient(180deg, #0D1B2A 0%, #112240 100%)',
         borderRight: '1px solid rgba(37,99,235,0.15)',
       }}
     >
       {/* ── Brand Header ── */}
-      <div className="flex items-center gap-3 px-5 py-6 border-b border-white/5">
-        <div
-          className="w-11 h-11 flex items-center justify-center flex-shrink-0"
-          style={{ borderRadius: '10px', background: 'linear-gradient(145deg, #0D1B2A 0%, #2563EB 100%)', boxShadow: '0 10px 24px rgba(37,99,235,0.28)' }}
-        >
-          <svg width="29" height="29" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path d="M8 12.2C8 9.35 10.35 7 13.2 7H18.8C21.65 7 24 9.35 24 12.2V26H8V12.2Z" fill="#0B2545"/>
-            <path d="M11 12.4V10.8C11 7.85 13.15 5.5 16 5.5C18.85 5.5 21 7.85 21 10.8V12.4" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            <path d="M10.6 22.8L15.3 9.2L18.2 17.9L23.3 8.8L20 23.1L16.9 14.2L10.6 22.8Z" fill="white"/>
-            <path d="M18.2 17.9L23.3 8.8L22.1 14.1L19.5 18.8L18.2 17.9Z" fill="#38BDF8"/>
-          </svg>
+      <div className="flex items-center justify-between gap-3 px-5 py-5 border-b border-white/5">
+        <div className="w-full h-24 rounded-3xl overflow-hidden bg-slate-900 shadow-lg">
+          <img
+            src="/assets/logos/logo.png"
+            alt="Navi AI logo"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: 'center' }}
+          />
         </div>
-        <div>
-          <h1 style={{ fontFamily: 'Inter, sans-serif', color: 'white', fontSize: '1.1rem', fontWeight: 700, lineHeight: 1.2, margin: 0 }}>
-            Navi <span style={{ color: '#38BDF8' }}>AI</span>
-          </h1>
-          <p style={{ color: '#64748B', fontSize: '0.6rem', letterSpacing: '0.1em', textTransform: 'uppercase', fontWeight: 600, margin: 0 }}>
-            Navigate. Engage. Grow.
-          </p>
-        </div>
+        {onClose ? (
+          <button
+            type="button"
+            onClick={onClose}
+            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+            aria-label="Close menu"
+          >
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        ) : null}
       </div>
 
       {/* ── Navigation ── */}
@@ -86,6 +85,7 @@ function SuperAdminSidebar() {
                       transition: 'all 0.15s ease',
                     };
               }}
+              onClick={() => onClose?.()}
               onMouseEnter={(e) => {
                 if (!e.currentTarget.classList.contains('active')) {
                   e.currentTarget.style.background = 'rgba(255,255,255,0.05)';

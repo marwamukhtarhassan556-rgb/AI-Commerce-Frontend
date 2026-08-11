@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, Outlet } from 'react-router-dom';
 import SuperAdminSidebar from './common/SuperAdminSidebar';
 import SuperAdminHeader from './common/SuperAdminHeader';
@@ -24,19 +25,26 @@ function getHeaderConfig(pathname) {
 
 function SuperAdminLayout() {
   const { pathname } = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const config = getHeaderConfig(pathname);
+
+  const toggleSidebar = () => setSidebarOpen((current) => !current);
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <div
       className="super-admin-shell min-h-screen font-sans antialiased"
       style={{ background: '#F8FAFF', color: '#0D1B2A' }}
     >
-      <SuperAdminSidebar />
-      <SuperAdminHeader {...config} />
-      <main
-        className="super-admin-main min-h-screen"
-        style={{ marginLeft: '256px', paddingTop: '64px' }}
-      >
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-slate-900/50 lg:hidden"
+          onClick={closeSidebar}
+        />
+      )}
+      <SuperAdminSidebar isOpen={sidebarOpen} onClose={closeSidebar} />
+      <SuperAdminHeader {...config} onMenuToggle={toggleSidebar} />
+      <main className="super-admin-main min-h-screen pt-16 lg:ml-64">
         <Outlet />
       </main>
     </div>

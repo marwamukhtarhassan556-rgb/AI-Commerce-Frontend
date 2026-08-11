@@ -231,6 +231,17 @@
     linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
 }
 
+@media (max-width: 1023px) {
+  .super-admin-shell {
+    overflow-x: hidden;
+  }
+
+  .super-admin-main {
+    margin-left: 0 !important;
+    padding-top: 64px !important;
+  }
+}
+
 .super-admin-shell h1,
 .super-admin-shell h2,
 .super-admin-shell h3 {

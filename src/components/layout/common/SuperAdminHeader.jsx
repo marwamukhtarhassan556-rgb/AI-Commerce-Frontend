@@ -4,7 +4,7 @@ import { ADMIN_AVATAR } from './SuperAdminNav';
 import { fetchAiLiveness } from '../../../api/aiService';
 import { resolveProfilePicture } from '../../../utils/profilePicture';
 
-function SuperAdminHeader({ title, searchPlaceholder = null }) {
+function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null }) {
   const [liveStatus, setLiveStatus] = useState('checking'); // 'live' | 'offline' | 'checking'
   const [refreshing, setRefreshing] = useState(false);
   const [adminProfile, setAdminProfile] = useState(() => {
@@ -51,15 +51,19 @@ function SuperAdminHeader({ title, searchPlaceholder = null }) {
 
   return (
     <header
-      className="fixed top-0 right-0 flex justify-between items-center px-6 z-40"
-      style={{
-        left: '256px',
-        height: '64px',
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(148,163,184,0.24)',
-      }}
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-200 bg-white/95 backdrop-blur lg:px-6"
+      style={{ height: '64px' }}
     >
+      {onMenuToggle ? (
+        <button
+          type="button"
+          onClick={onMenuToggle}
+          className="lg:hidden inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white/80 p-2 text-slate-700 transition hover:bg-slate-100"
+          aria-label="Open menu"
+        >
+          <span className="material-symbols-outlined">menu</span>
+        </button>
+      ) : null}
       {/* Left: Breadcrumb + Title */}
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {title && (
