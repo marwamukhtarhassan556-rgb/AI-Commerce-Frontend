@@ -214,6 +214,94 @@
 :root[data-theme='dark'] .merchant-shell [class*='rounded-xl'],
 :root[data-theme='dark'] .merchant-shell [class*='rounded-2xl'] { backdrop-filter: blur(16px); }
 
+/* Navi Super Admin */
+.super-admin-shell {
+  --admin-navy: #0d1b2a;
+  --admin-blue: #2563eb;
+  --admin-sky: #38bdf8;
+  --admin-card: #ffffff;
+  --admin-muted: #64748b;
+  --admin-border: #e2e8f0;
+  --admin-soft: #f1f6ff;
+}
+
+.super-admin-main {
+  background:
+    radial-gradient(circle at 94% 6%, rgba(56, 189, 248, .18), transparent 18rem),
+    linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
+}
+
+.super-admin-shell h1,
+.super-admin-shell h2,
+.super-admin-shell h3 {
+  letter-spacing: 0;
+}
+
+.super-admin-shell .bg-white {
+  background-color: var(--admin-card) !important;
+}
+
+.super-admin-shell .border-\[\#e0e2ec\],
+.super-admin-shell .border-slate-200,
+.super-admin-shell .border-gray-200 {
+  border-color: var(--admin-border) !important;
+}
+
+.super-admin-shell .text-\[\#0b1c30\] {
+  color: var(--admin-navy) !important;
+}
+
+.super-admin-shell .text-\[\#414753\],
+.super-admin-shell .text-\[\#717784\] {
+  color: var(--admin-muted) !important;
+}
+
+.super-admin-shell .shadow-sm {
+  box-shadow: 0 12px 32px rgba(13, 27, 42, .06) !important;
+}
+
+.super-admin-shell table th {
+  white-space: nowrap;
+}
+
+.super-admin-shell tbody tr {
+  transition: background-color .16s ease;
+}
+
+.super-admin-shell input,
+.super-admin-shell select,
+.super-admin-shell textarea {
+  letter-spacing: 0;
+}
+
+.super-admin-shell .admin-dark-panel {
+  background: #ffffff !important;
+  border-color: var(--admin-border) !important;
+  box-shadow: 0 12px 32px rgba(13, 27, 42, .06);
+}
+
+.navi-admin-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 2.4rem;
+  border-radius: .5rem;
+  border: 1px solid var(--admin-blue);
+  background: var(--admin-blue);
+  color: #fff;
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color .16s ease, border-color .16s ease, transform .16s ease;
+}
+
+.navi-admin-button:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-1px);
+}
+
 /* Isolated subscription layout: avoid dashboard theme utilities collapsing the details card. */
 .subscription-page { width: min(calc(100% - 2.5rem), 52rem); margin: 2rem auto; color: var(--color-on-surface); }
 .subscription-page__card { display: block; width: 100%; margin-top: 1.75rem; overflow: hidden; border: 1px solid var(--merchant-border); border-radius: 1rem; background: var(--merchant-card); box-shadow: var(--merchant-shadow); }

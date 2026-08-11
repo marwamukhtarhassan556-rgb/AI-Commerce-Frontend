@@ -36,6 +36,10 @@ import SuperAdminSubscriptions from './pages/super-admin/SuperAdminSubscriptions
 import SuperAdminLayout from './components/layout/SuperAdminLayout';
 import SuperAdminAuditLogs from './pages/super-admin/SuperAdminAuditLogs';
 import SuperAdminSettings from './pages/super-admin/SuperAdminSettings';
+import SuperAdminModelsHealth from './pages/super-admin/SuperAdminModelsHealth';
+import SuperAdminPrompts from './pages/super-admin/SuperAdminPrompts';
+import SuperAdminBundles from './pages/super-admin/SuperAdminBundles';
+import SuperAdminAssistant from './pages/super-admin/SuperAdminAssistant';
 
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
@@ -113,7 +117,7 @@ function App() {
         </Route>
 
         {/* Super Admin routes */}
-        <Route element={<ProtectedRoute allowedRoles={['super-admin']}><SuperAdminLayout /></ProtectedRoute>}>
+        <Route element={<ProtectedRoute allowedRoles={['super-admin', 'super_admin']}><SuperAdminLayout /></ProtectedRoute>}>
           <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin/diagnostics" element={<SuperAdminDiagnostics />} />
           <Route path="/admin/audit-logs" element={<SuperAdminAuditLogs />} />
@@ -121,6 +125,10 @@ function App() {
           <Route path="/admin/features" element={<SuperAdminFeatures />} />
           <Route path="/admin/features/create" element={<SuperAdminFeatureCreate />} />
           <Route path="/admin/merchants" element={<SuperAdminMerchants />} />
+          <Route path="/admin/models-health" element={<SuperAdminModelsHealth />} />
+          <Route path="/admin/prompts" element={<SuperAdminPrompts />} />
+          <Route path="/admin/bundles" element={<SuperAdminBundles />} />
+          <Route path="/admin/assistant" element={<SuperAdminAssistant />} />
           <Route path="/admin/plan-details" element={<SuperAdminPlanDetails />} />
           <Route path="/admin/subscriptions" element={<SuperAdminSubscriptions />} />
           <Route path="/admin/subscriptions/:planId" element={<SuperAdminPlanDetails />} />

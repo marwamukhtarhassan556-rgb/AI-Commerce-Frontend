@@ -92,36 +92,38 @@ function getPlatformIcon(platform = '') {
 
 export function mapDashboardOverview(data) {
   const kpis = data?.kpis ?? {};
+  const sentimentOverview = data?.sentimentOverview ?? {};
+  const aiHealth = data?.aiHealth ?? {};
 
   const kpiCards = [
     {
       label: 'Total Active Stores',
-      value: formatNumber(kpis.activeStores ?? kpis.totalStores),
+      value: formatNumber(kpis.activeStores ?? kpis.totalStores ?? data?.totalStores),
       change: `${kpis.storeGrowthPercent ?? 0}%`,
       icon: 'storefront',
       iconBg: 'bg-primary/10 text-primary',
     },
     {
       label: 'AI Conversations',
-      value: formatNumber(kpis.totalConversations),
+      value: formatNumber(kpis.totalConversations ?? data?.totalConversations),
       change: `${kpis.conversationGrowthPercent ?? 0}%`,
       icon: 'forum',
       iconBg: 'bg-secondary/10 text-secondary',
     },
     {
       label: 'MRR',
-      value: formatCurrency(kpis.monthlyRecurringRevenue),
-      change: `${kpis.activeSubscriptions ?? 0} active`,
+      value: formatCurrency(kpis.monthlyRecurringRevenue ?? data?.monthlyRecurringRevenue),
+      change: `${kpis.activeSubscriptions ?? data?.activeSubscriptions ?? 0} active`,
       icon: 'payments',
       iconBg: 'bg-primary-fixed text-primary',
     },
     {
-      label: 'AI Conversion Rate',
-      value: formatPercent(kpis.aiConversionRate),
-      badge: kpis.highIntentMessages > 0 ? 'High Intent' : undefined,
+      label: 'Positive Sentiment',
+      value: formatPercent(sentimentOverview.positive_pct ?? sentimentOverview.positivePct ?? kpis.aiConversionRate),
+      badge: aiHealth.status ?? (kpis.highIntentMessages > 0 ? 'High Intent' : undefined),
       icon: 'bolt',
       iconBg: 'bg-tertiary-fixed text-tertiary',
-      highlight: Boolean(kpis.highIntentMessages),
+      highlight: Boolean(kpis.highIntentMessages || sentimentOverview.total),
       iconFill: true,
     },
   ];
@@ -139,7 +141,7 @@ export function mapDashboardOverview(data) {
   return {
     kpiCards,
     platformBreakdown,
-    totalStores: kpis.totalStores ?? kpis.activeStores ?? 0,
+    totalStores: kpis.totalStores ?? kpis.activeStores ?? data?.totalStores ?? 0,
     trend: data?.revenueConversationTrend ?? [],
     intents,
     sentiment,
@@ -397,6 +399,9 @@ export function mapFeatureRow(feature) {
 }
 
 export function mapAiAnalytics(data) {
+  const sentiment = data?.sentimentOverview ?? {};
+  const providers = Array.isArray(data?.providers) ? data.providers : [];
+  const models = Array.isArray(data?.models) ? data.models : [];
   const intents = (data?.topIntents ?? []).map((item, index) => {
     const maxCount = Math.max(...(data.topIntents ?? []).map((entry) => entry.count ?? 0), 1);
     const height = `${Math.max(Math.round(((item.count ?? 0) / maxCount) * 100), 10)}%`;
@@ -421,9 +426,26 @@ export function mapAiAnalytics(data) {
       ? sentimentCategories
       : [{ label: 'No category data', positive: 0, neutral: 0, negative: 0 }],
     healthGauges: mapMongoHealth(data?.mongoHealth),
-    serviceStatus: mapMongoHealthToServices(data?.mongoHealth),
+    serviceStatus: [
+      ...mapMongoHealthToServices(data?.mongoHealth),
+      {
+        service: 'AI Service',
+        status: data?.aiHealth?.status ? String(data.aiHealth.status) : 'Unknown',
+        latency: data?.aiHealth?.latency_ms !== undefined ? `${data.aiHealth.latency_ms}ms` : '—',
+        uptime: data?.aiHealth?.provider ? `Provider: ${data.aiHealth.provider}` : '—',
+        icon: 'psychology',
+      },
+    ],
     conversionRate: data?.conversionRate ?? 0,
     totalMessages: data?.totalMessages ?? 0,
+    sentimentTotal: sentiment.total ?? 0,
+    sentimentBreakdown: [
+      { label: 'Positive', value: sentiment.positive_pct ?? sentiment.positivePct ?? 0, count: sentiment.positive_count ?? sentiment.positiveCount ?? 0 },
+      { label: 'Neutral', value: sentiment.neutral_pct ?? sentiment.neutralPct ?? 0, count: sentiment.neutral_count ?? sentiment.neutralCount ?? 0 },
+      { label: 'Negative', value: sentiment.negative_pct ?? sentiment.negativePct ?? 0, count: sentiment.negative_count ?? sentiment.negativeCount ?? 0 },
+    ],
+    providerCount: providers.length,
+    modelCount: models.length,
   };
 }
 
@@ -485,12 +507,14 @@ function mapMongoHealthToServices(mongoHealth) {
 export function mapAuditLogs(logs = []) {
   return logs.map((log) => ({
     id: log.id,
-    time: formatDateTime(log.createdAt),
-    source: log.userId ? `User ${log.userId.slice(0, 8)}` : 'System',
+    time: formatDateTime(log.createdAt ?? log.created_at ?? log.timestamp),
+    source: log.userId || log.user_id ? `User ${(log.userId ?? log.user_id).slice(0, 8)}` : 'System',
     activity: log.action,
-    status: 'Success',
-    statusClass: 'bg-secondary/10 text-secondary',
+    status: log.outcome ?? 'Success',
+    statusClass: String(log.outcome ?? 'success').toLowerCase() === 'success' ? 'bg-secondary/10 text-secondary' : 'bg-error/10 text-error',
     ipAddress: log.ipAddress,
+    storeId: log.store_id ?? log.storeId,
+    resource: log.resource,
     userAgent: log.userAgent,
   }));
 }

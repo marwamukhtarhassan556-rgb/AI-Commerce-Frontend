@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://localhost:7253', // أو رابط البيئة الحقيقي
+  baseURL: 'https://aisales123.runasp.net', // أو رابط البيئة الحقيقي
 });
 
 // إضافة الـ Bearer Token تلقائياً في كل الطلبات

@@ -11,11 +11,45 @@ import {
   mapAiAnalytics,
   mapAuditLogs,
 } from '../../utils/adminMappers';
+import {
+  fetchAiAuditLogs,
+  fetchAiHealth,
+  fetchAiModels,
+  fetchAiProviders,
+  fetchSentimentOverview,
+} from '../../api/aiService';
+
+function readPagedItems(data, primaryKey) {
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.[primaryKey])) return data[primaryKey];
+  if (Array.isArray(data?.[primaryKey]?.items)) return data[primaryKey].items;
+  if (Array.isArray(data?.items)) return data.items;
+  return [];
+}
 
 export async function fetchDashboardOverview() {
   try {
-    const response = await api.get('/api/admin/dashboard');
-    return mapDashboardOverview(response.data);
+    const [dashboardResult, sentimentResult, healthResult] = await Promise.allSettled([
+      api.get('/api/admin/dashboard'),
+      fetchSentimentOverview(),
+      fetchAiHealth(),
+    ]);
+    const dashboard = dashboardResult.status === 'fulfilled' ? dashboardResult.value.data : {};
+    const sentiment = sentimentResult.status === 'fulfilled' ? sentimentResult.value : null;
+    const aiHealth = healthResult.status === 'fulfilled' ? healthResult.value : null;
+
+    return mapDashboardOverview({
+      ...dashboard,
+      sentimentOverview: sentiment,
+      aiHealth,
+      sentimentBreakdown: sentiment
+        ? [
+            { label: 'positive', percentage: sentiment.positive_pct ?? sentiment.positivePct ?? 0 },
+            { label: 'neutral', percentage: sentiment.neutral_pct ?? sentiment.neutralPct ?? 0 },
+            { label: 'negative', percentage: sentiment.negative_pct ?? sentiment.negativePct ?? 0 },
+          ]
+        : dashboard.sentimentBreakdown,
+    });
   } catch (err) {
     console.warn('Using fallback admin dashboard data:', err);
     return mapDashboardOverview({
@@ -59,8 +93,8 @@ export async function fetchDashboardOverview() {
 
 export async function fetchMerchants() {
   try {
-    const response = await api.get('/api/admin/merchants');
-    const stores = Array.isArray(response.data) ? response.data : response.data?.merchants || [];
+    const response = await api.get('/api/admin/stores', { params: { page: 1, pageSize: 50 } });
+    const stores = readPagedItems(response.data, 'stores');
     return stores.map(mapStoreToMerchant);
   } catch (err) {
     console.warn('Using fallback merchants data:', err);
@@ -74,8 +108,8 @@ export async function fetchMerchants() {
 
 export async function fetchPlans() {
   try {
-    const response = await api.get('/api/admin/plans');
-    const rawPlans = Array.isArray(response.data) ? response.data : response.data?.plans || [];
+    const response = await api.get('/api/admin/subscriptions', { params: { page: 1, pageSize: 1 } });
+    const rawPlans = readPagedItems(response.data, 'plans');
     const features = await fetchFeatures().catch(() => []);
     return rawPlans.map((plan) => mapPlanToCard(plan, features));
   } catch (err) {
@@ -121,8 +155,8 @@ export async function updatePlan(planId, planData) {
 
 export async function fetchSubscriptions() {
   try {
-    const response = await api.get('/api/admin/subscriptions');
-    const rawSubs = Array.isArray(response.data) ? response.data : response.data?.subscriptions || [];
+    const response = await api.get('/api/admin/subscriptions', { params: { page: 1, pageSize: 50 } });
+    const rawSubs = readPagedItems(response.data, 'subscriptions');
     const summary = response.data?.summary || { monthlyRecurringRevenue: 24500, activeSubscriptions: 35, totalPlans: 3 };
     return {
       metrics: mapSubscriptionMetrics(summary),
@@ -164,8 +198,22 @@ export async function createFeature(featureData) {
 
 export async function fetchDiagnostics() {
   try {
-    const response = await api.get('/api/admin/diagnostics');
-    return mapAiAnalytics(response.data);
+    const [backendResult, sentimentResult, providersResult, modelsResult, healthResult] = await Promise.allSettled([
+      api.get('/api/admin/analytics/ai'),
+      fetchSentimentOverview(),
+      fetchAiProviders(),
+      fetchAiModels(),
+      fetchAiHealth(),
+    ]);
+
+    const backend = backendResult.status === 'fulfilled' ? backendResult.value.data : {};
+    return mapAiAnalytics({
+      ...backend,
+      sentimentOverview: sentimentResult.status === 'fulfilled' ? sentimentResult.value : null,
+      providers: providersResult.status === 'fulfilled' ? providersResult.value : [],
+      models: modelsResult.status === 'fulfilled' ? modelsResult.value : [],
+      aiHealth: healthResult.status === 'fulfilled' ? healthResult.value : null,
+    });
   } catch (err) {
     console.warn('Using fallback diagnostics data:', err);
     return mapAiAnalytics({
@@ -189,19 +237,29 @@ export async function fetchDiagnostics() {
   }
 }
 
-export async function fetchAuditLogs() {
+export async function fetchAuditLogs(skip = 0, limit = 50) {
   try {
-    const response = await api.get('/api/admin/audit-logs');
-    const logs = Array.isArray(response.data) ? response.data : response.data?.logs || [];
+    const logs = await fetchAiAuditLogs(skip, limit);
     return mapAuditLogs(logs);
   } catch (err) {
-    console.warn('Using fallback audit logs:', err);
-    return mapAuditLogs([
-      { id: 'log-1', createdAt: new Date().toISOString(), userId: 'usr_89123', action: 'Updated Plan Pricing: Pro Plan', ipAddress: '192.168.1.1', userAgent: 'Mozilla/5.0' },
-      { id: 'log-2', createdAt: new Date(Date.now() - 3600000).toISOString(), userId: 'usr_12345', action: 'Created Feature: Custom LLM Persona', ipAddress: '10.0.0.4', userAgent: 'Mozilla/5.0' },
-      { id: 'log-3', createdAt: new Date(Date.now() - 86400000).toISOString(), userId: 'usr_99887', action: 'Activated Store: TechGizmo', ipAddress: '172.16.0.2', userAgent: 'Mozilla/5.0' },
-    ]);
+    console.warn('AI audit logs failed, falling back to backend audit logs:', err);
+    try {
+      const response = await api.get('/api/admin/audit-logs', { params: { page: 1, pageSize: 50 } });
+      return mapAuditLogs(readPagedItems(response.data, 'logs'));
+    } catch (fallbackErr) {
+      console.warn('Using fallback audit logs:', fallbackErr);
+      return mapAuditLogs([
+        { id: 'log-1', createdAt: new Date().toISOString(), userId: 'usr_89123', action: 'Updated Plan Pricing: Pro Plan', ipAddress: '192.168.1.1', userAgent: 'Mozilla/5.0' },
+        { id: 'log-2', createdAt: new Date(Date.now() - 3600000).toISOString(), userId: 'usr_12345', action: 'Created Feature: Custom LLM Persona', ipAddress: '10.0.0.4', userAgent: 'Mozilla/5.0' },
+        { id: 'log-3', createdAt: new Date(Date.now() - 86400000).toISOString(), userId: 'usr_99887', action: 'Activated Store: TechGizmo', ipAddress: '172.16.0.2', userAgent: 'Mozilla/5.0' },
+      ]);
+    }
   }
+}
+
+export async function updateStoreStatus(storeId, status, reason = 'Updated by Super Admin') {
+  const response = await api.patch(`/api/admin/stores/${storeId}/status`, { status, reason });
+  return response.data;
 }
 
 export async function fetchSettings() {

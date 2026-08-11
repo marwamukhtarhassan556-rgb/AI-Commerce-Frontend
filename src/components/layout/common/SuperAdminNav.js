@@ -1,11 +1,15 @@
 export const adminNavItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', path: '/admin/dashboard' },
-  { id: 'merchants', label: 'Stores Management', icon: 'storefront', path: '/admin/merchants' },
-  { id: 'subscriptions', label: 'Subscriptions & Plans', icon: 'subscriptions', path: '/admin/subscriptions' },
-  { id: 'features', label: 'Features', icon: 'extension', path: '/admin/features' },
-  { id: 'diagnostics', label: 'AI Analytics', icon: 'analytics', path: '/admin/diagnostics' },
-  { id: 'audit', label: 'Audit Logs', icon: 'receipt_long', path: '/admin/audit-logs' },
-  { id: 'settings', label: 'Settings', icon: 'settings', path: '/admin/settings' },
+  { id: 'dashboard',     label: 'Dashboard',           icon: 'dashboard',              path: '/admin/dashboard' },
+  { id: 'merchants',     label: 'Stores Management',   icon: 'storefront',             path: '/admin/merchants' },
+  { id: 'subscriptions', label: 'Subscriptions & Plans', icon: 'subscriptions',        path: '/admin/subscriptions' },
+  { id: 'features',      label: 'Features',            icon: 'extension',              path: '/admin/features' },
+  { id: 'models',        label: 'AI Models & Health',  icon: 'smart_toy',              path: '/admin/models-health' },
+  { id: 'prompts',       label: 'Prompt Manager',      icon: 'edit_note',              path: '/admin/prompts' },
+  { id: 'bundles',       label: 'Bundle Promos',       icon: 'redeem',                 path: '/admin/bundles' },
+  { id: 'diagnostics',   label: 'AI Analytics',        icon: 'analytics',              path: '/admin/diagnostics' },
+  { id: 'audit',         label: 'Audit Logs',          icon: 'receipt_long',           path: '/admin/audit-logs' },
+  { id: 'assistant',     label: 'Navi Assistant',      icon: 'forum',                  path: '/admin/assistant' },
+  { id: 'settings',      label: 'Settings',            icon: 'settings',               path: '/admin/settings' },
 ];
 
 export const ADMIN_AVATAR =
