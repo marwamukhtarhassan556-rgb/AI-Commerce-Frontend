@@ -32,10 +32,7 @@ function SuperAdminLayout() {
   const closeSidebar = () => setSidebarOpen(false);
 
   return (
-    <div
-      className="super-admin-shell min-h-screen font-sans antialiased"
-      style={{ background: '#F8FAFF', color: '#0D1B2A' }}
-    >
+    <div className="super-admin-shell min-h-screen font-sans antialiased">
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-slate-900/50 lg:hidden"

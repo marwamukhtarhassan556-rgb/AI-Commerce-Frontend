@@ -247,7 +247,7 @@ export function mapSubscriptionMetrics(summary = {}) {
       label: 'Total Plans',
       value: formatNumber(summary.totalPlans),
       icon: 'trending_up',
-      iconBg: 'bg-[#dce9ff] text-on-surface-variant',
+      iconBg: 'bg-primary-container/10 text-primary',
       accentBar: 'bg-primary/20 group-hover:bg-primary',
     },
   ];

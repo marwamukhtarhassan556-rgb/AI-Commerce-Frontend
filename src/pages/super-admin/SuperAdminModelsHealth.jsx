@@ -173,9 +173,9 @@ export default function SuperAdminModelsHealth() {
                 {models.map((model, index) => {
                   const caps = model.capabilities || {};
                   return (
-                    <tr key={model.name || model.model_id || model.id || index} className="hover:bg-[#F8FAFC]">
-                      <td className="px-4 py-3 font-semibold text-[#0D1B2A]">{model.name || model.model_id || model.id || '-'}</td>
-                      <td className="px-4 py-3 text-[#64748B]">{model.provider || '-'}</td>
+                    <tr key={model.name || model.model_id || model.id || index} className="group hover:bg-slate-50 dark:hover:bg-slate-800/70 transition-colors">
+                      <td className="px-4 py-3 font-semibold text-[#0D1B2A] dark:text-white group-hover:text-slate-900 dark:group-hover:text-white">{model.name || model.model_id || model.id || '-'}</td>
+                      <td className="px-4 py-3 text-[#64748B] dark:text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200">{model.provider || '-'}</td>
                       <td className="px-4 py-3"><CapabilityBadge value={caps.chat ?? model.chat} /></td>
                       <td className="px-4 py-3"><CapabilityBadge value={caps.vision ?? model.supports_vision ?? model.vision} /></td>
                       <td className="px-4 py-3"><CapabilityBadge value={caps.json_mode ?? model.supports_json_mode ?? model.json_mode} /></td>

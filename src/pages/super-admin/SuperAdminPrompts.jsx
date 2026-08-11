@@ -13,10 +13,7 @@ const PROMPT_TYPES = ['system', 'user', 'template'];
 
 function TagBadge({ tag }) {
   return (
-    <span
-      className="px-2.5 py-0.5 rounded-full text-xs font-medium"
-      style={{ background: 'rgba(37, 99, 235, 0.08)', color: '#2563EB', border: '1px solid rgba(37, 99, 235, 0.15)' }}
-    >
+    <span className="admin-tag px-2.5 py-0.5 rounded-full text-xs font-medium">
       {tag}
     </span>
   );
@@ -59,88 +56,87 @@ function PromptEditor({ prompt, onSave, onCancel }) {
     setSaving(false);
   };
 
-  const labelStyle = { color: '#475569', fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' };
-  const inputStyle = { width: '100%', background: '#F8FAFC', border: '1px solid #CBD5E1', borderRadius: '10px', padding: '0.6rem 0.85rem', color: '#0F172A', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' };
-
   return (
-    <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'rgba(15, 23, 42, 0.5)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '1rem',
-        boxSizing: 'border-box',
-      }}
-      onClick={(e) => e.target === e.currentTarget && onCancel()}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: '680px',
-          backgroundColor: '#FFFFFF',
-          border: '1px solid #E2E8F0',
-          borderRadius: '20px',
-          padding: '1.75rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '1.15rem',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          boxSizing: 'border-box',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-          margin: 'auto',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
-          <h3 style={{ color: '#0F172A', fontWeight: 700, fontSize: '1.15rem', margin: 0, letterSpacing: '-0.01em' }}>
+    <div className="admin-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={(e) => e.target === e.currentTarget && onCancel()}>
+      <div className="admin-modal-panel w-full max-w-[680px] bg-white border border-slate-200 rounded-2xl p-7 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div className="flex items-center justify-between w-full border-b border-[#F1F5F9] pb-3">
+          <h3 className="text-lg font-bold text-[#0F172A] m-0">
             {prompt?.key ? `Edit Prompt: ${prompt.key}` : 'Create New Prompt'}
           </h3>
-          <button onClick={onCancel} style={{ color: '#64748B', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>✕</button>
+          <button
+            onClick={onCancel}
+            className="inline-flex items-center justify-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B] w-9 h-9 cursor-pointer"
+          >
+            ✕
+          </button>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label style={labelStyle}>Key *</label>
-            <input value={form.key} onChange={set('key')} disabled={!!prompt?.key} placeholder="e.g. system.greeting" style={{ ...inputStyle, opacity: prompt?.key ? 0.6 : 1 }} />
+            <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Key *</label>
+            <input
+              value={form.key}
+              onChange={set('key')}
+              disabled={!!prompt?.key}
+              placeholder="e.g. system.greeting"
+              className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none"
+              style={{ opacity: prompt?.key ? 0.6 : 1 }}
+            />
           </div>
           <div>
-            <label style={labelStyle}>Name</label>
-            <input value={form.name} onChange={set('name')} placeholder="Human-readable name" style={inputStyle} />
+            <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Name</label>
+            <input
+              value={form.name}
+              onChange={set('name')}
+              placeholder="Human-readable name"
+              className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none"
+            />
           </div>
           <div>
-            <label style={labelStyle}>Type</label>
-            <select value={form.type} onChange={set('type')} style={{ ...inputStyle, cursor: 'pointer' }}>
-              {PROMPT_TYPES.map((t) => <option key={t} value={t} style={{ background: '#FFFFFF', color: '#0F172A' }}>{t}</option>)}
+            <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Type</label>
+            <select
+              value={form.type}
+              onChange={set('type')}
+              className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none cursor-pointer"
+            >
+              {PROMPT_TYPES.map((t) => <option key={t} value={t} className="text-slate-900 dark:text-slate-100">{t}</option>)}
             </select>
           </div>
           <div>
-            <label style={labelStyle}>Tags (comma-separated)</label>
-            <input value={form.tags} onChange={set('tags')} placeholder="store, welcome, rag" style={inputStyle} />
+            <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Tags (comma-separated)</label>
+            <input
+              value={form.tags}
+              onChange={set('tags')}
+              placeholder="store, welcome, rag"
+              className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none"
+            />
           </div>
         </div>
 
         <div>
-          <label style={labelStyle}>Description</label>
-          <input value={form.description} onChange={set('description')} placeholder="What does this prompt do?" style={inputStyle} />
+          <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Description</label>
+          <input
+            value={form.description}
+            onChange={set('description')}
+            placeholder="What does this prompt do?"
+            className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none"
+          />
         </div>
 
         <div>
-          <label style={labelStyle}>Variables (comma-separated)</label>
-          <input value={form.variables} onChange={set('variables')} placeholder="store_name, ticket_id" style={inputStyle} />
+          <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">Variables (comma-separated)</label>
+          <input
+            value={form.variables}
+            onChange={set('variables')}
+            placeholder="store_name, ticket_id"
+            className="admin-input w-full rounded-xl px-4 py-3 text-sm text-slate-950 dark:text-white outline-none"
+          />
         </div>
 
         <div>
-          <label style={{ ...labelStyle, marginBottom: '6px' }}>
+          <label className="block text-sm font-semibold text-slate-900 dark:text-white mb-1">
             Prompt Content *
-            <span style={{ color: '#64748B', fontWeight: 400, marginLeft: '8px', textTransform: 'none', letterSpacing: 0 }}>
+            <span className="block text-sm font-normal text-slate-500 dark:text-slate-300 mt-1">
               Variables: {'{store_name}'}, {'{user_name}'}, {'{product_list}'}
             </span>
           </label>
@@ -149,20 +145,25 @@ function PromptEditor({ prompt, onSave, onCancel }) {
             onChange={set('content')}
             rows={6}
             placeholder="You are Navi, an AI shopping assistant for {store_name}..."
-            style={{ ...inputStyle, resize: 'vertical', fontFamily: 'monospace', lineHeight: 1.6 }}
+            className="admin-input w-full rounded-2xl px-4 py-3 text-sm font-mono leading-6 text-slate-950 dark:text-white outline-none resize-vertical"
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid #F1F5F9' }}>
-          <button onClick={onCancel} style={{ padding: '0.55rem 1.25rem', borderRadius: '10px', background: '#F1F5F9', color: '#475569', fontWeight: 600, fontSize: '0.85rem', border: '1px solid #E2E8F0', cursor: 'pointer' }}>
+        <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-[#F1F5F9]">
+          <button
+            onClick={onCancel}
+            className="admin-button-secondary rounded-xl px-5 py-3 text-sm font-semibold cursor-pointer"
+            style={{ boxShadow: '0 1px 2px rgba(254, 254, 255, 0.14)' }}
+
+          >
             Cancel
           </button>
-          <button onClick={handleSave} disabled={saving || !form.key || !form.content} style={{
-            padding: '0.55rem 1.4rem', borderRadius: '10px',
-            background: saving || !form.key || !form.content ? '#93C5FD' : '#2563EB',
-            color: 'white', fontWeight: 600, fontSize: '0.85rem', border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
-          }}>
+          <button
+            onClick={handleSave}
+            disabled={saving || !form.key || !form.content}
+            className="admin-cta-btn rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50 cursor-pointer"
+            style={{ boxShadow: '0 4px 12px rgba(254, 254, 255, 0.25)' }}
+          >
             {saving ? 'Saving…' : (prompt?.key ? 'Update Prompt' : 'Create Prompt')}
           </button>
         </div>
@@ -241,12 +242,12 @@ export default function SuperAdminPrompts() {
   };
 
   return (
-    <div style={{ padding: '2.5rem 2rem', maxWidth: '1300px', margin: '0 auto', background: '#F8FAFC', minHeight: '100vh', color: '#0F172A' }}>
+    <div className="p-10 max-w-[1300px] mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
         <div>
-          <h2 style={{ color: '#0F172A', fontSize: '1.75rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Prompt Manager</h2>
-          <p style={{ color: '#64748B', fontSize: '0.9rem', marginTop: '6px' }}>Create, edit, restore and version system prompts for the AI engine</p>
+          <h2 className="text-slate-950 dark:text-white text-[1.75rem] font-bold m-0 tracking-tight">Prompt Manager</h2>
+          <p className="text-slate-600 dark:text-slate-300 text-sm mt-1">Create, edit, restore and version system prompts for the AI engine</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleSeed} disabled={seeding}
@@ -266,61 +267,49 @@ export default function SuperAdminPrompts() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search prompts by key, name, or content…"
-          style={{
-            flex: 1, background: '#FFFFFF', border: '1px solid #CBD5E1',
-            borderRadius: '12px', padding: '0.75rem 1rem', color: '#0F172A', fontSize: '0.9rem', outline: 'none',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-          }}
+          className="admin-input flex-1 rounded-[12px] px-4 py-3 text-sm outline-none shadow-sm"
         />
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          style={{
-            background: '#FFFFFF', border: '1px solid #CBD5E1',
-            borderRadius: '12px', padding: '0.75rem 1rem', color: '#0F172A', fontSize: '0.9rem', outline: 'none', cursor: 'pointer',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-          }}
+          className="admin-input rounded-[12px] px-4 py-3 text-sm text-slate-950 dark:text-white outline-none cursor-pointer shadow-sm"
         >
-          <option value="" style={{ background: '#FFFFFF', color: '#0F172A' }}>All Types</option>
-          {PROMPT_TYPES.map((t) => <option key={t} value={t} style={{ background: '#FFFFFF', color: '#0F172A' }}>{t}</option>)}
+          <option value="" className="text-slate-900 dark:text-slate-100">All Types</option>
+          {PROMPT_TYPES.map((t) => <option key={t} value={t} className="text-slate-900 dark:text-slate-100">{t}</option>)}
         </select>
       </div>
 
       {/* Prompts Grid */}
       {loading ? (
-        <div className="text-center py-20" style={{ color: '#64748B', fontSize: '1rem' }}>Loading prompts…</div>
+        <div className="text-center py-20 text-[#64748B] text-base">Loading prompts…</div>
       ) : prompts.length === 0 ? (
-        <div className="text-center py-20 rounded-2xl" style={{ background: '#FFFFFF', border: '1px dashed #CBD5E1', color: '#64748B' }}>
-          <p style={{ fontSize: '1rem', marginBottom: '8px' }}>No prompts found.</p>
-          <p style={{ fontSize: '0.85rem', color: '#94A3B8' }}>Click "Seed Defaults" to create the initial system prompts.</p>
+        <div className="text-center py-20 rounded-2xl admin-card admin-border">
+          <p className="text-base mb-2">No prompts found.</p>
+          <p className="text-sm text-[#94A3B8]">Click "Seed Defaults" to create the initial system prompts.</p>
         </div>
       ) : (
-        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))' }}>
+        <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-2">
           {prompts.map((p) => (
             <div
               key={p.key}
-              className="p-6 rounded-2xl flex flex-col gap-3.5 transition-all duration-200"
-              style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}
+              className="p-6 rounded-2xl flex flex-col gap-3.5 transition-all duration-200 admin-card admin-border shadow-sm"
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p style={{ color: '#0F172A', fontWeight: 600, margin: 0, fontSize: '0.95rem' }}>{p.name || p.key}</p>
-                  <p style={{ color: '#64748B', fontSize: '0.75rem', margin: '3px 0 0', fontFamily: 'monospace' }}>{p.key}</p>
+                  <p className="text-slate-950 dark:text-white font-semibold m-0 text-sm">{p.name || p.key}</p>
+                  <p className="text-slate-600 dark:text-slate-300 text-xs m-0 font-mono">{p.key}</p>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0" style={{ background: 'rgba(37, 99, 235, 0.08)', color: '#2563EB', border: '1px solid rgba(37, 99, 235, 0.15)' }}>
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 text-slate-900 dark:text-white" style={{ background: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.15)' }}>
                   {p.type || 'system'}
                 </span>
               </div>
 
               {p.description && (
-                <p style={{ color: '#64748B', fontSize: '0.85rem', margin: 0, lineHeight: 1.4 }}>{p.description}</p>
+                <p className="text-slate-700 dark:text-slate-300 text-sm leading-6 m-0">{p.description}</p>
               )}
 
-              <div
-                className="rounded-xl p-3.5"
-                style={{ background: '#F8FAFC', maxHeight: '90px', overflow: 'hidden', position: 'relative', border: '1px solid #E2E8F0' }}
-              >
-                <p style={{ color: '#334155', fontSize: '0.78rem', fontFamily: 'monospace', margin: 0, lineHeight: 1.6 }}>
+              <div className="rounded-xl p-3.5 admin-surface admin-border overflow-hidden relative" style={{ maxHeight: '90px' }}>
+                <p className="text-slate-700 dark:text-slate-300 text-xs font-mono leading-6 m-0">
                   {p.content?.slice(0, 200)}{p.content?.length > 200 ? '…' : ''}
                 </p>
               </div>
@@ -332,16 +321,23 @@ export default function SuperAdminPrompts() {
               )}
 
               <div className="flex gap-2.5 mt-auto pt-3 border-t border-slate-100">
-                <button onClick={() => setEditing(p)}
-                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.2)', color: '#2563EB' }}>
+                <button
+                  onClick={() => setEditing(p)}
+                  className="flex-1 rounded-xl border border-[#2563EB]/25 bg-[#eff6ff] px-3 py-2 text-sm font-semibold text-[#2563EB] cursor-pointer"
+                >
                   Edit
                 </button>
-                <button onClick={() => handleRestore(p.key)} disabled={restoring === p.key}
-                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(217, 119, 6, 0.08)', border: '1px solid rgba(217, 119, 6, 0.2)', color: '#D97706' }}>
+                <button
+                  onClick={() => handleRestore(p.key)}
+                  disabled={restoring === p.key}
+                  className="flex-1 rounded-xl border border-[#f59e0b]/25 bg-[#fffbeb] px-3 py-2 text-sm font-semibold text-[#d97706] disabled:opacity-50 cursor-pointer"
+                >
                   {restoring === p.key ? '…' : 'Restore'}
                 </button>
-                <button onClick={() => handleDelete(p.key)}
-                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(220, 38, 38, 0.08)', border: '1px solid rgba(220, 38, 38, 0.2)', color: '#DC2626' }}>
+                <button
+                  onClick={() => handleDelete(p.key)}
+                  className="flex-1 rounded-xl border border-[#ef4444]/25 bg-[#fef2f2] px-3 py-2 text-sm font-semibold text-[#dc2626] cursor-pointer"
+                >
                   Delete
                 </button>
               </div>

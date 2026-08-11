@@ -62,9 +62,9 @@ function SuperAdminDashboard() {
   const negativeVal = parsePct(rawSentiment?.negative_pct ?? rawSentiment?.negative);
 
   const sentimentItems = rawSentiment ? [
-    { label: 'Positive', pct: `${positiveVal}%`, color: 'bg-emerald-500', trackColor: 'bg-emerald-50', height: `${positiveVal}%` },
-    { label: 'Neutral', pct: `${neutralVal}%`, color: 'bg-amber-500', trackColor: 'bg-amber-50', height: `${neutralVal}%` },
-    { label: 'Negative', pct: `${negativeVal}%`, color: 'bg-rose-500', trackColor: 'bg-rose-50', height: `${negativeVal}%` },
+    { label: 'Positive', pct: `${positiveVal}%`, color: '#10B981', trackColor: '#DCFCE7', height: `${positiveVal}%` },
+    { label: 'Neutral', pct: `${neutralVal}%`, color: '#F59E0B', trackColor: '#FEF3C7', height: `${neutralVal}%` },
+    { label: 'Negative', pct: `${negativeVal}%`, color: '#EF4444', trackColor: '#FECACA', height: `${negativeVal}%` },
   ] : [];
 
   const getPieChartGradient = (platforms) => {
@@ -199,10 +199,10 @@ function SuperAdminDashboard() {
               {sentimentItems.length > 0 ? (
                 sentimentItems.map((item, idx) => (
                   <div key={idx} className="flex flex-1 flex-col items-center gap-3 h-full justify-end">
-                    <div className={`flex h-36 w-full items-end rounded-xl ${item.trackColor} p-2 shadow-inner overflow-hidden border border-slate-100`}>
+                    <div className="flex h-36 w-full items-end rounded-xl p-2 shadow-inner overflow-hidden border border-slate-100" style={{ backgroundColor: item.trackColor }}>
                       <div 
-                        className={`w-full rounded-lg transition-all duration-1000 ease-out shadow-sm ${item.color}`} 
-                        style={{ height: item.height }} 
+                        className="w-full rounded-lg transition-all duration-1000 ease-out shadow-sm"
+                        style={{ height: item.height, backgroundColor: item.color }} 
                       />
                     </div>
                     <div className="text-center">

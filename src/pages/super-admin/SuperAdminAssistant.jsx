@@ -9,34 +9,23 @@ function ChatBubble({ role, text, sources }) {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       {!isUser && (
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1"
-          style={{ background: 'linear-gradient(135deg, #2563EB, #38BDF8)' }}
-        >
+        <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 flex-shrink-0 mt-1 admin-chat-avatar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M12 2 L14.2 9.8 L22 12 L14.2 14.2 L12 22 L9.8 14.2 L2 12 L9.8 9.8 Z" fill="white" opacity="0.9" />
             <circle cx="12" cy="12" r="2" fill="white" />
           </svg>
         </div>
       )}
-      <div style={{ maxWidth: '72%' }}>
-        <div
-          className="px-4 py-3 rounded-2xl"
-          style={
-            isUser
-              ? { background: 'linear-gradient(135deg, #2563EB, #1D4ED8)', color: 'white', borderBottomRightRadius: '4px' }
-              : { background: 'rgba(255,255,255,0.05)', color: '#E2E8F0', borderBottomLeftRadius: '4px', border: '1px solid rgba(255,255,255,0.07)' }
-          }
-        >
-          <p style={{ margin: 0, fontSize: '0.875rem', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>{text}</p>
+      <div className="max-w-[72%]">
+        <div className={`px-4 py-3 rounded-2xl ${isUser ? 'admin-chat-user' : 'admin-chat-assistant'}`}>
+          <p className="m-0 text-sm leading-6 whitespace-pre-wrap">{text}</p>
         </div>
         {sources && sources.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {sources.map((src, i) => (
               <span
                 key={i}
-                className="px-2 py-0.5 rounded-full text-xs"
-                style={{ background: 'rgba(56,189,248,0.1)', color: '#38BDF8', border: '1px solid rgba(56,189,248,0.2)' }}
+                className="admin-pill px-2 py-0.5 rounded-full text-xs"
               >
                 📄 {src.title || src.source || `Source ${i + 1}`}
               </span>
@@ -150,32 +139,23 @@ export default function SuperAdminAssistant() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', padding: '1.5rem', gap: '1rem' }}>
+    <div className="flex flex-col min-h-[calc(100vh-64px)] p-6 gap-4">
       {/* Top bar */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 style={{ color: 'white', fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>Navi Back-office Assistant</h2>
-          <p style={{ color: '#64748B', fontSize: '0.8rem', marginTop: '4px' }}>Powered by RAG · GPT-level context over your platform data</p>
+          <h2 className="text-2xl font-bold text-[#ffffff] m-0">Navi Back-office Assistant</h2>
+          <p className="text-sm text-[#94a3b8] mt-1">Powered by RAG · GPT-level context over your platform data</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <input
             value={storeId}
             onChange={(e) => setStoreId(e.target.value)}
             placeholder="Filter by store_id (optional)"
-            style={{
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(71,85,105,0.4)',
-              borderRadius: '8px', padding: '0.4rem 0.75rem', color: '#CBD5E1',
-              fontSize: '0.8rem', width: '200px', outline: 'none',
-            }}
+            className="admin-chat-input rounded-xl px-3 py-2 text-sm text-[#e2e8f0] w-52 outline-none"
           />
           <button
             onClick={() => setUseStream((v) => !v)}
-            style={{
-              padding: '0.4rem 1rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer',
-              background: useStream ? 'rgba(37,99,235,0.15)' : 'rgba(255,255,255,0.05)',
-              border: useStream ? '1px solid rgba(37,99,235,0.3)' : '1px solid rgba(255,255,255,0.08)',
-              color: useStream ? '#38BDF8' : '#64748B',
-            }}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${useStream ? 'bg-[#1d4ed8]/15 border border-[#2563EB]/30 text-[#38BDF8]' : 'bg-[#ffffff]/10 border border-white/20 text-[#94a3b8]'}`}
           >
             {useStream ? '⚡ Streaming' : '📄 Batch'}
           </button>
@@ -183,10 +163,7 @@ export default function SuperAdminAssistant() {
       </div>
 
       {/* Messages area */}
-      <div
-        className="flex-1 overflow-y-auto rounded-2xl p-6"
-        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)' }}
-      >
+      <div className="flex-1 overflow-y-auto rounded-2xl p-6 admin-chat-area">
         {messages.map((m, i) => (
           <ChatBubble key={i} role={m.role} text={m.text} sources={m.sources} />
         ))}
@@ -208,32 +185,22 @@ export default function SuperAdminAssistant() {
       </div>
 
       {/* Input area */}
-      <div
-        className="flex items-end gap-3 p-4 rounded-2xl"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
-      >
+      <div className="flex items-end gap-3 p-4 rounded-2xl admin-chat-area">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
           placeholder="Ask about platform data, stores, AI models... (Enter to send)"
           rows={2}
-          style={{
-            flex: 1, resize: 'none', background: 'transparent', border: 'none',
-            color: '#E2E8F0', fontSize: '0.9rem', outline: 'none', lineHeight: 1.6,
-          }}
+          className="flex-1 resize-none rounded-2xl bg-transparent border-0 px-3 py-3 text-sm text-[#E2E8F0] outline-none leading-6"
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
-          style={{
-            width: '40px', height: '40px', borderRadius: '10px', border: 'none',
-            background: loading || !input.trim() ? 'rgba(37,99,235,0.2)' : 'linear-gradient(135deg, #2563EB, #38BDF8)',
-            color: 'white', cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center text-white disabled:opacity-50"
+          style={{ background: loading || !input.trim() ? 'rgba(37,99,235,0.2)' : 'linear-gradient(135deg, #2563EB, #38BDF8)' }}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>send</span>
+          <span className="material-symbols-outlined text-lg">send</span>
         </button>
       </div>
 

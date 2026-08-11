@@ -23,6 +23,22 @@ function SuperAdminAuditLogs() {
     }
   };
 
+  const getAuditStatusClasses = (status = '') => {
+    const normalized = String(status || '').toLowerCase();
+
+    if (normalized === 'success' || normalized === 'completed' || normalized === 'ok') {
+      return 'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-900/25 dark:text-emerald-200 dark:border-emerald-500/20';
+    }
+    if (normalized === 'pending' || normalized === 'in progress' || normalized === 'processing') {
+      return 'bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-900/25 dark:text-amber-200 dark:border-amber-500/20';
+    }
+    if (normalized === 'failure' || normalized === 'error' || normalized === 'declined' || normalized === 'rejected') {
+      return 'bg-rose-50 text-rose-700 border border-rose-100 dark:bg-rose-900/25 dark:text-rose-200 dark:border-rose-500/20';
+    }
+
+    return 'bg-slate-100 text-slate-700 border border-slate-200 dark:bg-slate-800/80 dark:text-slate-200 dark:border-slate-700';
+  };
+
   useEffect(() => {
     loadData();
   }, [skip, limit]);
@@ -114,8 +130,8 @@ function SuperAdminAuditLogs() {
                       <td className="py-3.5 px-6 text-slate-700 font-medium">{log.activity}</td>
                       <td className="py-3.5 px-6 text-slate-500">{log.resource || '-'}</td>
                       <td className="py-3.5 px-6">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-block border ${log.statusClass || 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
-                          {log.status}
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-block ${getAuditStatusClasses(log.status || log.statusClass)} `}>
+                          {log.status || 'Unknown'}
                         </span>
                       </td>
                     </motion.tr>

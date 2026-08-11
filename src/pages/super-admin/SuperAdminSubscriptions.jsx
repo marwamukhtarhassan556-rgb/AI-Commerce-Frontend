@@ -56,6 +56,24 @@ function SuperAdminSubscriptions() {
     }
   };
 
+  const getTransactionStatusClasses = (status = '') => {
+    const normalized = status?.toLowerCase() || '';
+
+    if (normalized === 'successful' || normalized === 'success') {
+      return 'status-badge status-success bg-emerald-50 text-emerald-700 border border-emerald-200';
+    }
+
+    if (normalized === 'pending') {
+      return 'status-badge status-pending bg-amber-50 text-amber-700 border border-amber-200';
+    }
+
+    if (normalized === 'failed' || normalized === 'declined' || normalized === 'cancelled' || normalized === 'canceled') {
+      return 'status-badge status-failed bg-rose-50 text-rose-700 border border-rose-200';
+    }
+
+    return 'status-badge status-default bg-slate-100 text-slate-700 border border-slate-200';
+  };
+
   return (
     <AdminPageState loading={loading} error={error} onRetry={loadData}>
       <div className="p-8 space-y-8">
@@ -80,11 +98,11 @@ function SuperAdminSubscriptions() {
           {data?.metrics?.map((metric) => (
             <div
               key={metric.label}
-              className="bg-white px-5 py-4 rounded-xl border border-[#e0e2ec] shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 relative overflow-hidden group flex items-center justify-between"
+              className="bg-white dark:bg-slate-900/80 px-5 py-4 rounded-xl border border-[#e0e2ec] dark:border-slate-700/60 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 relative overflow-hidden group flex items-center justify-between"
             >
               <div className="space-y-1">
-                <p className="text-[#64748b] text-xs font-bold tracking-wider uppercase">{metric.label}</p>
-                <h3 className="font-outfit text-2xl font-bold text-[#0b1c30] tracking-tight">{metric.value}</h3>
+                <p className="text-slate-400 dark:text-slate-300 text-xs font-bold tracking-wider uppercase">{metric.label}</p>
+                <h3 className="font-outfit text-2xl font-bold metric-card-value tracking-tight">{metric.value}</h3>
                 {metric.change && (
                   <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 pt-0.5">
                     <span className="material-symbols-outlined text-sm">trending_up</span>
@@ -164,7 +182,9 @@ function SuperAdminSubscriptions() {
                       <li
                         key={feature.label || feature}
                         className={`flex items-center gap-3 text-sm ${
-                          feature.included !== false ? 'text-on-surface' : 'text-on-surface-variant/50 line-through'
+                          feature.included !== false
+                            ? 'text-on-surface'
+                            : 'text-on-surface-variant/50 line-through'
                         }`}
                       >
                         <span
@@ -186,7 +206,12 @@ function SuperAdminSubscriptions() {
                   className="w-full py-3 px-4 bg-[#0b1c30] hover:bg-[#132847] text-white font-semibold text-sm rounded-xl text-center transition-all shadow-sm hover:shadow active:scale-95 flex items-center justify-center gap-2 group/btn"
                 >
                   <span>Manage Tier</span>
-                  <span className="material-symbols-outlined text-base transition-transform group-hover/btn:translate-x-1">arrow_forward</span>
+                  <span
+                    className="material-symbols-outlined text-base transition-transform group-hover/btn:translate-x-1"
+                    style={{ color: '#ffffff' }}
+                  >
+                    arrow_forward
+                  </span>
                 </button>
               </div>
             ))}
@@ -215,11 +240,7 @@ function SuperAdminSubscriptions() {
                     <td className="py-3.5 px-4 text-[#414753]">{row.date}</td>
                     <td className="py-3.5 px-4 font-semibold text-[#0b1c30]">{row.amount}</td>
                     <td className="py-3.5 px-4">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-                        row.status === 'successful' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {row.status}
-                      </span>
+                      <span className={`${getTransactionStatusClasses(row.status)} rounded-full text-xs font-medium`}>{row.status}</span>
                     </td>
                   </tr>
                 ))}

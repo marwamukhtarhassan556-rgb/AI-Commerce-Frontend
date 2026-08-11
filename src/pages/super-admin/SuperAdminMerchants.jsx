@@ -65,6 +65,49 @@ function SuperAdminMerchants() {
     }
   };
 
+  const getPlanBadgeClasses = (planLabel = 'Standard') => {
+    const label = planLabel?.toLowerCase() || '';
+
+    if (label.includes('enterprise') || label.includes('master')) {
+      return 'plan-badge plan-enterprise bg-emerald-900 text-emerald-100 border-2 border-emerald-500/30 px-.8 py-1';
+    }
+
+    if (label.includes('pro')) {
+      return 'plan-badge plan-pro bg-indigo-700 text-indigo-100 border-2 border-indigo-600 px-3 py-1';
+    }
+
+    if (label.includes('starter')) {
+      return 'plan-badge plan-starter bg-sky-900 text-sky-100 border-2 border-sky-500/30 px-3 py-1';
+    }
+
+    if (label.includes('standard')) {
+      return 'plan-badge plan-standard bg-slate-900 text-slate-100 border-2 border-slate-600/30 px-3 py-1';
+    }
+
+    return 'plan-badge plan-default bg-slate-900 text-slate-100 border-2 border-slate-600/30 px-3 py-1';
+  };
+
+  const getStatusClasses = (statusValue = '') => {
+    const statusKey = statusValue?.toLowerCase();
+
+    if (statusKey === 'active') {
+      return 'status-badge status-active bg-emerald-50 text-emerald-700 border border-emerald-200 px-1 py-1';
+    }
+
+    if (statusKey === 'suspended') {
+      return 'status-badge status-suspended bg-rose-50 text-rose-700 border border-rose-200 px-1 py-1';
+    }
+
+    return 'status-badge status-inactive bg-gray-100 text-gray-600 border border-gray-400 px-1 py-1';
+  };
+
+  const getStatusDotClasses = (statusValue = '') => {
+    const statusKey = statusValue?.toLowerCase();
+    if (statusKey === 'active') return 'bg-emerald-200';
+    if (statusKey === 'suspended') return 'bg-rose-200';
+    return 'bg-gray-900';
+  };
+
   const filteredMerchants = merchants.filter((merchant) => {
     const matchesSearch =
       !search ||
@@ -201,21 +244,13 @@ function SuperAdminMerchants() {
                     <td className="py-4 px-6 text-[#414753] capitalize font-medium">{merchant.platform}</td>
                     <td className="py-4 px-6 text-[#414753] font-medium">{merchant.email}</td>
                     <td className="py-4 px-6">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${merchant.plan?.className || 'bg-slate-100 text-slate-700'}`}>
+                      <span className={`${getPlanBadgeClasses(merchant.plan?.label)} rounded-lg text-xs font-semibold`}>
                         {merchant.plan?.label || 'Standard'}
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 ${
-                          merchant.status?.toLowerCase() === 'active'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            : merchant.status?.toLowerCase() === 'suspended'
-                            ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                            : 'bg-gray-100 text-gray-600 border border-gray-200'
-                        }`}
-                      >
-                        <span className={`w-1.5 h-1.5 rounded-full ${merchant.status?.toLowerCase() === 'active' ? 'bg-emerald-500' : merchant.status?.toLowerCase() === 'suspended' ? 'bg-rose-500' : 'bg-gray-400'}`}></span>
+                      <span className={`${getStatusClasses(merchant.status)} rounded-full text-xs font-semibold inline-flex items-center gap-1.5`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${getStatusDotClasses(merchant.status)}`}></span>
                         {merchant.status}
                       </span>
                     </td>

@@ -51,8 +51,8 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-200 bg-white/95 backdrop-blur lg:px-6"
-      style={{ height: '64px' }}
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-200 backdrop-blur lg:left-64 lg:right-0 lg:px-6"
+      style={{ height: '64px', background: 'var(--admin-header)' }}
     >
       {onMenuToggle ? (
         <button
@@ -85,26 +85,17 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
           </div>
         )}
         {searchPlaceholder && (
-          <div className="relative ml-4" style={{ maxWidth: '320px', width: '100%' }}>
+          <div className="relative ml-4 w-full max-w-[320px]">
             <span
-              className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2"
-              style={{ fontSize: '1rem', color: '#475569' }}
+              className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+              style={{ fontSize: '1rem' }}
             >
               search
             </span>
             <input
               type="text"
               placeholder={searchPlaceholder}
-              style={{
-                width: '100%',
-                background: '#F8FAFC',
-                border: '1px solid #E2E8F0',
-                borderRadius: '8px',
-                padding: '0.4rem 0.75rem 0.4rem 2.2rem',
-                color: '#0D1B2A',
-                fontSize: '0.85rem',
-                outline: 'none',
-              }}
+              className="w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 pl-10 text-sm text-[#0D1B2A] outline-none focus:border-primary"
             />
           </div>
         )}
@@ -143,27 +134,18 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#64748B',
+            color: '#1D4ED8',
             cursor: 'pointer',
           }}
           title="Refresh status"
         >
           <span
             className="material-symbols-outlined"
-            style={{ fontSize: '1.1rem', animation: refreshing ? 'spin 0.8s linear infinite' : 'none' }}
+            style={{ fontSize: '1.1rem', color: '#1D4ED8', animation: refreshing ? 'spin 0.8s linear infinite' : 'none' }}
           >
             refresh
           </span>
         </button>
-
-        {/* Divider */}
-        <div style={{ width: '1px', height: '28px', background: 'rgba(71,85,105,0.3)' }} />
-
-        {/* Role badge */}
-        <div className="hidden xl:block text-right">
-          <p style={{ color: '#0D1B2A', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>{adminName}</p>
-          <p style={{ color: '#64748B', fontSize: '0.65rem', margin: 0 }}>Platform Control</p>
-        </div>
 
         {/* Avatar */}
         <Link
