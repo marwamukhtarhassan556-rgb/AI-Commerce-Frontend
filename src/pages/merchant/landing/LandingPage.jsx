@@ -24,7 +24,7 @@ const plans = [
 
 export default function LandingPage() {
   return <div className="landing-page min-h-screen bg-white text-[#0d2342]">
-    <Navbar />
+    <Navbar tagline />
     <main className="pt-[73px]">
       <section className="navi-hero px-5 pb-16 pt-14 md:px-8 md:pb-24 md:pt-20">
         <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[.95fr_1.05fr]">

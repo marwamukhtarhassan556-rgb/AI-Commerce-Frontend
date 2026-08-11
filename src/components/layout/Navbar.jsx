@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
 import BrandLogo from '../BrandLogo'
 
-export default function Navbar() {
+export default function Navbar({ tagline = false }) {
   return (
     <header className="fixed top-0 left-0 z-50 flex w-full items-center justify-between border-b border-outline-variant bg-surface px-4 py-sm md:px-lg">
       <Link to="/" className="flex items-center gap-2">
-        <BrandLogo />
+        <BrandLogo tagline={tagline} className={tagline ? 'landing-nav-brand' : ''} />
       </Link>
       <nav className="hidden items-center gap-xl md:flex">
         <a className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary" href="#features">Features</a>
