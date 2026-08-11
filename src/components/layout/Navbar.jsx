@@ -13,7 +13,7 @@ export default function Navbar({ tagline = false }) {
         <a className="font-body-md text-body-md text-on-surface-variant transition-colors hover:text-primary" href="#integrations">Integrations</a>
       </nav>
       <div className="flex items-center gap-sm">
-        <Link to="/signin" className="rounded-lg border border-outline-variant px-lg py-sm text-label-sm font-label-sm text-on-surface-variant transition-all hover:border-primary hover:text-primary">
+        <Link to="/signin" className={`${tagline ? 'landing-signin ' : ''}rounded-lg border border-outline-variant px-lg py-sm text-label-sm font-label-sm text-on-surface-variant transition-all hover:border-primary hover:text-primary`}>
           Sign In
         </Link>
       </div>
