@@ -25,7 +25,7 @@ export default function ForgotPassword() {
     } finally { setLoading(false); }
   }
 
-  return <div className="auth-page">
+  return <div className="auth-page auth-business-page">
     <main className="auth-content">
       <div className="auth-topbar"><Link className="auth-brand" to="/"><BrandLogo light /></Link></div>
       <section className="auth-card">
