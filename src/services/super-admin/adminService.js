@@ -118,7 +118,6 @@ export async function fetchMerchants(params = { page: 1, pageSize: 50 }) {
 
 export async function fetchStoreById(storeId) {
   try {
-    // المسار الصحيح حسب الـ Swagger (بدون /admin/)
     const response = await api.get(`/api/stores/${storeId}`);
     const rawStore = response.data?.store || response.data;
     const mappedStore = mapStoreToMerchant(rawStore);
@@ -127,20 +126,28 @@ export async function fetchStoreById(storeId) {
       shopDomain: mappedStore.domain || rawStore.shopDomain,
     };
   } catch (err) {
-    console.warn(`Using fallback store details for ${storeId}:`, err);
+    console.warn(`API fetch failed for store ${storeId}, using local merchant data:`, err);
+    
+    // جلب المتجر مباشرة من قائمة المتاجر المحملة مسبقاً لتفادي الـ 404 تماماً
     const merchants = await fetchMerchants().catch(() => []);
-    const store = merchants.find((merchant) => String(merchant.id) === String(storeId)) || {
+    const foundMerchant = merchants.find((m) => String(m.id) === String(storeId));
+    
+    if (foundMerchant) {
+      return {
+        ...foundMerchant,
+        shopDomain: foundMerchant.domain || foundMerchant.shopDomain,
+      };
+    }
+
+    return {
       id: storeId,
       name: 'Sample Store',
       platform: 'shopify',
       email: 'owner@example.com',
       domain: 'samplestore.myshopify.com',
+      shopDomain: 'samplestore.myshopify.com',
       status: 'Active',
       plan: { label: 'Standard', className: 'bg-slate-100 text-slate-700' },
-    };
-    return {
-      ...store,
-      shopDomain: store.domain,
     };
   }
 }

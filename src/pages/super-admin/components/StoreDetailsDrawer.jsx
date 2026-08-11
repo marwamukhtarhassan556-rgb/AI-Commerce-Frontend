@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchStoreById } from '../../../services/super-admin/adminService';
+import { fetchMerchants } from '../../../services/super-admin/adminService';
 
 function DetailRow({ label, value }) {
   return (
@@ -24,10 +24,25 @@ function StoreDetailsDrawer({ storeId, open, onClose }) {
       setLoading(true);
       setError(null);
       try {
-        const data = await fetchStoreById(storeId);
-        if (!cancelled) setStore(data);
+        const merchants = await fetchMerchants();
+        const found = merchants.find((m) => String(m.id) === String(storeId));
+        
+        if (!cancelled) {
+          if (found) {
+            setStore(found);
+          } else {
+            setStore({
+              id: storeId,
+              name: 'Store Details',
+              platform: 'N/A',
+              email: 'N/A',
+              domain: 'N/A',
+              status: 'Active',
+            });
+          }
+        }
       } catch (err) {
-        if (!cancelled) setError(err.message || 'Failed to load store details');
+        if (!cancelled) setError('Failed to load store details');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -46,14 +61,12 @@ function StoreDetailsDrawer({ storeId, open, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <button
-        type="button"
-        aria-label="Close store details"
-        className="fixed inset-0 bg-slate-900/30 backdrop-blur-xs"
+      <div
+        className="fixed inset-0 bg-slate-950/20 transition-opacity"
         onClick={onClose}
       />
 
-      <aside className="relative z-10 flex h-full w-full max-w-lg flex-col border-l border-slate-200 bg-white shadow-2xl">
+      <aside className="relative z-10 flex h-full w-full sm:w-[480px] flex-col border-l border-slate-200 bg-white shadow-2xl">
         <header className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-5">
           <div>
             <h2 className="font-outfit text-lg font-bold text-slate-900">Store Details</h2>

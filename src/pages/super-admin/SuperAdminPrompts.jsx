@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   fetchPrompts,
   fetchPromptByKey,
@@ -14,8 +14,8 @@ const PROMPT_TYPES = ['system', 'user', 'template'];
 function TagBadge({ tag }) {
   return (
     <span
-      className="px-2 py-0.5 rounded-full text-xs"
-      style={{ background: 'rgba(56,189,248,0.1)', color: '#38BDF8', border: '1px solid rgba(56,189,248,0.15)' }}
+      className="px-2.5 py-0.5 rounded-full text-xs font-medium"
+      style={{ background: 'rgba(37, 99, 235, 0.08)', color: '#2563EB', border: '1px solid rgba(37, 99, 235, 0.15)' }}
     >
       {tag}
     </span>
@@ -59,30 +59,57 @@ function PromptEditor({ prompt, onSave, onCancel }) {
     setSaving(false);
   };
 
-  const labelStyle = { color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' };
-  const inputStyle = { width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(71,85,105,0.4)', borderRadius: '8px', padding: '0.45rem 0.75rem', color: '#E2E8F0', fontSize: '0.875rem', outline: 'none' };
+  const labelStyle = { color: '#475569', fontSize: '0.75rem', fontWeight: 600, display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.05em' };
+  const inputStyle = { width: '100%', background: '#F8FAFC', border: '1px solid #CBD5E1', borderRadius: '10px', padding: '0.6rem 0.85rem', color: '#0F172A', fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box' };
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50"
-      style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(15, 23, 42, 0.5)',
+        backdropFilter: 'blur(4px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '1rem',
+        boxSizing: 'border-box',
+      }}
       onClick={(e) => e.target === e.currentTarget && onCancel()}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl p-6 flex flex-col gap-4"
-        style={{ background: '#0F172A', border: '1px solid rgba(37,99,235,0.25)', maxHeight: '90vh', overflowY: 'auto' }}
+        style={{
+          width: '100%',
+          maxWidth: '680px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E2E8F0',
+          borderRadius: '20px',
+          padding: '1.75rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.15rem',
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          boxSizing: 'border-box',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          margin: 'auto',
+        }}
       >
-        <div className="flex items-center justify-between">
-          <h3 style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem', margin: 0 }}>
-            {prompt?.key ? `Edit: ${prompt.key}` : 'New Prompt'}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', borderBottom: '1px solid #F1F5F9', paddingBottom: '0.75rem' }}>
+          <h3 style={{ color: '#0F172A', fontWeight: 700, fontSize: '1.15rem', margin: 0, letterSpacing: '-0.01em' }}>
+            {prompt?.key ? `Edit Prompt: ${prompt.key}` : 'Create New Prompt'}
           </h3>
-          <button onClick={onCancel} style={{ color: '#64748B', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>✕</button>
+          <button onClick={onCancel} style={{ color: '#64748B', background: '#F1F5F9', border: '1px solid #E2E8F0', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem' }}>✕</button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
           <div>
             <label style={labelStyle}>Key *</label>
-            <input value={form.key} onChange={set('key')} disabled={!!prompt?.key} placeholder="e.g. system.greeting" style={{ ...inputStyle, opacity: prompt?.key ? 0.5 : 1 }} />
+            <input value={form.key} onChange={set('key')} disabled={!!prompt?.key} placeholder="e.g. system.greeting" style={{ ...inputStyle, opacity: prompt?.key ? 0.6 : 1 }} />
           </div>
           <div>
             <label style={labelStyle}>Name</label>
@@ -91,7 +118,7 @@ function PromptEditor({ prompt, onSave, onCancel }) {
           <div>
             <label style={labelStyle}>Type</label>
             <select value={form.type} onChange={set('type')} style={{ ...inputStyle, cursor: 'pointer' }}>
-              {PROMPT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              {PROMPT_TYPES.map((t) => <option key={t} value={t} style={{ background: '#FFFFFF', color: '#0F172A' }}>{t}</option>)}
             </select>
           </div>
           <div>
@@ -113,27 +140,28 @@ function PromptEditor({ prompt, onSave, onCancel }) {
         <div>
           <label style={{ ...labelStyle, marginBottom: '6px' }}>
             Prompt Content *
-            <span style={{ color: '#475569', fontWeight: 400, marginLeft: '8px', textTransform: 'none', letterSpacing: 0 }}>
+            <span style={{ color: '#64748B', fontWeight: 400, marginLeft: '8px', textTransform: 'none', letterSpacing: 0 }}>
               Variables: {'{store_name}'}, {'{user_name}'}, {'{product_list}'}
             </span>
           </label>
           <textarea
             value={form.content}
             onChange={set('content')}
-            rows={10}
+            rows={6}
             placeholder="You are Navi, an AI shopping assistant for {store_name}..."
             style={{ ...inputStyle, resize: 'vertical', fontFamily: 'monospace', lineHeight: 1.6 }}
           />
         </div>
 
-        <div className="flex gap-3 justify-end">
-          <button onClick={onCancel} style={{ padding: '0.5rem 1.25rem', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: '#94A3B8', fontWeight: 600, fontSize: '0.85rem', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end', paddingTop: '0.75rem', borderTop: '1px solid #F1F5F9' }}>
+          <button onClick={onCancel} style={{ padding: '0.55rem 1.25rem', borderRadius: '10px', background: '#F1F5F9', color: '#475569', fontWeight: 600, fontSize: '0.85rem', border: '1px solid #E2E8F0', cursor: 'pointer' }}>
             Cancel
           </button>
           <button onClick={handleSave} disabled={saving || !form.key || !form.content} style={{
-            padding: '0.5rem 1.25rem', borderRadius: '8px',
-            background: saving || !form.key || !form.content ? 'rgba(37,99,235,0.2)' : '#2563EB',
+            padding: '0.55rem 1.4rem', borderRadius: '10px',
+            background: saving || !form.key || !form.content ? '#93C5FD' : '#2563EB',
             color: 'white', fontWeight: 600, fontSize: '0.85rem', border: 'none', cursor: saving ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
           }}>
             {saving ? 'Saving…' : (prompt?.key ? 'Update Prompt' : 'Create Prompt')}
           </button>
@@ -148,7 +176,7 @@ export default function SuperAdminPrompts() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
-  const [editing, setEditing] = useState(null); // null | {} (new) | {key,...} (existing)
+  const [editing, setEditing] = useState(null); 
   const [seeding, setSeeding] = useState(false);
   const [restoring, setRestoring] = useState(null);
 
@@ -213,104 +241,107 @@ export default function SuperAdminPrompts() {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
+    <div style={{ padding: '2.5rem 2rem', maxWidth: '1300px', margin: '0 auto', background: '#F8FAFC', minHeight: '100vh', color: '#0F172A' }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
         <div>
-          <h2 style={{ color: 'white', fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Prompt Manager</h2>
-          <p style={{ color: '#64748B', fontSize: '0.875rem', marginTop: '4px' }}>Create, edit, restore and version system prompts for the AI engine</p>
+          <h2 style={{ color: '#0F172A', fontSize: '1.75rem', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Prompt Manager</h2>
+          <p style={{ color: '#64748B', fontSize: '0.9rem', marginTop: '6px' }}>Create, edit, restore and version system prompts for the AI engine</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleSeed} disabled={seeding}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(167,139,250,0.1)', border: '1px solid rgba(167,139,250,0.25)', color: '#A78BFA' }}>
+            style={{ padding: '0.6rem 1.1rem', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: '#F1F5F9', border: '1px solid #CBD5E1', color: '#475569', transition: 'all 0.2s' }}>
             {seeding ? 'Seeding…' : '🌱 Seed Defaults'}
           </button>
           <button onClick={() => setEditing({})}
-            style={{ padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.82rem', fontWeight: 600, cursor: 'pointer', background: '#2563EB', border: 'none', color: 'white' }}>
+            style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: '#2563EB', border: 'none', color: 'white', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)' }}>
             + New Prompt
           </button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-8">
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search prompts…"
+          placeholder="Search prompts by key, name, or content…"
           style={{
-            flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(71,85,105,0.4)',
-            borderRadius: '10px', padding: '0.5rem 1rem', color: '#E2E8F0', fontSize: '0.875rem', outline: 'none',
+            flex: 1, background: '#FFFFFF', border: '1px solid #CBD5E1',
+            borderRadius: '12px', padding: '0.75rem 1rem', color: '#0F172A', fontSize: '0.9rem', outline: 'none',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
           }}
         />
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
           style={{
-            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(71,85,105,0.4)',
-            borderRadius: '10px', padding: '0.5rem 1rem', color: '#E2E8F0', fontSize: '0.875rem', outline: 'none',
+            background: '#FFFFFF', border: '1px solid #CBD5E1',
+            borderRadius: '12px', padding: '0.75rem 1rem', color: '#0F172A', fontSize: '0.9rem', outline: 'none', cursor: 'pointer',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
           }}
         >
-          <option value="">All Types</option>
-          {PROMPT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+          <option value="" style={{ background: '#FFFFFF', color: '#0F172A' }}>All Types</option>
+          {PROMPT_TYPES.map((t) => <option key={t} value={t} style={{ background: '#FFFFFF', color: '#0F172A' }}>{t}</option>)}
         </select>
       </div>
 
       {/* Prompts Grid */}
       {loading ? (
-        <div className="text-center py-12" style={{ color: '#64748B' }}>Loading prompts…</div>
+        <div className="text-center py-20" style={{ color: '#64748B', fontSize: '1rem' }}>Loading prompts…</div>
       ) : prompts.length === 0 ? (
-        <div className="text-center py-12" style={{ color: '#64748B' }}>
-          <p>No prompts found. Click "Seed Defaults" to create the system prompts.</p>
+        <div className="text-center py-20 rounded-2xl" style={{ background: '#FFFFFF', border: '1px dashed #CBD5E1', color: '#64748B' }}>
+          <p style={{ fontSize: '1rem', marginBottom: '8px' }}>No prompts found.</p>
+          <p style={{ fontSize: '0.85rem', color: '#94A3B8' }}>Click "Seed Defaults" to create the initial system prompts.</p>
         </div>
       ) : (
-        <div className="grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))' }}>
+        <div className="grid gap-5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(360px, 1fr))' }}>
           {prompts.map((p) => (
             <div
               key={p.key}
-              className="p-5 rounded-2xl flex flex-col gap-3"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+              className="p-6 rounded-2xl flex flex-col gap-3.5 transition-all duration-200"
+              style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)' }}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p style={{ color: 'white', fontWeight: 600, margin: 0, fontSize: '0.9rem' }}>{p.name || p.key}</p>
-                  <p style={{ color: '#475569', fontSize: '0.72rem', margin: '2px 0 0', fontFamily: 'monospace' }}>{p.key}</p>
+                  <p style={{ color: '#0F172A', fontWeight: 600, margin: 0, fontSize: '0.95rem' }}>{p.name || p.key}</p>
+                  <p style={{ color: '#64748B', fontSize: '0.75rem', margin: '3px 0 0', fontFamily: 'monospace' }}>{p.key}</p>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-xs font-semibold flex-shrink-0" style={{ background: 'rgba(56,189,248,0.08)', color: '#38BDF8' }}>
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0" style={{ background: 'rgba(37, 99, 235, 0.08)', color: '#2563EB', border: '1px solid rgba(37, 99, 235, 0.15)' }}>
                   {p.type || 'system'}
                 </span>
               </div>
 
               {p.description && (
-                <p style={{ color: '#64748B', fontSize: '0.8rem', margin: 0 }}>{p.description}</p>
+                <p style={{ color: '#64748B', fontSize: '0.85rem', margin: 0, lineHeight: 1.4 }}>{p.description}</p>
               )}
 
               <div
-                className="rounded-lg p-3"
-                style={{ background: 'rgba(0,0,0,0.2)', maxHeight: '80px', overflow: 'hidden', position: 'relative' }}
+                className="rounded-xl p-3.5"
+                style={{ background: '#F8FAFC', maxHeight: '90px', overflow: 'hidden', position: 'relative', border: '1px solid #E2E8F0' }}
               >
-                <p style={{ color: '#94A3B8', fontSize: '0.75rem', fontFamily: 'monospace', margin: 0, lineHeight: 1.5 }}>
+                <p style={{ color: '#334155', fontSize: '0.78rem', fontFamily: 'monospace', margin: 0, lineHeight: 1.6 }}>
                   {p.content?.slice(0, 200)}{p.content?.length > 200 ? '…' : ''}
                 </p>
               </div>
 
               {Array.isArray(p.tags) && p.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {p.tags.map((t) => <TagBadge key={t} tag={t} />)}
                 </div>
               )}
 
-              <div className="flex gap-2 mt-auto">
+              <div className="flex gap-2.5 mt-auto pt-3 border-t border-slate-100">
                 <button onClick={() => setEditing(p)}
-                  style={{ flex: 1, padding: '0.4rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(37,99,235,0.1)', border: '1px solid rgba(37,99,235,0.2)', color: '#60A5FA' }}>
+                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.2)', color: '#2563EB' }}>
                   Edit
                 </button>
                 <button onClick={() => handleRestore(p.key)} disabled={restoring === p.key}
-                  style={{ flex: 1, padding: '0.4rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', color: '#F59E0B' }}>
+                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(217, 119, 6, 0.08)', border: '1px solid rgba(217, 119, 6, 0.2)', color: '#D97706' }}>
                   {restoring === p.key ? '…' : 'Restore'}
                 </button>
                 <button onClick={() => handleDelete(p.key)}
-                  style={{ flex: 1, padding: '0.4rem', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.18)', color: '#F87171' }}>
+                  style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: 'rgba(220, 38, 38, 0.08)', border: '1px solid rgba(220, 38, 38, 0.2)', color: '#DC2626' }}>
                   Delete
                 </button>
               </div>

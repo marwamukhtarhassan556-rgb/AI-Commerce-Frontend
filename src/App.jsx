@@ -35,7 +35,7 @@ import SuperAdminPlanDetails from './pages/super-admin/SuperAdminPlanDetails';
 import SuperAdminSubscriptions from './pages/super-admin/SuperAdminSubscriptions';
 import SuperAdminLayout from './components/layout/SuperAdminLayout';
 import SuperAdminAuditLogs from './pages/super-admin/SuperAdminAuditLogs';
-import SuperAdminSettings from './pages/super-admin/SuperAdminSettings';
+// import SuperAdminSettings from './pages/super-admin/SuperAdminSettings';
 import SuperAdminModelsHealth from './pages/super-admin/SuperAdminModelsHealth';
 import SuperAdminPrompts from './pages/super-admin/SuperAdminPrompts';
 import SuperAdminBundles from './pages/super-admin/SuperAdminBundles';
@@ -121,7 +121,7 @@ function App() {
           <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
           <Route path="/admin/diagnostics" element={<SuperAdminDiagnostics />} />
           <Route path="/admin/audit-logs" element={<SuperAdminAuditLogs />} />
-          <Route path="/admin/settings" element={<SuperAdminSettings />} />
+          {/* <Route path="/admin/settings" element={<SuperAdminSettings />} /> */}
           <Route path="/admin/features" element={<SuperAdminFeatures />} />
           <Route path="/admin/features/create" element={<SuperAdminFeatureCreate />} />
           <Route path="/admin/merchants" element={<SuperAdminMerchants />} />

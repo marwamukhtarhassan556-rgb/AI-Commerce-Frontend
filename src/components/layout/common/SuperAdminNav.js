@@ -9,7 +9,7 @@ export const adminNavItems = [
   { id: 'diagnostics',   label: 'AI Analytics',        icon: 'analytics',              path: '/admin/diagnostics' },
   { id: 'audit',         label: 'Audit Logs',          icon: 'receipt_long',           path: '/admin/audit-logs' },
   { id: 'assistant',     label: 'Navi Assistant',      icon: 'forum',                  path: '/admin/assistant' },
-  { id: 'settings',      label: 'Settings',            icon: 'settings',               path: '/admin/settings' },
+  // { id: 'settings',      label: 'Settings',            icon: 'settings',               path: '/admin/settings' },
 ];
 
 export const ADMIN_AVATAR =

@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { fetchSubscriptions, fetchPlans } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
+import axios from 'axios';
 
 function SuperAdminSubscriptions() {
   const [data, setData] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const navigate = useNavigate();
 
   const loadData = async () => {
@@ -31,10 +33,26 @@ function SuperAdminSubscriptions() {
     loadData();
   }, []);
 
-  // دالة حذف البلان (يمكنك ربطها بـ API الحذف الخاص بك لاحقاً)
-  const handleDeletePlan = (planId) => {
-    if (window.confirm('Are you sure you want to delete this plan?')) {
+  // دالة حذف البلان المربوطة بالـ API الفعلي
+  const handleDeletePlan = async (planId) => {
+    if (!window.confirm('Are you sure you want to delete this plan?')) {
+      return;
+    }
+
+    setDeletingId(planId);
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // إرسال طلب الحذف للـ API الأساسي (مع مراعاة الـ Base URL أو الرابط كاملاً حسب إعدادات الـ Axios لديك)
+      await axios.delete(`https://aisales123.runasp.net/api/admin/plans/${planId}`, { headers });
+
+      // تحديث القائمة محلياً بعد نجاح الحذف من السيرفر
       setPlans((prevPlans) => prevPlans.filter((p) => p.id !== planId));
+    } catch (err) {
+      alert(err.response?.data?.message || err.message || 'Failed to delete the plan.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -97,14 +115,19 @@ function SuperAdminSubscriptions() {
                     : 'hover:border-primary/30'
                 }`}
               >
-                {/* زر الحذف الخارجي في أعلى الكارد */}
+                {/* زر الحذف الخارجي في أعلى الكارد مع حالة التحميل */}
                 <button
                   type="button"
+                  disabled={deletingId === plan.id}
                   onClick={() => handleDeletePlan(plan.id)}
-                  className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors shadow-sm flex items-center justify-center"
+                  className="absolute top-4 right-4 p-2 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors shadow-sm flex items-center justify-center disabled:opacity-50"
                   title="Delete Plan"
                 >
-                  <span className="material-symbols-outlined text-base">delete</span>
+                  {deletingId === plan.id ? (
+                    <span className="material-symbols-outlined text-base animate-spin">sync</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-base">delete</span>
+                  )}
                 </button>
 
                 {plan.popular && (
