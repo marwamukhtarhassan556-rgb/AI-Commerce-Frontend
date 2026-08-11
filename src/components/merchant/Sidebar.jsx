@@ -25,7 +25,7 @@ const Sidebar = () => {
     <aside className="fixed h-full w-70 left-0 top-0 bg-surface-container-low border-r border-outline-variant z-50 hidden lg:flex flex-col py-6">
       {/* Header */}
       <div className="px-6 mb-10">
-        <BrandLogo light />
+        <BrandLogo light className="sidebar-brand" />
         <p className="mt-1 text-xs font-medium text-on-surface-variant">Pro Merchant</p>
       </div>
 

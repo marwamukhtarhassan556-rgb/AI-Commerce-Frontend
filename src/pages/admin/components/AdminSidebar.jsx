@@ -4,7 +4,7 @@ import { adminNavItems } from './adminNav';
 function AdminSidebar() {
   const { pathname } = useLocation();
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 overflow-y-auto bg-[#eff4ff] border-r border-outline-variant flex flex-col p-4 gap-2 z-50">
+    <aside className="admin-sidebar h-screen w-64 fixed left-0 top-0 overflow-y-auto border-r border-outline-variant flex flex-col p-4 gap-2 z-50">
       <div className="flex items-center gap-2 mb-8 px-2">
         <div className="w-10 h-10 bg-[#4f46e5] rounded-xl flex items-center justify-center text-white">
           <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>

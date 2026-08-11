@@ -43,7 +43,7 @@ function AdminLayout() {
   const config = getHeaderConfig(pathname);
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] text-[#0b1c30] font-sans antialiased">
+    <div className="admin-shell min-h-screen font-sans antialiased">
       <AdminSidebar />
       <AdminHeader {...config} />
       <main className="ml-64 pt-20 min-h-screen"><Outlet /></main>
