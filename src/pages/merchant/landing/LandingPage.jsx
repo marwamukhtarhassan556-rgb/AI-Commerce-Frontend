@@ -1,54 +1,69 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BarChart3, Bot, Cable, CheckCircle2, MessageSquareText, PlayCircle, ShieldCheck, Sparkles, Star } from 'lucide-react';
+import {
+  ArrowRight, BarChart3, Bot, Check, ChevronRight, CircleHelp, Headphones,
+  LineChart, MessageCircleMore, PackageCheck, Play, Send, ShieldCheck,
+  ShoppingBag, Sparkles, Star, WandSparkles,
+} from 'lucide-react';
 import Navbar from '../../../components/layout/Navbar';
 import Footer from '../../../components/layout/Footer';
 import './landing.css';
 
-const steps = [
-  ['1', 'Connect Store', 'Sync your Shopify, Salla, or custom store in under two minutes.'],
-  ['2', 'AI Implementation', 'Your assistant learns your products and support history.'],
-  ['3', 'Track & Scale', 'Monitor customer satisfaction and revenue as you grow.'],
+const features = [
+  [Headphones, 'AI Chat & Support', 'Resolve customer questions instantly and keep your shoppers happy around the clock.'],
+  [Sparkles, 'Smart Recommendations', 'Recommend products and bundles from your catalog at exactly the right moment.'],
+  [PackageCheck, 'Abandoned Cart Recovery', 'Bring shoppers back with timely, relevant AI-powered follow-ups.'],
+  [BarChart3, 'Analytics & Insights', 'Understand customer intent, support quality, and sales impact in one place.'],
 ];
 
-const testimonials = [
-  ['Sarah Jenkins', 'CEO, Trendify Collective', 'Navi reduced our support ticket volume by 70% in the first month.'],
-  ['Mark Rosetti', 'Ops Director, TechGear', 'The sentiment analysis saved dozens of customers before they reached a human.'],
-  ['Leila Ahmed', 'Founder, LuxeGlow', 'Easy integration and a stellar support team. Best investment we made this year.'],
+const plans = [
+  ['Starter', '$49', 'For growing stores getting started with AI.', ['AI chat assistant', 'Knowledge base', 'Basic analytics', 'Email support'], 'Start Free Trial'],
+  ['Growth', '$149', 'For stores ready to turn support into growth.', ['Everything in Starter', 'Smart recommendations', 'Cart recovery', 'Advanced analytics'], 'Start Free Trial'],
+  ['Scale', '$299', 'For high-volume teams that need more control.', ['Everything in Growth', 'Custom integrations', 'Priority support', 'Team workspace'], 'Start Free Trial'],
+  ['Enterprise', 'Custom', 'A tailored plan for your organization.', ['Unlimited conversations', 'Dedicated support', 'Custom onboarding', 'SLA & security review'], 'Book a Demo'],
 ];
 
 export default function LandingPage() {
-  return <div className="landing-page min-h-screen bg-surface text-on-surface">
+  return <div className="landing-page min-h-screen bg-white text-[#0d2342]">
     <Navbar />
-    <main className="pt-16">
-      <section className="landing-hero px-6 py-20 md:py-28">
-        <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2">
-          <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary-fixed px-4 py-2 text-xs font-bold text-primary"><Sparkles size={15} /> AI-powered merchant operations</p>
-            <h1 className="max-w-xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">Supercharge your e-commerce store with <span className="text-primary">next-gen AI.</span></h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-on-surface-variant">Manage support, track real-time sentiment, and boost your store’s sales with a focused AI workspace built for merchants.</p>
-            <div className="mt-8 flex flex-wrap gap-4"><Link className="landing-primary" to="/register">Get started free <ArrowRight size={18} /></Link><a className="landing-secondary" href="#features"><PlayCircle size={18} /> Watch demo</a></div>
+    <main className="pt-[73px]">
+      <section className="navi-hero px-5 pb-16 pt-14 md:px-8 md:pb-24 md:pt-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[.95fr_1.05fr]">
+          <div className="navi-hero-copy">
+            <p className="navi-eyebrow"><Sparkles size={14} /> AI-powered e-commerce assistant</p>
+            <h1>Your AI Navigator<br />for <span>E-commerce Success</span></h1>
+            <p className="navi-lede">Turn every customer conversation into a better shopping experience. Navi understands your store, supports shoppers, and helps your business grow.</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link className="navi-button navi-button-main" to="/register">Start Free Trial <ArrowRight size={17} /></Link>
+              <a className="navi-button navi-button-outline" href="#how-it-works"><Play size={16} fill="currentColor" /> See How It Works</a>
+            </div>
+            <div className="navi-hero-points">
+              <span><MessageCircleMore /> AI chat support 24/7</span>
+              <span><WandSparkles /> Personalized recommendations</span>
+              <span><LineChart /> Clear business insights</span>
+            </div>
           </div>
-          <div className="relative mx-auto w-full max-w-xl py-8">
-            <div className="landing-growth"><span className="text-xs text-on-surface-variant">Real-time growth</span><div className="mt-2 h-2 rounded-full bg-primary/15"><span className="block h-full w-3/4 rounded-full bg-primary" /></div><strong>+142% Revenue</strong></div>
-            <div className="landing-dashboard"><div className="mb-3 flex gap-2"><i className="bg-red-400" /><i className="bg-amber-400" /><i className="bg-emerald-400" /></div><img src="/assets/screenshots/dashboard-preview.svg" alt="Navi merchant dashboard preview" /></div>
+
+          <div className="navi-hero-visual" aria-label="Navi platform preview">
+            <div className="navi-orbit navi-orbit-one" /><div className="navi-orbit navi-orbit-two" />
+            <div className="navi-dashboard-window">
+              <aside><span className="navi-mini-brand"><img src="/navi-mark.png" alt="" />Navi</span><span className="active">Overview</span><span>Conversations</span><span>Tickets</span><span>Knowledge base</span><span>Products</span></aside>
+              <div className="navi-dashboard-content"><div className="navi-dashboard-head"><b>Store Overview</b><small>This week <ChevronRight size={13} /></small></div><div className="navi-kpis"><div><small>Conversations</small><b>2,540</b><em>↗ 18.6%</em></div><div><small>Tickets</small><b>1,120</b><em>↗ 12.4%</em></div><div><small>Revenue impact</small><b>$128,430</b><em>↗ 28.6%</em></div></div><div className="navi-chart"><div><b>Conversations over time</b><small>● This week &nbsp; ○ Last week</small></div><svg viewBox="0 0 390 110" role="img" aria-label="Growth chart"><path d="M4 88 C45 79 44 53 86 65 S120 40 150 58 S203 26 233 44 S283 23 310 35 S354 12 386 20" /><path className="muted" d="M4 94 C45 72 63 84 86 78 S128 61 150 75 S190 49 233 70 S286 42 310 57 S347 47 386 38" /></svg></div></div>
+            </div>
+            <div className="navi-revenue-card"><span>Revenue impact</span><b>$128,430</b><em>↗ 28.6%</em><div className="navi-sparkline" /></div>
+            <div className="navi-chat-card"><div className="navi-chat-title"><span><img src="/navi-mark.png" alt="" /></span><b>Navi Assistant</b><i>Online</i></div><p className="user">How can I help you today?</p><p className="bot">I found 3 popular products your customers are loving.</p><div className="navi-products"><span>Running shoes<br /><b>$89</b></span><span>Wireless headphones<br /><b>$129</b></span></div><div className="navi-message">Ask anything <Send size={14} /></div></div>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-outline-variant bg-surface-container-low px-6 py-7"><div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row"><div><b className="text-lg">Trusted by 1,000+ growing merchants</b><p className="text-sm text-on-surface-variant">Leading brands choose AICommerce for automated growth.</p></div><div className="flex flex-wrap justify-center gap-6 text-sm font-bold text-on-surface-variant"><span>Shopify</span><span>WooCommerce</span><span>Salla</span><span>Magento</span></div><div className="flex gap-3 text-xs font-bold"><span className="rounded-full bg-primary-fixed px-3 py-2 text-primary"><CheckCircle2 className="mr-1 inline" size={14} />94.2% resolution</span><span className="rounded-full bg-primary-fixed px-3 py-2 text-primary"><Star className="mr-1 inline" size={14} />4.8 CSAT</span></div></div></section>
+      <section className="navi-trust px-5 py-9 md:px-8"><p>Trusted by forward-thinking e-commerce brands</p><div><span>LUXORA</span><span>BOHÈME</span><span>avif.</span><span>THREADS</span><span>SOUQAN</span><span>BRANDLY</span></div></section>
 
-      <section id="features" className="mx-auto max-w-7xl px-6 py-24"><header className="mb-12 text-center"><p className="text-xs font-bold uppercase tracking-[.18em] text-primary">Powerful features</p><h2 className="mt-3 text-3xl font-bold md:text-4xl">Engineered for merchant efficiency</h2></header><div className="grid gap-5 md:grid-cols-12">
-        <article className="landing-card landing-feature md:col-span-8"><Bot className="text-primary" size={38} /><h3>Automated AI ticket resolution</h3><p>AICommerce understands customer questions and resolves tracking, returns, FAQs, and more in seconds.</p><div className="landing-chat"><span>Where is my order #5512?</span><b><Bot size={14} /> Your order is in transit and arrives Friday.</b></div></article>
-        <article className="landing-card landing-feature md:col-span-4"><MessageSquareText className="text-primary" size={38} /><h3>Sentiment analysis</h3><p>Detect customer mood instantly and prioritize the conversations that matter most.</p><div className="mt-6 space-y-2 text-xs"><span className="block rounded bg-emerald-500/10 p-2 text-emerald-700">“Love the quality!”</span><span className="block rounded bg-red-500/10 p-2 text-red-700">“Still waiting on shipping...”</span></div></article>
-        <article className="landing-card landing-feature md:col-span-6"><BarChart3 className="text-primary" size={38} /><h3>Merchant analytics</h3><p>Track revenue, response time, and AI efficiency from one clear dashboard.</p><div className="landing-bars"><i /><i /><i /><i /><i /></div></article>
-        <article className="landing-card landing-feature md:col-span-6"><Cable className="text-primary" size={38} /><h3>Seamless integrations</h3><p>Connect your favorite commerce platforms with a single click. No coding required.</p><div className="mt-7 flex gap-3"><span className="landing-icon">S</span><span className="landing-icon">W</span><span className="landing-icon">M</span><span className="landing-icon">+20</span></div></article>
-      </div></section>
+      <section id="features" className="navi-section px-5 py-20 md:px-8"><div className="mx-auto max-w-7xl"><div className="navi-section-heading"><p className="navi-eyebrow"><Sparkles size={14} /> Everything in one place</p><h2>AI that understands your shoppers<br />and grows your business</h2></div><div className="navi-feature-grid">{features.map(([Icon, title, copy]) => <article key={title} className="navi-feature-card"><span className="navi-feature-icon"><Icon size={21} /></span><h3>{title}</h3><p>{copy}</p><a href="#how-it-works">Learn more <ArrowRight size={14} /></a></article>)}</div></div></section>
 
-      <section id="how-it-works" className="bg-surface-container-low px-6 py-24"><div className="mx-auto max-w-7xl"><h2 className="mb-14 text-center text-3xl font-bold">Get started in 3 easy steps</h2><div className="grid gap-10 md:grid-cols-3">{steps.map(([number, title, text]) => <div key={number} className="text-center"><span className="landing-step">{number}</span><h3 className="mt-5 font-bold">{title}</h3><p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-on-surface-variant">{text}</p></div>)}</div></div></section>
+      <section id="integrations" className="navi-platform-section px-5 pb-20 md:px-8"><div className="navi-platform-shell mx-auto grid max-w-7xl gap-10 lg:grid-cols-[.82fr_1.18fr]"><div className="navi-platform-copy"><p className="navi-eyebrow"><ShoppingBag size={14} /> Built for your store</p><h2>Manage, analyze and optimize your entire customer journey</h2><p>Connect your e-commerce platform and let Navi turn daily conversations into decisions you can act on.</p><ul><li><Check /> Unified customer conversations</li><li><Check /> AI-powered recommendations</li><li><Check /> Automated insights and reporting</li><li><Check /> Secure, simple integrations</li></ul><Link to="/register" className="navi-button navi-button-main">Explore Platform <ArrowRight size={17} /></Link></div><div className="navi-analytics"><div className="navi-analytics-side"><b><img src="/navi-mark.png" alt="" /> Navi</b><span className="active">Overview</span><span>Conversations</span><span>Tickets</span><span>Analytics</span></div><div className="navi-analytics-main"><header><b>Overview</b><small>May 1 – May 7</small></header><div className="navi-analytics-kpis"><b>2,540 <small>Conversations</small></b><b>1,320 <small>Tickets resolved</small></b><b>$128,430 <small>Revenue impact</small></b><b>4.32% <small>Conversion rate</small></b></div><div className="navi-analytics-chart"><b>Conversation growth</b><svg viewBox="0 0 410 130"><path d="M5 105 C49 101 52 71 88 85 S120 56 150 69 S192 27 227 61 S270 42 300 53 S353 12 405 25" /></svg></div></div></div></div></section>
 
-      <section className="mx-auto max-w-7xl px-6 py-24"><h2 className="mb-12 text-center text-3xl font-bold">What merchants are saying</h2><div className="grid gap-5 md:grid-cols-3">{testimonials.map(([name, role, quote]) => <article key={name} className="landing-card p-7"><div className="mb-4 flex text-amber-500">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={16} fill="currentColor" />)}</div><p className="min-h-20 text-sm leading-6 text-on-surface-variant">“{quote}”</p><div className="mt-6 flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-primary-fixed font-bold text-primary">{name[0]}</span><div><b className="text-sm">{name}</b><p className="text-xs text-on-surface-variant">{role}</p></div></div></article>)}</div></section>
+      <section id="pricing" className="navi-pricing px-5 py-20 md:px-8"><div className="mx-auto max-w-7xl"><div className="navi-section-heading"><p className="navi-eyebrow"><Sparkles size={14} /> Simple, transparent pricing</p><h2>Choose the plan that grows with you</h2><p>Start free, upgrade when you are ready, and keep full control of your plan.</p></div><div className="navi-plan-grid">{plans.map(([name, price, description, benefits, cta], index) => <article className={`navi-plan ${index === 1 ? 'featured' : ''}`} key={name}>{index === 1 && <span className="navi-popular">Most popular</span>}<h3>{name}</h3><p>{description}</p><div className="navi-plan-price">{price === 'Custom' ? <b>Custom</b> : <><b>{price}</b><small>/ month</small></>}</div><ul>{benefits.map(benefit => <li key={benefit}><Check size={15} />{benefit}</li>)}</ul><Link to={name === 'Enterprise' ? '/signin' : '/register'} className="navi-button navi-plan-button">{cta}</Link></article>)}</div></div></section>
 
-      <section className="px-6 pb-24"><div className="landing-cta mx-auto max-w-7xl text-center"><ShieldCheck className="mx-auto" size={30} /><h2>Ready to automate your store and double customer happiness?</h2><p>Join thousands of merchants upgrading their customer support with AI.</p><div className="mt-7 flex flex-wrap justify-center gap-4"><Link to="/register" className="landing-cta-main">Start your 14-day free trial</Link><Link to="/signin" className="landing-cta-alt">Sign in to your account</Link></div><small>No credit card required · Cancel anytime</small></div></section>
+      <section id="how-it-works" className="navi-final-cta px-5 pb-20 md:px-8"><div className="mx-auto max-w-7xl"><div><p className="navi-eyebrow"><Sparkles size={14} /> Ready to grow?</p><h2>Start your journey with Navi today</h2><p>Join merchants building smarter customer experiences with an AI assistant that understands their store.</p><div className="mt-7 flex flex-wrap gap-3"><Link className="navi-button navi-button-main" to="/register">Start Free Trial <ArrowRight size={17} /></Link><Link className="navi-button navi-button-outline" to="/signin">Talk to Sales</Link></div></div><div className="navi-final-mark"><img src="/navi-mark.png" alt="Navi shopping bag" /><span><MessageCircleMore /></span><span><Sparkles /></span></div></div></section>
     </main>
     <Footer />
   </div>;
