@@ -2,9 +2,12 @@
 // Dedicated Axios client for the Railway-hosted AI Service.
 // Priority: All endpoints that exist in both the ASP.NET backend and here
 // should be fetched from this client (AI Service takes precedence).
+// Requests go through the same-origin proxy (/api-ai → AI Service) so the
+// browser never issues cross-origin calls: Vite dev proxy and the Vercel
+// rewrite both strip the /api-ai prefix and forward to Railway.
 import axios from 'axios';
 
-const AI_BASE_URL = 'https://aicommerce-ai-service-production.up.railway.app';
+const AI_BASE_URL = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai';
 
 const aiService = axios.create({
   baseURL: AI_BASE_URL,
@@ -114,9 +117,9 @@ export const sendRagChat = (payload, providerName = 'openrouter') =>
 // Streaming version — returns a fetch Response for manual stream reading
 export const sendRagChatStream = async (payload, providerName = 'openrouter') => {
   const token = localStorage.getItem('token');
-  const url = new URL(`${AI_BASE_URL}/rag/chat/stream`);
-  url.searchParams.set('provider_name', providerName);
-  const response = await fetch(url.toString(), {
+  const url = `${AI_BASE_URL}/rag/chat/stream`;
+  const query = new URLSearchParams({ provider_name: providerName });
+  const response = await fetch(`${url}?${query.toString()}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
