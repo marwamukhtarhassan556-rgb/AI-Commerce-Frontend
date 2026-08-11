@@ -11,6 +11,12 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api-ai/, ''),
       },
+      // أضف هذا الجزء لتوجيه طلبات الـ api عبر البروكسي وتخطي الـ CORS
+      '/api': {
+        target: 'https://aisales123.runasp.net',
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

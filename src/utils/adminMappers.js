@@ -1,4 +1,4 @@
-// adminMappers.js - copied from backup
+// adminMappers.js
 
 const INITIALS_BACKGROUNDS = [
   'bg-primary/5 text-primary',
@@ -16,13 +16,6 @@ const PLATFORM_ICONS = {
 };
 
 const PLATFORM_COLORS = ['bg-primary', 'bg-secondary-container', 'bg-tertiary-fixed', 'bg-primary/60'];
-
-const FEATURE_ICON_POOL = ['psychology', 'webhook', 'support_agent', 'inventory_2', 'local_shipping', 'auto_awesome'];
-const FEATURE_ICON_BG_POOL = [
-  'bg-primary/5 text-primary',
-  'bg-secondary-container/20 text-secondary',
-  'bg-tertiary-fixed/30 text-tertiary',
-];
 
 function formatNumber(value) {
   return new Intl.NumberFormat('en-US').format(value ?? 0);
@@ -76,7 +69,7 @@ export function getInitialsBg(seed = '') {
 }
 
 function normalizeStatus(status = 'Active') {
-  return status.toLowerCase();
+  return typeof status === 'string' ? status.toLowerCase() : 'active';
 }
 
 function planBadgeClass(planName = '') {
@@ -159,10 +152,7 @@ export function mapTopIntents(intents = []) {
 
   return intents.map((item, index) => {
     const rawValue = item.percentage ?? item.count ?? 0;
-    const value =
-      item.percentage !== undefined
-        ? rawValue
-        : Math.round((rawValue / maxValue) * 100);
+    const value = item.percentage !== undefined ? rawValue : Math.round((rawValue / maxValue) * 100);
 
     return {
       label: item.label,
@@ -188,9 +178,8 @@ export function mapSentimentBreakdown(items = []) {
   ];
 
   return sentimentMeta.map((meta) => {
-    const match =
-      items.find((item) => item.label?.toLowerCase() === meta.key) ??
-      items.find((item) => item.label?.toLowerCase().includes(meta.key));
+    const match = items.find((item) => item.label?.toLowerCase() === meta.key) ??
+                  items.find((item) => item.label?.toLowerCase().includes(meta.key));
 
     const percentage = match?.percentage ?? match?.count ?? 0;
 
@@ -206,7 +195,6 @@ export function mapSentimentBreakdown(items = []) {
 
 export function mapStoreToMerchant(store) {
   const displayName = store.sellerName || store.name;
-
   return {
     id: store.id,
     initials: getInitials(displayName),
@@ -265,10 +253,13 @@ export function mapSubscriptionMetrics(summary = {}) {
   ];
 }
 
+// تم تصحيح الحقول لتطابق الـ API الفعلية (name, description, price)
 export function mapPlanToCard(plan, allFeatures = []) {
   const featureLookup = new Map(allFeatures.map((feature) => [feature.id, feature]));
+  
+  const planFeatureIds = plan.featureIds ?? plan.features?.map(f => f.id || f.featureId) ?? [];
 
-  const features = (plan.featureIds ?? []).map((featureId) => ({
+  const features = planFeatureIds.map((featureId) => ({
     label: featureLookup.get(featureId)?.name ?? featureId,
     included: true,
   }));
@@ -277,33 +268,31 @@ export function mapPlanToCard(plan, allFeatures = []) {
     allFeatures.slice(0, 4).forEach((feature) => {
       features.push({
         label: feature.name,
-        included: (plan.featureIds ?? []).includes(feature.id),
+        included: planFeatureIds.includes(feature.id),
       });
     });
   }
 
+  const pName = plan.name ?? plan.planName ?? 'Untitled Plan';
+  const pStatus = plan.status ?? plan.planStatus ?? 'active';
+
   return {
     id: plan.id,
-    name: plan.planName,
-    description: plan.planDescription,
-    price: plan.planPrice,
-    users: plan.activeSubscriptions ?? 0,
-    popular: plan.planStatus === 'Active' && (plan.activeSubscriptions ?? 0) > 0,
-    userBadgeClass: 'bg-surface-container text-on-surface-variant',
-    status: plan.planStatus,
-    featureIds: plan.featureIds ?? [],
+    name: pName,
+    description: plan.description ?? plan.planDescription ?? '',
+    price: plan.price ?? plan.planPrice ?? 0,
+    users: plan.users ?? plan.activeSubscriptions ?? 0,
+    popular: plan.popular ?? (pStatus.toLowerCase() === 'active' && (plan.users ?? plan.activeSubscriptions ?? 0) > 0),
+    userBadgeClass: plan.userBadgeClass ?? 'bg-surface-container text-on-surface-variant',
+    status: pStatus,
+    featureIds: planFeatureIds,
     features: features.length ? features : [{ label: 'No linked features', included: false }],
   };
 }
 
 export function mapPlanDetails(plan = {}, allFeatures = []) {
-  // Extract feature IDs from plan.features array or plan.featureIds array
-  const planFeatureIds = (plan.features ?? [])
-    .map((f) => f.featureId || f.id)
-    .concat(plan.featureIds ?? []);
-
+  const planFeatureIds = (plan.features ?? []).map((f) => f.featureId || f.id).concat(plan.featureIds ?? []);
   const uniquePlanFeatureIds = Array.from(new Set(planFeatureIds.filter(Boolean)));
-
   const includedFeatures = allFeatures.map((feature) => ({
     id: feature.id,
     label: feature.name || feature.featureName || 'Unnamed Feature',
@@ -311,28 +300,30 @@ export function mapPlanDetails(plan = {}, allFeatures = []) {
     enabled: uniquePlanFeatureIds.includes(feature.id),
   }));
 
-  const planName = plan.planName || plan.name || 'Untitled Plan';
-  const planStatus = plan.planStatus || plan.status || 'Active';
+  const planName = plan.name || plan.planName || 'Untitled Plan';
+  const planStatus = plan.status || plan.planStatus || 'Active';
+  const planPrice = plan.price ?? plan.planPrice ?? 0;
+  const activeSubs = plan.users ?? plan.activeSubscriptions ?? 0;
 
   return {
     id: plan.id,
     name: planName,
     shortName: planName,
-    price: plan.planPrice ?? plan.price ?? 0,
+    price: planPrice,
     developmentPrice: plan.developmentprice ?? plan.developmentPrice ?? 0,
-    description: plan.planDescription || plan.description || '',
+    description: plan.description || plan.planDescription || '',
     status: planStatus,
     aiModels: Array.isArray(plan.aiModels) && plan.aiModels.length ? plan.aiModels : ['gpt-4o-mini'],
     featureIds: uniquePlanFeatureIds,
     includedFeatures,
     metrics: {
       subscribers: {
-        value: formatNumber(plan.activeSubscriptions ?? 0),
+        value: formatNumber(activeSubs),
         change: String(planStatus).toLowerCase() === 'active' ? 'Active' : 'Inactive',
       },
       churn: { value: '—', change: planStatus, positive: false },
       mrr: {
-        value: formatCurrency((plan.planPrice ?? plan.price ?? 0) * (plan.activeSubscriptions ?? 0)),
+        value: formatCurrency(planPrice * activeSubs),
         suffix: '/mo',
       },
     },
@@ -343,48 +334,35 @@ export function mapPlanDetails(plan = {}, allFeatures = []) {
 }
 
 export function mapSubscriptionRow(subscription) {
-  const email = subscription.sellerEmail ?? 'Unknown seller';
-  const initial = email.charAt(0).toUpperCase();
+  const email = subscription.sellerEmail ?? subscription.email ?? subscription.merchant?.name ?? 'Unknown seller';
+  const initial = typeof email === 'string' && email.length > 0 ? email.charAt(0).toUpperCase() : '?';
+  const planName = subscription.planName ?? subscription.plan ?? subscription.name ?? '—';
+  const rawStatus = (subscription.status ?? subscription.subscriptionStatus ?? 'active').toLowerCase();
+  const isSuccessful = rawStatus === 'active' || rawStatus === 'successful' || rawStatus === 'success';
+  const price = subscription.planPrice ?? subscription.price ?? subscription.amount ?? 0;
+  const dateValue = subscription.createdAt ?? subscription.created_at ?? subscription.renewalDate ?? subscription.date;
 
   return {
-    id: subscription.id,
+    id: subscription.id ?? subscription._id ?? Math.random().toString(),
     merchant: {
       name: email,
       initial,
       initialBg: getInitialsBg(email),
     },
-    plan: subscription.planName ?? '—',
-    status: subscription.status?.toLowerCase() === 'active' ? 'successful' : 'failed',
-    date: formatDate(subscription.createdAt ?? subscription.renewalDate),
-    amount: formatCurrency(subscription.planPrice),
-    actionIcon: subscription.status?.toLowerCase() === 'active' ? 'receipt' : 'priority_high',
+    plan: planName,
+    status: isSuccessful ? 'successful' : 'failed',
+    date: formatDate(dateValue),
+    amount: formatCurrency(price),
+    actionIcon: isSuccessful ? 'receipt' : 'priority_high',
   };
 }
 
 export function mapFeatureMetrics(features = []) {
-  const enabledCount = features.filter(
-    (feature) => feature.enabled === true
-  ).length;
-
+  const enabledCount = features.filter((feature) => feature.enabled === true).length;
   return [
-    {
-      label: 'Total Features',
-      value: String(features.length),
-      icon: 'featured_play_list',
-      iconBg: 'bg-primary/10 text-primary',
-    },
-    {
-      label: 'Enabled Features',
-      value: String(enabledCount),
-      icon: 'rocket_launch',
-      iconBg: 'bg-secondary-container/20 text-secondary',
-    },
-    {
-      label: 'Disabled Features',
-      value: String(features.length - enabledCount),
-      icon: 'auto_awesome',
-      iconBg: 'bg-tertiary-fixed-dim/20 text-tertiary',
-    },
+    { label: 'Total Features', value: String(features.length), icon: 'featured_play_list', iconBg: 'bg-primary/10 text-primary' },
+    { label: 'Enabled Features', value: String(enabledCount), icon: 'rocket_launch', iconBg: 'bg-secondary-container/20 text-secondary' },
+    { label: 'Disabled Features', value: String(features.length - enabledCount), icon: 'auto_awesome', iconBg: 'bg-tertiary-fixed-dim/20 text-tertiary' },
   ];
 }
 
@@ -402,15 +380,10 @@ export function mapAiAnalytics(data) {
   const sentiment = data?.sentimentOverview ?? {};
   const providers = Array.isArray(data?.providers) ? data.providers : [];
   const models = Array.isArray(data?.models) ? data.models : [];
-  const intents = (data?.topIntents ?? []).map((item, index) => {
+  const intents = (data?.topIntents ?? []).map((item) => {
     const maxCount = Math.max(...(data.topIntents ?? []).map((entry) => entry.count ?? 0), 1);
     const height = `${Math.max(Math.round(((item.count ?? 0) / maxCount) * 100), 10)}%`;
-
-    return {
-      label: item.label,
-      height,
-      tooltip: String(item.count ?? 0),
-    };
+    return { label: item.label, height, tooltip: String(item.count ?? 0) };
   });
 
   const sentimentCategories = (data?.productStats?.topCategories ?? []).map((category) => ({
@@ -422,9 +395,7 @@ export function mapAiAnalytics(data) {
 
   return {
     intents: intents.length ? intents : [{ label: 'No intents yet', height: '10%', tooltip: '0' }],
-    sentimentCategories: sentimentCategories.length
-      ? sentimentCategories
-      : [{ label: 'No category data', positive: 0, neutral: 0, negative: 0 }],
+    sentimentCategories: sentimentCategories.length ? sentimentCategories : [{ label: 'No category data', positive: 0, neutral: 0, negative: 0 }],
     healthGauges: mapMongoHealth(data?.mongoHealth),
     serviceStatus: [
       ...mapMongoHealthToServices(data?.mongoHealth),
@@ -457,32 +428,11 @@ export function mapMongoHealth(mongoHealth) {
       { label: 'DB Load', value: '—', sub: 'No connection data', icon: 'database', accent: 'text-on-surface-variant bg-[#dce9ff]', progress: 0 },
     ];
   }
-
   const isHealthy = mongoHealth.ok === 1 || mongoHealth.status === 'connected';
-
   return [
-    {
-      label: 'Mongo Latency',
-      value: `${mongoHealth.latencyMs ?? '—'}ms`,
-      sub: mongoHealth.database ? `Database: ${mongoHealth.database}` : 'Cluster status',
-      icon: 'timer',
-      accent: 'text-primary bg-primary/10',
-    },
-    {
-      label: 'MongoDB',
-      value: isHealthy ? 'Connected' : 'Degraded',
-      sub: mongoHealth.checkedAt ? `Checked ${formatDateTime(mongoHealth.checkedAt)}` : 'Health check',
-      icon: 'psychology',
-      accent: 'text-secondary bg-secondary/10',
-    },
-    {
-      label: 'DB Status',
-      value: mongoHealth.status ?? 'Unknown',
-      sub: mongoHealth.database ?? 'ai_commerce',
-      icon: 'database',
-      accent: 'text-on-surface-variant bg-[#dce9ff]',
-      progress: isHealthy ? 32 : 72,
-    },
+    { label: 'Mongo Latency', value: `${mongoHealth.latencyMs ?? '—'}ms`, sub: mongoHealth.database ? `Database: ${mongoHealth.database}` : 'Cluster status', icon: 'timer', accent: 'text-primary bg-primary/10' },
+    { label: 'MongoDB', value: isHealthy ? 'Connected' : 'Degraded', sub: mongoHealth.checkedAt ? `Checked ${formatDateTime(mongoHealth.checkedAt)}` : 'Health check', icon: 'psychology', accent: 'text-secondary bg-secondary/10' },
+    { label: 'DB Status', value: mongoHealth.status ?? 'Unknown', sub: mongoHealth.database ?? 'ai_commerce', icon: 'database', accent: 'text-on-surface-variant bg-[#dce9ff]', progress: isHealthy ? 32 : 72 },
   ];
 }
 
@@ -490,18 +440,8 @@ function mapMongoHealthToServices(mongoHealth) {
   if (!mongoHealth) {
     return [{ service: 'MongoDB Atlas', status: 'Unknown', latency: '—', uptime: '—', icon: 'database' }];
   }
-
   const isHealthy = mongoHealth.ok === 1 || mongoHealth.status === 'connected';
-
-  return [
-    {
-      service: 'MongoDB Atlas',
-      status: isHealthy ? 'Healthy' : 'Degraded',
-      latency: `${mongoHealth.latencyMs ?? '—'}ms`,
-      uptime: isHealthy ? '99.99%' : '—',
-      icon: 'database',
-    },
-  ];
+  return [{ service: 'MongoDB Atlas', status: isHealthy ? 'Healthy' : 'Degraded', latency: `${mongoHealth.latencyMs ?? '—'}ms`, uptime: isHealthy ? '99.99%' : '—', icon: 'database' }];
 }
 
 export function mapAuditLogs(logs = []) {

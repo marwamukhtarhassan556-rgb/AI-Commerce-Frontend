@@ -91,7 +91,8 @@ api.interceptors.response.use(
 //    https://aicommerce-ai-service-production.up.railway.app
 //    عبر Vite Proxy في التطوير: /api-ai → AI Service
 // ─────────────────────────────────────────────
-const AI_BASE_URL = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai/api/v1';
+const configuredAiBaseUrl = import.meta.env.VITE_AI_SERVICE_URL;
+const AI_BASE_URL = configuredAiBaseUrl?.startsWith('/') ? configuredAiBaseUrl : '/api-ai/api/v1';
 
 export const aiApi = axios.create({
   baseURL: AI_BASE_URL,

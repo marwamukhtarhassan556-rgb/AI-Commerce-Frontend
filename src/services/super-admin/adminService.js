@@ -19,6 +19,9 @@ import {
   fetchSentimentOverview,
 } from '../../api/aiService';
 
+/**
+ * Safely extracts array items from various paginated API response shapes.
+ */
 function readPagedItems(data, primaryKey) {
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.[primaryKey])) return data[primaryKey];
@@ -27,6 +30,9 @@ function readPagedItems(data, primaryKey) {
   return [];
 }
 
+// ============================================================================
+// DASHBOARD OVERVIEW
+// ============================================================================
 export async function fetchDashboardOverview() {
   try {
     const [dashboardResult, sentimentResult, healthResult] = await Promise.allSettled([
@@ -34,6 +40,7 @@ export async function fetchDashboardOverview() {
       fetchSentimentOverview(),
       fetchAiHealth(),
     ]);
+
     const dashboard = dashboardResult.status === 'fulfilled' ? dashboardResult.value.data : {};
     const sentiment = sentimentResult.status === 'fulfilled' ? sentimentResult.value : null;
     const aiHealth = healthResult.status === 'fulfilled' ? healthResult.value : null;
@@ -91,26 +98,75 @@ export async function fetchDashboardOverview() {
   }
 }
 
-export async function fetchMerchants() {
+// ============================================================================
+// MERCHANTS / STORES
+// ============================================================================
+export async function fetchMerchants(params = { page: 1, pageSize: 50 }) {
   try {
-    const response = await api.get('/api/admin/stores', { params: { page: 1, pageSize: 50 } });
+    const response = await api.get('/api/admin/stores', { params });
     const stores = readPagedItems(response.data, 'stores');
     return stores.map(mapStoreToMerchant);
   } catch (err) {
     console.warn('Using fallback merchants data:', err);
     return [
-      mapStoreToMerchant({ id: '1', sellerName: 'Acme Fashion', name: 'Acme Fashion', platform: 'shopify', sellerEmail: 'alex@acme.com', activePlan: 'Pro Plan', shopDomain: 'acme.myshopify.com', status: 'Active', subscriptionStatus: 'active' }),
+      mapStoreToMerchant({ id: 'dfab9c3f-fee5-4a32-95a7-15d4b66f4a0c', sellerName: 'Acme Fashion', name: 'Acme Fashion', platform: 'shopify', sellerEmail: 'alex@acme.com', activePlan: 'Pro Plan', shopDomain: 'acme.myshopify.com', status: 'Active', subscriptionStatus: 'active' }),
       mapStoreToMerchant({ id: '2', sellerName: 'TechGizmo', name: 'TechGizmo', platform: 'woocommerce', sellerEmail: 'sarah@techgizmo.com', activePlan: 'Enterprise Plan', shopDomain: 'techgizmo.io', status: 'Active', subscriptionStatus: 'active' }),
       mapStoreToMerchant({ id: '3', sellerName: 'Organic Foods', name: 'Organic Foods', platform: 'magento', sellerEmail: 'john@organic.com', activePlan: 'Starter Plan', shopDomain: 'organicfoods.com', status: 'Inactive', subscriptionStatus: 'canceled' }),
     ];
   }
 }
 
-export async function fetchPlans() {
+export async function fetchStoreById(storeId) {
   try {
-    const response = await api.get('/api/admin/subscriptions', { params: { page: 1, pageSize: 1 } });
-    const rawPlans = readPagedItems(response.data, 'plans');
-    const features = await fetchFeatures().catch(() => []);
+    // المسار الصحيح حسب الـ Swagger (بدون /admin/)
+    const response = await api.get(`/api/stores/${storeId}`);
+    const rawStore = response.data?.store || response.data;
+    const mappedStore = mapStoreToMerchant(rawStore);
+    return {
+      ...mappedStore,
+      shopDomain: mappedStore.domain || rawStore.shopDomain,
+    };
+  } catch (err) {
+    console.warn(`Using fallback store details for ${storeId}:`, err);
+    const merchants = await fetchMerchants().catch(() => []);
+    const store = merchants.find((merchant) => String(merchant.id) === String(storeId)) || {
+      id: storeId,
+      name: 'Sample Store',
+      platform: 'shopify',
+      email: 'owner@example.com',
+      domain: 'samplestore.myshopify.com',
+      status: 'Active',
+      plan: { label: 'Standard', className: 'bg-slate-100 text-slate-700' },
+    };
+    return {
+      ...store,
+      shopDomain: store.domain,
+    };
+  }
+}
+
+export async function updateStoreStatus(storeId, statusOrData, reason = 'Updated by Super Admin') {
+  // دعم الطريقتين: سواء اتبعتت كـ Object أو كـ قيم منفصلة
+  const payload = 
+    typeof statusOrData === 'object' && statusOrData !== null
+      ? statusOrData 
+      : { status: statusOrData, reason };
+
+  const response = await api.patch(`/api/admin/stores/${storeId}/status`, payload);
+  return response.data;
+}
+
+// ============================================================================
+// PLANS
+// ============================================================================
+export async function fetchPlans(params = { page: 1, pageSize: 50 }) {
+  try {
+    const [plansResponse, features] = await Promise.all([
+      api.get('/api/admin/plans', { params }),
+      fetchFeatures().catch(() => []),
+    ]);
+
+    const rawPlans = readPagedItems(plansResponse.data, 'plans');
     return rawPlans.map((plan) => mapPlanToCard(plan, features));
   } catch (err) {
     console.warn('Using fallback plans data:', err);
@@ -124,9 +180,11 @@ export async function fetchPlans() {
 
 export async function fetchPlanById(planId) {
   try {
-    const response = await api.get(`/api/admin/plans/${planId}`);
-    const features = await fetchFeatures().catch(() => []);
-    return mapPlanDetails(response.data, features);
+    const [planResponse, features] = await Promise.all([
+      api.get(`/api/admin/plans/${planId}`),
+      fetchFeatures().catch(() => []),
+    ]);
+    return mapPlanDetails(planResponse.data, features);
   } catch (err) {
     console.warn(`Using fallback plan details for ${planId}:`, err);
     return mapPlanDetails({
@@ -153,9 +211,17 @@ export async function updatePlan(planId, planData) {
   return response.data;
 }
 
-export async function fetchSubscriptions() {
+export async function deletePlan(planId) {
+  const response = await api.delete(`/api/admin/plans/${planId}`);
+  return response.data;
+}
+
+// ============================================================================
+// SUBSCRIPTIONS
+// ============================================================================
+export async function fetchSubscriptions(params = { page: 1, pageSize: 50 }) {
   try {
-    const response = await api.get('/api/admin/subscriptions', { params: { page: 1, pageSize: 50 } });
+    const response = await api.get('/api/admin/subscriptions', { params });
     const rawSubs = readPagedItems(response.data, 'subscriptions');
     const summary = response.data?.summary || { monthlyRecurringRevenue: 24500, activeSubscriptions: 35, totalPlans: 3 };
     return {
@@ -175,18 +241,21 @@ export async function fetchSubscriptions() {
   }
 }
 
+// ============================================================================
+// FEATURES MANAGEMENT
+// ============================================================================
 export async function fetchFeatures() {
   try {
     const response = await api.get('/api/admin/features');
     const rawFeatures = Array.isArray(response.data) ? response.data : response.data?.features || [];
-    return rawFeatures.map(mapFeatureRow);
+    return rawFeatures;
   } catch (err) {
     console.warn('Using fallback features data:', err);
     return [
-      mapFeatureRow({ id: 'f-1', name: 'AI Product Search', description: 'Semantic search assistant for shoppers', enabled: true }),
-      mapFeatureRow({ id: 'f-2', name: 'Automated Order Tracking', description: 'Real-time order lookup and status updates', enabled: true }),
-      mapFeatureRow({ id: 'f-3', name: 'Custom LLM Persona', description: 'Train assistant on store brand guidelines', enabled: true }),
-      mapFeatureRow({ id: 'f-4', name: 'Multi-language Support', description: 'Instant translation in 30+ languages', enabled: false }),
+      { id: 'f-1', name: 'AI Product Search', description: 'Semantic search assistant for shoppers', enabled: true },
+      { id: 'f-2', name: 'Automated Order Tracking', description: 'Real-time order lookup and status updates', enabled: true },
+      { id: 'f-3', name: 'Custom LLM Persona', description: 'Train assistant on store brand guidelines', enabled: true },
+      { id: 'f-4', name: 'Multi-language Support', description: 'Instant translation in 30+ languages', enabled: false },
     ];
   }
 }
@@ -196,6 +265,19 @@ export async function createFeature(featureData) {
   return response.data;
 }
 
+export async function updateFeature(featureId, featureData) {
+  const response = await api.put(`/api/admin/features/${featureId}`, featureData);
+  return response.data;
+}
+
+export async function deleteFeature(featureId) {
+  const response = await api.delete(`/api/admin/features/${featureId}`);
+  return response.data;
+}
+
+// ============================================================================
+// DIAGNOSTICS & ANALYTICS
+// ============================================================================
 export async function fetchDiagnostics() {
   try {
     const [backendResult, sentimentResult, providersResult, modelsResult, healthResult] = await Promise.allSettled([
@@ -237,6 +319,9 @@ export async function fetchDiagnostics() {
   }
 }
 
+// ============================================================================
+// AUDIT LOGS
+// ============================================================================
 export async function fetchAuditLogs(skip = 0, limit = 50) {
   try {
     const logs = await fetchAiAuditLogs(skip, limit);
@@ -244,7 +329,8 @@ export async function fetchAuditLogs(skip = 0, limit = 50) {
   } catch (err) {
     console.warn('AI audit logs failed, falling back to backend audit logs:', err);
     try {
-      const response = await api.get('/api/admin/audit-logs', { params: { page: 1, pageSize: 50 } });
+      const page = Math.floor(skip / limit) + 1;
+      const response = await api.get('/api/admin/audit-logs', { params: { page, pageSize: limit } });
       return mapAuditLogs(readPagedItems(response.data, 'logs'));
     } catch (fallbackErr) {
       console.warn('Using fallback audit logs:', fallbackErr);
@@ -257,11 +343,9 @@ export async function fetchAuditLogs(skip = 0, limit = 50) {
   }
 }
 
-export async function updateStoreStatus(storeId, status, reason = 'Updated by Super Admin') {
-  const response = await api.patch(`/api/admin/stores/${storeId}/status`, { status, reason });
-  return response.data;
-}
-
+// ============================================================================
+// SETTINGS
+// ============================================================================
 export async function fetchSettings() {
   try {
     const response = await api.get('/api/admin/settings');
@@ -282,3 +366,12 @@ export async function updateSettings(settingsData) {
   const response = await api.put('/api/admin/settings', settingsData);
   return response.data;
 }
+
+// ============================================================================
+// ALIAS EXPORTS FOR COMPATIBILITY
+// ============================================================================
+export {
+  fetchPlans as getPlans,
+  fetchSubscriptions as getSubscriptions,
+  fetchFeatures as getFeatures,
+};

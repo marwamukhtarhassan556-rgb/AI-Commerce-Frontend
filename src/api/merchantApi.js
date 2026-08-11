@@ -2,7 +2,8 @@ import api from './axiosConfig';
 import axios from 'axios';
 
 // الـ URLs الخاصة بالسيرفرات
-const AI_SERVICE_BASE = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai/api/v1';
+const configuredAiBaseUrl = import.meta.env.VITE_AI_SERVICE_URL;
+const AI_SERVICE_BASE = configuredAiBaseUrl?.startsWith('/') ? configuredAiBaseUrl : '/api-ai/api/v1';
 
 // Helper لعمل طلبات لخدمة الـ AI مع التوكين
 const aiApi = axios.create({
