@@ -214,6 +214,26 @@
 :root[data-theme='dark'] .merchant-shell [class*='rounded-xl'],
 :root[data-theme='dark'] .merchant-shell [class*='rounded-2xl'] { backdrop-filter: blur(16px); }
 
+/* The desktop sidebar is hidden below lg. Reclaim its space and keep merchant
+   screens, cards, tables, and the top bar comfortable on tablets and phones. */
+@media (max-width: 1023px) {
+  .merchant-shell > .flex-1 { margin-left: 0 !important; }
+  .merchant-topbar { left: 0 !important; }
+  .merchant-shell main > div { padding-left: 1rem; padding-right: 1rem; }
+  .merchant-shell .h-\[calc\(100vh-280px\)\] { min-height: 32rem; height: auto; }
+}
+@media (max-width: 640px) {
+  .merchant-topbar { gap: .45rem; min-height: 3.75rem; padding: .45rem .65rem; }
+  .merchant-store-selector { min-width: 0; max-width: 8.25rem; padding: .3rem .45rem; }
+  .merchant-store-selector__label { display: none; }
+  .merchant-store-selector__name { max-width: 4.5rem; margin-top: 0; }
+  .merchant-shell main { padding-top: 3.75rem; }
+  .merchant-shell main > div { padding-left: .85rem; padding-right: .85rem; }
+  .merchant-shell .grid-cols-12 { display: block; }
+  .merchant-shell .grid-cols-12 > * { margin-bottom: 1rem; }
+  .merchant-shell .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+}
+
 /* Isolated subscription layout: avoid dashboard theme utilities collapsing the details card. */
 .subscription-page { width: min(calc(100% - 2.5rem), 52rem); margin: 2rem auto; color: var(--color-on-surface); }
 .subscription-page__card { display: block; width: 100%; margin-top: 1.75rem; overflow: hidden; border: 1px solid var(--merchant-border); border-radius: 1rem; background: var(--merchant-card); box-shadow: var(--merchant-shadow); }
@@ -537,8 +557,12 @@ body {
 .onboarding-plan-page .onboarding-back { display: none; }
 
 .onboarding-plans-card {
-  max-width: 76rem !important;
+  max-width: 84rem !important;
 }
+
+.onboarding-header { display: flex; min-height: 4.7rem; align-items: center; justify-content: space-between; padding: .7rem clamp(1.25rem, 5vw, 4rem); border-bottom: 1px solid rgba(37, 99, 235, .15); background: rgba(255, 255, 255, .9); box-shadow: 0 6px 20px rgba(15, 23, 42, .04); backdrop-filter: blur(16px); }
+.onboarding-header h1 { margin: .12rem 0 0; color: #123d86; font-size: 1.05rem; font-weight: 850; letter-spacing: -.02em; }.onboarding-header__eyebrow { display: inline-flex; align-items: center; gap: .35rem; color: #2563eb; font-size: .68rem; font-weight: 800; letter-spacing: .03em; }.onboarding-header__eyebrow svg:last-child { animation: onboarding-arrow-nudge 1.5s ease-in-out infinite; }.onboarding-header__help { display: grid; width:2.35rem; height:2.35rem; place-items:center; color:#2563eb; border:1px solid #bfdbfe; border-radius:50%; background:#eff6ff; transition:transform .2s,box-shadow .2s; }.onboarding-header__help:hover { transform:translateY(-2px) rotate(8deg); box-shadow:0 8px 18px rgba(37,99,235,.15); }
+@keyframes onboarding-arrow-nudge { 0%,100% { transform:translateX(0); } 50% { transform:translateX(4px); } }
 
 .onboarding-card form {
   font-size: 1rem;
@@ -655,16 +679,16 @@ body {
 
 /* Keep the onboarding plan selector independent from the app's custom spacing tokens. */
 .onboarding-plan-page > div > .grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .onboarding-plan-page > div > .grid > button {
   position: relative;
   display: flex;
-  min-height: 24.5rem;
+  min-height: 22.5rem;
   flex-direction: column;
-  padding: 1.75rem;
+  padding: 1.25rem;
   border-color: #dbe3f0;
   border-radius: .75rem;
   background: #fff;
@@ -748,3 +772,8 @@ body {
 @media (max-width: 767px) {
   .onboarding-plan-page > div > .grid { grid-template-columns: 1fr; }
 }
+
+@media (min-width: 768px) and (max-width: 1120px) { .onboarding-plan-page > div > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+:root[data-theme='dark'] .onboarding-header { border-color:#1f426e; background:rgba(8, 24, 49, .88); }:root[data-theme='dark'] .onboarding-header h1 { color:#e9f3ff; }:root[data-theme='dark'] .onboarding-header__help { border-color:#28527f; background:#102d54; color:#8fc6ff; }
+:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button { border-color:#294b78; background:#102645; color:#edf5ff; box-shadow:0 12px 28px rgba(0,0,0,.17); }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > div > span { color:#f4f8ff; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > ul { border-color:#294b78; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button::after { color:#9bcaff; border-color:#4788ed; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button:nth-child(2)::after { color:#fff; background:#2563eb; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-500,:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-600 { color:#b8c8de!important; }

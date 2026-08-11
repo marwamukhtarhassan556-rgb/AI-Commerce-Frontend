@@ -4,7 +4,7 @@ export default function TicketDetailPanel({ ticket, onStatusChange, updatingStat
   if (!ticket) {
     return (
       <div className="hidden lg:flex lg:col-span-7 items-center justify-center bg-white border border-outline-variant/40 rounded-xl p-8 text-on-surface-variant">
-        اختر تذكرة لمشاهدة التفاصيل
+        Select a ticket to view its details.
       </div>
     );
   }

@@ -1,28 +1,25 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Globe, Info, Save, Tag } from 'lucide-react';
-import { storeCapabilitiesApi, storesApi } from '../../../api/integrationApi';
+import { AlertTriangle, Globe, Info, Save } from 'lucide-react';
+import { storesApi } from '../../../api/integrationApi';
 
 const emptyStore = { name: '', description: '', platform: '', shopDomain: '', status: 'active', currency: '', language: '', timezone: '' };
 
 export default function StoreSettingsPage() {
   const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');
   const [store, setStore] = useState(emptyStore);
-  const [capabilities, setCapabilities] = useState({});
   const [loading, setLoading] = useState(Boolean(storeId));
   const [saving, setSaving] = useState(false);
-  const [updatingPromoCapability, setUpdatingPromoCapability] = useState(false);
   const [message, setMessage] = useState(storeId ? '' : 'Select a store before managing its settings.');
 
   useEffect(() => {
     if (!storeId) return;
     let mounted = true;
-    Promise.all([storesApi.getById(storeId), storeCapabilitiesApi.get(storeId)])
-      .then(([{ data: storeData }, { data: capabilityData }]) => {
+    storesApi.getById(storeId)
+      .then(({ data: storeData }) => {
         if (!mounted) return;
         setStore({ ...emptyStore, ...storeData });
-        setCapabilities(capabilityData?.capabilities || {});
       })
-      .catch(() => mounted && setMessage('Store details or capabilities could not be loaded.'))
+      .catch(() => mounted && setMessage('Store details could not be loaded.'))
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
   }, [storeId]);
@@ -51,22 +48,6 @@ export default function StoreSettingsPage() {
     finally { setSaving(false); }
   };
 
-  const updatePromoCapability = async (event) => {
-    const nextValue = event.target.checked;
-    if (!storeId) return;
-    const previousCapabilities = capabilities;
-    const nextCapabilities = { ...capabilities, has_promo_code: nextValue };
-    setCapabilities(nextCapabilities);
-    setUpdatingPromoCapability(true); setMessage('');
-    try {
-      await storeCapabilitiesApi.update({ storeId, capabilities: nextCapabilities });
-      setMessage(`Promo codes ${nextValue ? 'enabled' : 'disabled'} for this store.`);
-    } catch {
-      setCapabilities(previousCapabilities);
-      setMessage('Promo-code capability could not be updated.');
-    } finally { setUpdatingPromoCapability(false); }
-  };
-
   const deleteStore = async () => {
     if (!storeId || !window.confirm(`Delete ${store.name || 'this store'} permanently?`)) return;
     try {
@@ -79,7 +60,7 @@ export default function StoreSettingsPage() {
   return (
     <div className="min-h-screen bg-surface p-6 text-on-surface lg:p-10">
       <div className="mx-auto max-w-5xl space-y-8">
-        <div><h2 className="text-3xl font-extrabold tracking-tight">Store Settings</h2><p className="mt-1 text-sm text-gray-500">Manage your store's identity, preferences, and capabilities.</p></div>
+        <div><h2 className="text-3xl font-extrabold tracking-tight">Store Settings</h2><p className="mt-1 text-sm text-gray-500">Manage your store's identity and regional preferences.</p></div>
         {message && <p className="rounded-lg bg-surface-container-low px-4 py-3 text-sm text-on-surface-variant" role="status">{message}</p>}
         {loading ? <div className="rounded-xl bg-white p-8 text-center text-sm text-on-surface-variant">Loading store…</div> : <>
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -92,14 +73,6 @@ export default function StoreSettingsPage() {
               <Field label="Status"><select name="status" value={store.status} onChange={updateField} className="store-input"><option value="active">Active</option><option value="inactive">Inactive</option></select></Field>
             </div>
             <div className="flex justify-end border-t border-gray-200 px-6 py-4"><button onClick={saveDetails} disabled={saving || !storeId} className="store-primary-button"><Save className="h-4 w-4" />Save Details</button></div>
-          </section>
-
-          <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-            <SectionTitle icon={<Tag className="h-5 w-5" />} title="Store Capabilities" iconClass="bg-amber-100 text-amber-700" />
-            <div className="store-capability-row">
-              <div className="store-capability-copy"><span className="store-capability-eyebrow">Discount settings</span><h4>This store supports promo codes</h4><p>Enable this only if sellers can create and apply promo codes in this store. The AI uses this setting when making suggestions.</p></div>
-              <label className={`store-capability-toggle ${updatingPromoCapability ? 'is-saving' : ''}`}><input type="checkbox" checked={Boolean(capabilities.has_promo_code)} onChange={updatePromoCapability} disabled={updatingPromoCapability || !storeId} /><span className="store-capability-switch" aria-hidden="true" /><span className="text-sm font-semibold" aria-live="polite">{!storeId ? 'Select a store first' : updatingPromoCapability ? 'Saving…' : capabilities.has_promo_code ? 'Promo codes on' : 'Promo codes off'}</span></label>
-            </div>
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
