@@ -129,10 +129,10 @@ function SuperAdminMerchants() {
         {/* Header */}
         <div className="flex justify-between items-center gap-4 flex-wrap pb-2 border-b border-slate-200/80">
           <div>
-            <h1 className="font-outfit text-2xl md:text-3xl font-black text-[#0b1c30] tracking-tight">
+            <h1 className="font-outfit text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
               Stores & Merchants
             </h1>
-            <p className="text-[#414753] text-xs md:text-sm mt-1 font-medium">
+            <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium">
               Directory of connected e-commerce stores across platforms.
             </p>
           </div>
@@ -161,8 +161,8 @@ function SuperAdminMerchants() {
                 </span>
               </div>
               <div>
-                <h4 className="font-outfit text-base font-bold text-[#0b1c30]">Merchants Health & Insights</h4>
-                <p className="text-xs text-[#414753] font-medium mt-0.5">
+                <h4 className="font-outfit text-base font-bold text-slate-900">Merchants Health & Insights</h4>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">
                   Platform activity is stable with over {filteredMerchants.length} active matching stores synchronized successfully.
                 </p>
               </div>
@@ -214,10 +214,10 @@ function SuperAdminMerchants() {
         </div>
 
         {/* Merchants Table */}
-        <div className="bg-white rounded-2xl border border-[#e0e2ec] shadow-sm overflow-hidden">
-          <table className="w-full text-left border-collapse">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <table className="navi-table w-full text-left border-collapse">
             <thead>
-              <tr className="bg-[#f8f9ff] border-b border-[#e0e2ec] text-xs font-bold text-[#414753] uppercase tracking-wider">
+              <tr className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-4 px-6">Store Name</th>
                 <th className="py-4 px-6">Platform</th>
                 <th className="py-4 px-6">Owner Email</th>
@@ -226,10 +226,10 @@ function SuperAdminMerchants() {
                 <th className="py-4 px-6">Change Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#e0e2ec] text-sm bg-white">
+            <tbody className="divide-y divide-slate-200 text-sm bg-white">
               {filteredMerchants.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-[#414753] font-medium bg-white">
+                  <td colSpan={6} className="text-center py-12 text-slate-500 font-medium bg-white">
                     No merchants match your filter criteria.
                   </td>
                 </tr>
@@ -238,11 +238,11 @@ function SuperAdminMerchants() {
                   <tr
                     key={merchant.id}
                     onClick={() => handleRowClick(merchant)}
-                    className="hover:bg-[#f8f9ff] cursor-pointer transition-colors duration-150 bg-white"
+                    className="hover:bg-slate-50 cursor-pointer transition-colors duration-150 bg-white"
                   >
-                    <td className="py-4 px-6 font-semibold text-[#0b1c30]">{merchant.name}</td>
-                    <td className="py-4 px-6 text-[#414753] capitalize font-medium">{merchant.platform}</td>
-                    <td className="py-4 px-6 text-[#414753] font-medium">{merchant.email}</td>
+                    <td className="py-4 px-6 font-semibold text-slate-900">{merchant.name}</td>
+                    <td className="py-4 px-6 text-slate-500 capitalize font-medium">{merchant.platform}</td>
+                    <td className="py-4 px-6 text-slate-500 font-medium">{merchant.email}</td>
                     <td className="py-4 px-6">
                       <span className={`${getPlanBadgeClasses(merchant.plan?.label)} rounded-lg text-xs font-semibold`}>
                         {merchant.plan?.label || 'Standard'}

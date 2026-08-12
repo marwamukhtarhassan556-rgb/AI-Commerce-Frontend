@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ADMIN_AVATAR } from './SuperAdminNav';
 import { fetchAiLiveness } from '../../../api/aiService';
 import { resolveProfilePicture } from '../../../utils/profilePicture';
+import ThemeToggle from '../../ui/ThemeToggle';
 
 function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null }) {
   const [liveStatus, setLiveStatus] = useState('checking'); // 'live' | 'offline' | 'checking'
@@ -50,10 +51,7 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
   const s = statusConfig[liveStatus];
 
   return (
-    <header
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-200 backdrop-blur lg:left-64 lg:right-0 lg:px-6"
-      style={{ height: '64px', background: 'var(--admin-header)' }}
-    >
+    <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-4 px-4 py-3 navi-topbar lg:left-64 lg:right-0 lg:px-6" style={{ height: '64px' }}>
       {onMenuToggle ? (
         <button
           type="button"
@@ -64,94 +62,61 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
           <span className="material-symbols-outlined">menu</span>
         </button>
       ) : null}
-      {/* Left: Breadcrumb + Title */}
+
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {title && (
           <div className="flex items-center gap-2 min-w-0">
-            <span style={{ color: '#64748B', fontSize: '0.8rem' }}>Navi Platform</span>
-            <span style={{ color: '#CBD5E1', fontSize: '0.8rem' }}>/</span>
-            <h1
-              style={{
-                color: '#0D1B2A',
-                fontSize: '1.1rem',
-                fontWeight: 700,
-                margin: 0,
-                fontFamily: 'Inter, sans-serif',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {title}
-            </h1>
+            <span className="text-slate-500 text-sm">Navi Platform</span>
+            <span className="text-slate-300 text-sm">/</span>
+            <h1 className="text-slate-900 text-lg font-semibold m-0 whitespace-nowrap">{title}</h1>
           </div>
         )}
         {searchPlaceholder && (
           <div className="relative ml-4 w-full max-w-[320px]">
-            <span
-              className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
-              style={{ fontSize: '1rem' }}
-            >
-              search
-            </span>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-base">search</span>
             <input
               type="text"
               placeholder={searchPlaceholder}
-              className="w-full rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3.5 py-2.5 pl-10 text-sm text-[#0D1B2A] outline-none focus:border-primary"
+              className="navi-input w-full rounded-lg border border-slate-200 bg-slate-50 px-3.5 py-2.5 pl-10 text-sm text-slate-700 outline-none focus:border-primary"
             />
           </div>
         )}
       </div>
 
-      {/* Right: AI Status Badge + Refresh + Avatar */}
       <div className="flex items-center gap-4">
-        {/* Liveness Badge */}
-        <div
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full"
-          style={{ background: s.bg }}
-        >
+        <div className="hidden md:flex navi-status-pill">
           <span
-            className="w-2 h-2 rounded-full"
+            className="navi-status-dot"
             style={{
               background: s.dot,
               boxShadow: `0 0 6px ${s.dot}`,
               animation: liveStatus === 'live' ? 'pulse 2s infinite' : 'none',
             }}
           />
-          <span style={{ color: s.text, fontSize: '0.72rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+          <span className="text-xs font-semibold" style={{ color: s.text, whiteSpace: 'nowrap' }}>
             {s.label}
           </span>
         </div>
 
-        {/* Refresh */}
         <button
           type="button"
           onClick={handleRefresh}
-          style={{
-            background: '#F8FAFC',
-            border: '1px solid #E2E8F0',
-            borderRadius: '8px',
-            width: '34px',
-            height: '34px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#1D4ED8',
-            cursor: 'pointer',
-          }}
-          title="Refresh status"
+          className="inline-flex items-center justify-center navi-button-secondary p-2 w-9 h-9"
+          title="Refresh AI status"
         >
           <span
-            className="material-symbols-outlined"
-            style={{ fontSize: '1.1rem', color: '#1D4ED8', animation: refreshing ? 'spin 0.8s linear infinite' : 'none' }}
+            className="material-symbols-outlined text-base"
+            style={{ animation: refreshing ? 'spin 0.8s linear infinite' : 'none' }}
           >
             refresh
           </span>
         </button>
 
-        {/* Avatar */}
+        <ThemeToggle />
+
         <Link
           to="/admin/profile"
-          className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 block"
-          style={{ border: '2px solid rgba(37,99,235,0.4)' }}
+          className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 block navi-avatar-button"
           title="Open profile"
         >
           {profilePicture ? (

@@ -19,11 +19,7 @@ function SuperAdminSidebar({ isOpen = false, onClose = null }) {
 
   return (
     <aside
-      className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 transform overflow-y-auto flex flex-col transition-transform duration-300 shadow-2xl lg:translate-x-0`}
-      style={{
-        background: 'linear-gradient(180deg, #0D1B2A 0%, #112240 100%)',
-        borderRight: '1px solid rgba(37,99,235,0.15)',
-      }}
+      className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 transform overflow-y-auto flex flex-col transition-transform duration-300 shadow-2xl lg:translate-x-0 navi-sidebar`}
     >
       {/* ── Brand Header ── */}
       <div className="flex items-center justify-between gap-3 px-5 py-5 border-b border-white/5">
@@ -50,7 +46,6 @@ function SuperAdminSidebar({ isOpen = false, onClose = null }) {
       {/* ── Navigation ── */}
       <nav className="flex flex-col gap-0.5 flex-grow px-3 py-4">
         {adminNavItems.map((item) => {
-          // Special multi-path active check for subscriptions
           const isItemActive =
             item.id === 'subscriptions'
               ? pathname.startsWith('/admin/subscriptions') || pathname.startsWith('/admin/plans')
@@ -63,71 +58,22 @@ function SuperAdminSidebar({ isOpen = false, onClose = null }) {
               end={item.id === 'dashboard'}
               className={({ isActive }) => {
                 const active = isItemActive ?? isActive;
-                return active ? 'nav-item-active' : 'nav-item';
-              }}
-              style={({ isActive }) => {
-                const active = isItemActive ?? isActive;
-                return active
-                  ? {
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
-                      padding: '0.6rem 0.9rem', borderRadius: '0.6rem',
-                      background: 'linear-gradient(90deg, rgba(37,99,235,0.25) 0%, rgba(56,189,248,0.08) 100%)',
-                      color: '#38BDF8', fontWeight: 600, fontSize: '0.875rem',
-                      textDecoration: 'none', marginBottom: '2px',
-                      borderLeft: '3px solid #2563EB',
-                    }
-                  : {
-                      display: 'flex', alignItems: 'center', gap: '0.75rem',
-                      padding: '0.6rem 0.9rem', borderRadius: '0.6rem',
-                      color: '#94A3B8', fontWeight: 500, fontSize: '0.875rem',
-                      textDecoration: 'none', marginBottom: '2px',
-                      borderLeft: '3px solid transparent',
-                      transition: 'all 0.15s ease',
-                    };
+                return active ? 'navi-sidebar-link navi-sidebar-link-active' : 'navi-sidebar-link';
               }}
               onClick={() => onClose?.()}
-              onMouseEnter={(e) => {
-                if (!e.currentTarget.classList.contains('active')) {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.color = '#CBD5E1';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!pathname.startsWith(item.path.replace('/admin/', '/admin/'))) {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = '#94A3B8';
-                }
-              }}
             >
-              {({ isActive }) => {
-                const active = isItemActive ?? isActive;
-                return (
-                  <>
-                    <span
-                      className="material-symbols-outlined"
-                      style={{
-                        fontSize: '1.15rem',
-                        color: active ? '#38BDF8' : '#64748B',
-                        fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
-                      }}
-                    >
-                      {item.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </>
-                );
-              }}
+              <span className="material-symbols-outlined">{item.icon}</span>
+              <span>{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
       {/* ── Footer: Admin Profile & Logout ── */}
-      <div className="px-3 py-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
+      <div className="px-3 py-4 border-t border-white/5">
         <NavLink
           to="/admin/profile"
-          className="flex items-center gap-3 px-3 py-3 rounded-xl mb-2 transition-all"
-          style={{ background: 'rgba(37,99,235,0.08)' }}
+          className="flex items-center gap-3 px-3 py-3 rounded-xl mb-2 transition-all navi-sidebar-footer-link"
         >
           <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center flex-shrink-0 bg-slate-800 text-white text-xs font-semibold">
             {profilePicture ? (
@@ -137,18 +83,15 @@ function SuperAdminSidebar({ isOpen = false, onClose = null }) {
             )}
           </div>
           <div className="min-w-0">
-            <p style={{ color: 'white', fontSize: '0.8rem', fontWeight: 600, margin: 0 }}>{adminName}</p>
-            <p style={{ color: '#64748B', fontSize: '0.65rem', margin: 0 }}>Platform Administrator</p>
+            <p className="text-white text-sm font-semibold m-0">{adminName}</p>
+            <p className="text-slate-400 text-[0.65rem] m-0">Platform Administrator</p>
           </div>
         </NavLink>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all"
-          style={{ color: '#64748B', fontSize: '0.8rem', fontWeight: 500, background: 'transparent', border: 'none', cursor: 'pointer' }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = '#F87171'; e.currentTarget.style.background = 'rgba(248,113,113,0.08)'; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B'; e.currentTarget.style.background = 'transparent'; }}
+          className="navi-sidebar-logout flex items-center gap-3 px-3 py-2.5 rounded-xl"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: '1.1rem' }}>logout</span>
+          <span className="material-symbols-outlined text-lg">logout</span>
           Sign Out
         </button>
       </div>

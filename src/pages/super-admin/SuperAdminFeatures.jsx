@@ -95,7 +95,7 @@ function AdminFeatures() {
             </div>
             <button
               onClick={() => navigate('/admin/features/create')}
-              className="px-4 py-2 bg-primary text-white rounded-lg font-medium text-sm hover:opacity-90 transition-all flex items-center gap-2 shadow-sm"
+              className="admin-cta-btn rounded-xl px-4 py-2.5 text-sm font-semibold flex items-center gap-2"
             >
               <span className="material-symbols-outlined text-lg">add</span>
               Create Feature

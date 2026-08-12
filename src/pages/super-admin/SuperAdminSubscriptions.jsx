@@ -86,7 +86,7 @@ function SuperAdminSubscriptions() {
           </div>
           <button
             onClick={() => navigate('/admin/plans/create')}
-            className="px-4 py-2.5 bg-primary text-white rounded-xl font-medium text-sm hover:opacity-95 transition-all flex items-center gap-2 shadow-sm hover:shadow"
+            className="admin-cta-btn rounded-xl px-4 py-2.5 text-sm font-semibold flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-lg">add</span>
             Create Plan
@@ -156,18 +156,17 @@ function SuperAdminSubscriptions() {
 
                 <div className="flex justify-between items-start mb-6 pr-8">
                   <div>
-                    <h4 className={`font-outfit text-xl font-medium ${plan.popular ? 'text-primary' : 'text-on-surface'}`}>
+                    <h4 className={`font-outfit text-xl font-medium ${plan.popular ? 'text-primary' : 'text-slate-900'}`}>
                       {plan.name}
                     </h4>
-                    <p className="text-on-surface-variant text-sm mt-1">{plan.description}</p>
+                    <p className="text-slate-500 text-sm mt-1">{plan.description}</p>
                   </div>
                 </div>
 
-                {/* عرض عدد المستخدمين والـ Edit بشكل أنيق بجانب السعر أو تحته */}
                 <div className="flex items-center justify-between mb-6">
                   <div>
-                    <span className="font-outfit text-[42px] font-bold text-[#0b1c30] leading-none">${plan.price}</span>
-                    <span className="text-on-surface-variant text-sm">/mo</span>
+                    <span className="font-outfit text-[42px] font-bold text-slate-900 leading-none">${plan.price}</span>
+                    <span className="text-slate-500 text-sm">/mo</span>
                   </div>
                   {plan.users !== undefined && (
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
@@ -203,12 +202,11 @@ function SuperAdminSubscriptions() {
                 {/* زر Manage Tier بلون كحلي أنيق وفعال */}
                 <button
                   onClick={() => navigate(`/admin/subscriptions/${plan.id}`)}
-                  className="w-full py-3 px-4 bg-[#0b1c30] hover:bg-[#132847] text-white font-semibold text-sm rounded-xl text-center transition-all shadow-sm hover:shadow active:scale-95 flex items-center justify-center gap-2 group/btn"
+                  className="navi-button-primary w-full py-3 px-4 text-sm rounded-xl text-center transition-all shadow-sm hover:shadow active:scale-95 flex items-center justify-center gap-2 group/btn"
                 >
                   <span>Manage Tier</span>
                   <span
                     className="material-symbols-outlined text-base transition-transform group-hover/btn:translate-x-1"
-                    style={{ color: '#ffffff' }}
                   >
                     arrow_forward
                   </span>
@@ -219,12 +217,12 @@ function SuperAdminSubscriptions() {
         </div>
 
         {/* Recent Subscriptions / Transactions */}
-        <div className="bg-white rounded-2xl border border-[#e0e2ec] shadow-sm overflow-hidden space-y-4 p-6">
-          <h2 className="font-outfit text-lg font-semibold text-[#0b1c30]">Recent Transactions</h2>
+        <div className="admin-card admin-border rounded-2xl shadow-sm overflow-hidden space-y-4 p-6">
+          <h2 className="font-outfit text-lg font-semibold text-slate-900">Recent Transactions</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#f8f9ff] border-b border-[#e0e2ec] text-xs font-semibold text-[#414753] uppercase">
+                <tr className="bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-600 uppercase">
                   <th className="py-3.5 px-4">Merchant</th>
                   <th className="py-3.5 px-4">Plan</th>
                   <th className="py-3.5 px-4">Date</th>
@@ -232,13 +230,13 @@ function SuperAdminSubscriptions() {
                   <th className="py-3.5 px-4">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#e0e2ec] text-sm">
+              <tbody className="divide-y divide-slate-200 text-sm">
                 {data?.rows?.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="py-3.5 px-4 font-medium text-[#0b1c30]">{row.merchant?.name}</td>
-                    <td className="py-3.5 px-4 text-[#414753]">{row.plan}</td>
-                    <td className="py-3.5 px-4 text-[#414753]">{row.date}</td>
-                    <td className="py-3.5 px-4 font-semibold text-[#0b1c30]">{row.amount}</td>
+                    <td className="py-3.5 px-4 font-medium text-slate-900">{row.merchant?.name}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{row.plan}</td>
+                    <td className="py-3.5 px-4 text-slate-600">{row.date}</td>
+                    <td className="py-3.5 px-4 font-semibold text-slate-900">{row.amount}</td>
                     <td className="py-3.5 px-4">
                       <span className={`${getTransactionStatusClasses(row.status)} rounded-full text-xs font-medium`}>{row.status}</span>
                     </td>

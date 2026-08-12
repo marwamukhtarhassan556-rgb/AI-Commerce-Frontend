@@ -94,7 +94,7 @@ function SuperAdminDiagnostics() {
         initial={{ opacity: 0, y: 10 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.3 }}
-        className="p-4 md:p-6 lg:p-8 space-y-6 bg-gradient-to-br from-slate-50/50 via-white to-indigo-50/25 min-h-screen"
+        className="p-4 md:p-6 lg:p-8 space-y-6 min-h-screen"
       >
         {/* Header */}
         <div className="border-b border-slate-200/80 pb-5">

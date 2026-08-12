@@ -58,14 +58,14 @@ function PromptEditor({ prompt, onSave, onCancel }) {
 
   return (
     <div className="admin-modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onClick={(e) => e.target === e.currentTarget && onCancel()}>
-      <div className="admin-modal-panel w-full max-w-[680px] bg-white border border-slate-200 rounded-2xl p-7 flex flex-col gap-4 max-h-[90vh] overflow-y-auto shadow-2xl">
-        <div className="flex items-center justify-between w-full border-b border-[#F1F5F9] pb-3">
-          <h3 className="text-lg font-bold text-[#0F172A] m-0">
+      <div className="admin-modal-panel w-full max-w-[680px] rounded-2xl p-7 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between w-full border-b border-slate-200 pb-3">
+          <h3 className="text-lg font-bold text-slate-900 m-0">
             {prompt?.key ? `Edit Prompt: ${prompt.key}` : 'Create New Prompt'}
           </h3>
           <button
             onClick={onCancel}
-            className="inline-flex items-center justify-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B] w-9 h-9 cursor-pointer"
+            className="admin-button-secondary inline-flex items-center justify-center rounded-lg w-9 h-9"
           >
             ✕
           </button>
@@ -149,12 +149,10 @@ function PromptEditor({ prompt, onSave, onCancel }) {
           />
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-[#F1F5F9]">
+        <div className="flex flex-col sm:flex-row gap-3 justify-end pt-4 border-t border-slate-200">
           <button
             onClick={onCancel}
             className="admin-button-secondary rounded-xl px-5 py-3 text-sm font-semibold cursor-pointer"
-            style={{ boxShadow: '0 1px 2px rgba(254, 254, 255, 0.14)' }}
-
           >
             Cancel
           </button>
@@ -162,7 +160,6 @@ function PromptEditor({ prompt, onSave, onCancel }) {
             onClick={handleSave}
             disabled={saving || !form.key || !form.content}
             className="admin-cta-btn rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50 cursor-pointer"
-            style={{ boxShadow: '0 4px 12px rgba(254, 254, 255, 0.25)' }}
           >
             {saving ? 'Saving…' : (prompt?.key ? 'Update Prompt' : 'Create Prompt')}
           </button>
@@ -246,16 +243,14 @@ export default function SuperAdminPrompts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
         <div>
-          <h2 className="text-slate-950 dark:text-white text-[1.75rem] font-bold m-0 tracking-tight">Prompt Manager</h2>
-          <p className="text-slate-600 dark:text-slate-300 text-sm mt-1">Create, edit, restore and version system prompts for the AI engine</p>
+          <h2 className="text-slate-900 text-[1.75rem] font-bold m-0 tracking-tight">Prompt Manager</h2>
+          <p className="text-slate-600 text-sm mt-1">Create, edit, restore and version system prompts for the AI engine</p>
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={handleSeed} disabled={seeding}
-            style={{ padding: '0.6rem 1.1rem', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: '#F1F5F9', border: '1px solid #CBD5E1', color: '#475569', transition: 'all 0.2s' }}>
+          <button onClick={handleSeed} disabled={seeding} className="admin-button-secondary rounded-2xl text-sm font-semibold">
             {seeding ? 'Seeding…' : '🌱 Seed Defaults'}
           </button>
-          <button onClick={() => setEditing({})}
-            style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer', background: '#2563EB', border: 'none', color: 'white', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)' }}>
+          <button onClick={() => setEditing({})} className="admin-cta-btn rounded-2xl text-sm font-semibold">
             + New Prompt
           </button>
         </div>
@@ -272,10 +267,10 @@ export default function SuperAdminPrompts() {
         <select
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
-          className="admin-input rounded-[12px] px-4 py-3 text-sm text-slate-950 dark:text-white outline-none cursor-pointer shadow-sm"
+          className="admin-input rounded-[12px] px-4 py-3 text-sm outline-none cursor-pointer shadow-sm"
         >
-          <option value="" className="text-slate-900 dark:text-slate-100">All Types</option>
-          {PROMPT_TYPES.map((t) => <option key={t} value={t} className="text-slate-900 dark:text-slate-100">{t}</option>)}
+          <option value="">All Types</option>
+          {PROMPT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
 
@@ -296,20 +291,20 @@ export default function SuperAdminPrompts() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-slate-950 dark:text-white font-semibold m-0 text-sm">{p.name || p.key}</p>
-                  <p className="text-slate-600 dark:text-slate-300 text-xs m-0 font-mono">{p.key}</p>
+                  <p className="text-slate-900 font-semibold m-0 text-sm">{p.name || p.key}</p>
+                  <p className="text-slate-500 text-xs m-0 font-mono">{p.key}</p>
                 </div>
-                <span className="px-2.5 py-1 rounded-full text-xs font-semibold flex-shrink-0 text-slate-900 dark:text-white" style={{ background: 'rgba(37, 99, 235, 0.08)', border: '1px solid rgba(37, 99, 235, 0.15)' }}>
+                <span className="navi-badge navi-badge-info flex-shrink-0">
                   {p.type || 'system'}
                 </span>
               </div>
 
               {p.description && (
-                <p className="text-slate-700 dark:text-slate-300 text-sm leading-6 m-0">{p.description}</p>
+                <p className="text-slate-600 text-sm leading-6 m-0">{p.description}</p>
               )}
 
-              <div className="rounded-xl p-3.5 admin-surface admin-border overflow-hidden relative" style={{ maxHeight: '90px' }}>
-                <p className="text-slate-700 dark:text-slate-300 text-xs font-mono leading-6 m-0">
+              <div className="rounded-xl p-3.5 bg-slate-100 border border-slate-200 overflow-hidden relative" style={{ maxHeight: '90px' }}>
+                <p className="text-slate-800 text-xs font-mono leading-6 m-0 select-all">
                   {p.content?.slice(0, 200)}{p.content?.length > 200 ? '…' : ''}
                 </p>
               </div>
@@ -320,23 +315,23 @@ export default function SuperAdminPrompts() {
                 </div>
               )}
 
-              <div className="flex gap-2.5 mt-auto pt-3 border-t border-slate-100">
+              <div className="flex gap-2.5 mt-auto pt-3 border-t border-slate-200">
                 <button
                   onClick={() => setEditing(p)}
-                  className="flex-1 rounded-xl border border-[#2563EB]/25 bg-[#eff6ff] px-3 py-2 text-sm font-semibold text-[#2563EB] cursor-pointer"
+                  className="flex-1 navi-button-secondary rounded-xl px-3 py-2 text-sm font-semibold cursor-pointer text-[#2563EB] border-[#2563EB]/25 bg-[#eff6ff] hover:bg-[#dbeafe]"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleRestore(p.key)}
                   disabled={restoring === p.key}
-                  className="flex-1 rounded-xl border border-[#f59e0b]/25 bg-[#fffbeb] px-3 py-2 text-sm font-semibold text-[#d97706] disabled:opacity-50 cursor-pointer"
+                  className="flex-1 rounded-xl border border-[#f59e0b]/25 bg-[#fffbeb] px-3 py-2 text-sm font-semibold text-[#d97706] disabled:opacity-50 cursor-pointer hover:bg-[#fef3c7] transition-colors"
                 >
                   {restoring === p.key ? '…' : 'Restore'}
                 </button>
                 <button
                   onClick={() => handleDelete(p.key)}
-                  className="flex-1 rounded-xl border border-[#ef4444]/25 bg-[#fef2f2] px-3 py-2 text-sm font-semibold text-[#dc2626] cursor-pointer"
+                  className="flex-1 rounded-xl border border-[#ef4444]/25 bg-[#fef2f2] px-3 py-2 text-sm font-semibold text-[#dc2626] cursor-pointer hover:bg-[#fee2e2] transition-colors"
                 >
                   Delete
                 </button>

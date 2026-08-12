@@ -85,7 +85,7 @@ function SuperAdminDashboard() {
 
   return (
     <AdminPageState loading={loading} error={error} onRetry={loadData}>
-      <div className="p-6 md:p-8 space-y-8 bg-gradient-to-br from-slate-50/50 via-white to-indigo-50/20 min-h-screen">
+      <div className="p-6 md:p-8 space-y-8 min-h-screen">
         
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200/80 pb-6">
@@ -93,17 +93,19 @@ function SuperAdminDashboard() {
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 font-outfit">
               Platform Overview
             </h1>
-            <p className="text-sm text-slate-600 mt-1">
+            <p className="text-sm text-slate-500 mt-1">
               Monitor real-time store metrics, subscription health, and AI activity performance.
             </p>
           </div>
           <button 
             onClick={loadData}
-            className="inline-flex items-center justify-center px-4 py-2 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all duration-200 shadow-sm self-start md:self-auto border border-indigo-100 cursor-pointer"
+            className="navi-button-secondary inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold self-start md:self-auto cursor-pointer"
           >
+            <span className="material-symbols-outlined text-sm">refresh</span>
             Refresh Data
           </button>
         </div>
+
 
         {/* KPI Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
