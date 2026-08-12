@@ -27,10 +27,12 @@ export const refreshAccessToken = async () => {
       .then(({ data }) => {
         const accessToken = data?.accessToken || data?.token;
         if (!accessToken) throw new Error('Refresh completed without an access token.');
-        const previousToken = localStorage.getItem('token');
         localStorage.setItem('token', accessToken);
         if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-        if (localStorage.getItem('aiToken') === previousToken) localStorage.setItem('aiToken', accessToken);
+        // The AI service always reads aiToken first. A credential update must
+        // therefore refresh that token too, even when login originally returned
+        // a separate AI token.
+        localStorage.setItem('aiToken', data?.aiToken || data?.aiAccessToken || accessToken);
         return accessToken;
       })
       .finally(() => { refreshInFlight = null; });

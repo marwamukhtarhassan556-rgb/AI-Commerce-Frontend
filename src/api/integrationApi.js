@@ -117,6 +117,10 @@ export const storesApi = {
   updateSettings: (storeId, { currency, language, timezone }) =>
     api.put(`/api/stores/${storeId}/settings`, { currency, language, timezone }),
 
+  // PUT /api/stores/{id}/admin-info
+  updateAdminInfo: (storeId, { adminEmail, adminPassword }) =>
+    api.put(`/api/stores/${storeId}/admin-info`, { adminEmail, adminPassword }),
+
   // DELETE /api/stores/{id}
   delete: (storeId) => api.delete(`/api/stores/${storeId}`),
 };

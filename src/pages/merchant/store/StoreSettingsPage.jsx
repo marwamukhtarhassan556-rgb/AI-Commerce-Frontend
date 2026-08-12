@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Globe, Info, Save } from 'lucide-react';
+import { AlertTriangle, Globe, Info, KeyRound, Save } from 'lucide-react';
 import { storesApi } from '../../../api/integrationApi';
+import { refreshAccessToken } from '../../../api/axiosConfig';
 
 const emptyStore = { name: '', description: '', platform: '', shopDomain: '', status: 'active', currency: '', language: '', timezone: '' };
 
@@ -9,6 +10,8 @@ export default function StoreSettingsPage() {
   const [store, setStore] = useState(emptyStore);
   const [loading, setLoading] = useState(Boolean(storeId));
   const [saving, setSaving] = useState(false);
+  const [savingAdminInfo, setSavingAdminInfo] = useState(false);
+  const [adminInfo, setAdminInfo] = useState({ adminEmail: '', adminPassword: '' });
   const [message, setMessage] = useState(storeId ? '' : 'Select a store before managing its settings.');
 
   useEffect(() => {
@@ -48,6 +51,29 @@ export default function StoreSettingsPage() {
     finally { setSaving(false); }
   };
 
+  const updateAdminInfo = (event) => setAdminInfo((value) => ({ ...value, [event.target.name]: event.target.value }));
+
+  const saveAdminInfo = async () => {
+    if (!storeId) return;
+    if (!adminInfo.adminEmail.trim() || !adminInfo.adminPassword) {
+      setMessage('Enter the admin email and password before saving.');
+      return;
+    }
+    setSavingAdminInfo(true); setMessage('');
+    try {
+      await storesApi.updateAdminInfo(storeId, {
+        adminEmail: adminInfo.adminEmail.trim(),
+        adminPassword: adminInfo.adminPassword,
+      });
+      await refreshAccessToken();
+      setAdminInfo((value) => ({ ...value, adminPassword: '' }));
+      setMessage('Admin panel credentials updated and your access token was refreshed.');
+    } catch (error) {
+      const detail = error.response?.data?.message || error.response?.data?.detail;
+      setMessage(detail || 'We could not update the admin panel credentials. Please check them and try again.');
+    } finally { setSavingAdminInfo(false); }
+  };
+
   const deleteStore = async () => {
     if (!storeId || !window.confirm(`Delete ${store.name || 'this store'} permanently?`)) return;
     try {
@@ -79,6 +105,15 @@ export default function StoreSettingsPage() {
             <SectionTitle icon={<Globe className="h-5 w-5" />} title="Regional Settings" iconClass="bg-purple-100 text-purple-600" />
             <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-3">{[['currency', 'Base Currency'], ['language', 'Primary Language'], ['timezone', 'Store Timezone']].map(([field, label]) => <Field key={field} label={label}><input name={field} value={store[field] || ''} onChange={updateField} className="store-input" /></Field>)}</div>
             <div className="flex justify-end border-t border-gray-200 px-6 py-4"><button onClick={saveRegionalSettings} disabled={saving || !storeId} className="store-secondary-button">Save Localization</button></div>
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <SectionTitle icon={<KeyRound className="h-5 w-5" />} title="Update Admin Panel" iconClass="bg-sky-100 text-sky-700" />
+            <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+              <Field label="E-commerce Admin Email"><input type="email" name="adminEmail" value={adminInfo.adminEmail} onChange={updateAdminInfo} autoComplete="username" placeholder="admin@yourstore.com" className="store-input" /></Field>
+              <Field label="E-commerce Admin Password"><input type="password" name="adminPassword" value={adminInfo.adminPassword} onChange={updateAdminInfo} autoComplete="new-password" placeholder="Enter the current admin password" className="store-input" /></Field>
+            </div>
+            <div className="flex flex-col gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs text-gray-500">Saving refreshes your access token so the AI integration uses the latest credentials.</p><button onClick={saveAdminInfo} disabled={savingAdminInfo || !storeId} className="store-primary-button shrink-0"><KeyRound className="h-4 w-4" />{savingAdminInfo ? 'Saving…' : 'Save Admin Credentials'}</button></div>
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
