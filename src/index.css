@@ -603,6 +603,19 @@ body {
   margin: 0 auto;
 }
 
+/* Dedicated onboarding integration pages. Explicit sizing avoids utility-class
+   conflicts and keeps the explanatory copy readable in both themes. */
+.integration-single-step { width: 100%; }
+.integration-step-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; }
+.integration-step-heading__copy { min-width: 0; max-width: 45rem; }
+.integration-step-heading__eyebrow { display: inline-flex; align-items: center; gap: .5rem; color: #2563eb; font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.integration-step-heading h1 { margin: .85rem 0 0; color: #0f172a; font-size: clamp(1.85rem, 4vw, 2.7rem); font-weight: 850; letter-spacing: -.035em; line-height: 1.12; }
+.integration-step-heading p { max-width: 42rem; margin: .8rem 0 0; color: #52627a; font-size: 1rem; line-height: 1.65; overflow-wrap: normal; word-break: normal; }
+.integration-step-heading__action { flex: 0 0 auto; }
+@media (max-width: 640px) { .integration-step-heading { grid-template-columns: 1fr; gap: 1rem; } .integration-step-heading__action > button { width: 100%; } .integration-step-heading h1 { font-size: 1.85rem; } }
+.schema-prompt-card { border: 1px solid #bfdbfe; border-radius: 1rem; background: #eff6ff; padding: 1.25rem; }
+.schema-prompt-card h2 { margin: 0; color: #123d86; font-size: 1rem; font-weight: 800; }.schema-prompt-card p { margin: .3rem 0 0; color: #52627a; font-size: .85rem; }.schema-prompt-card pre { max-height: 14rem; margin: 1rem 0 0; overflow: auto; border: 1px solid #dbeafe; border-radius: .75rem; background: #fff; padding: 1rem; color: #334155; font: .76rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
+
 .integration-icon {
   display: grid;
   width: 5.5rem;
@@ -776,4 +789,6 @@ body {
 @media (min-width: 768px) and (max-width: 1120px) { .onboarding-plan-page > div > .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 :root[data-theme='dark'] .onboarding-header { border-color:#1f426e; background:rgba(8, 24, 49, .88); }:root[data-theme='dark'] .onboarding-header h1 { color:#e9f3ff; }:root[data-theme='dark'] .onboarding-header__help { border-color:#28527f; background:#102d54; color:#8fc6ff; }
+:root[data-theme='dark'] .integration-step-heading { border-color:#263a5d; }:root[data-theme='dark'] .integration-step-heading h1 { color:#f1f6ff; }:root[data-theme='dark'] .integration-step-heading p { color:#b9c6d9; }
+:root[data-theme='dark'] .schema-prompt-card { border-color:#28527f; background:#0d2443; }:root[data-theme='dark'] .schema-prompt-card h2 { color:#dcecff; }:root[data-theme='dark'] .schema-prompt-card p { color:#b9c6d9; }:root[data-theme='dark'] .schema-prompt-card pre { border-color:#294b78; background:#07162d; color:#d9e8fb; }
 :root[data-theme='dark'] .onboarding-plan-page > div > .grid > button { border-color:#294b78; background:#102645; color:#edf5ff; box-shadow:0 12px 28px rgba(0,0,0,.17); }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > div > span { color:#f4f8ff; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > ul { border-color:#294b78; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button::after { color:#9bcaff; border-color:#4788ed; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button:nth-child(2)::after { color:#fff; background:#2563eb; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-500,:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-600 { color:#b8c8de!important; }
