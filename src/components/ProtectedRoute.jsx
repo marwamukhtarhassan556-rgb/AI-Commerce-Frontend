@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { decodeToken, getRedirectPathByRole } from '../api/authService';
+import { decodeToken, getRedirectPathByRole, normalizeRole } from '../api/authService';
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const token = localStorage.getItem('token');
@@ -16,10 +16,8 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
   // لو فيه allowedRoles محددة، شيك الـ Role
   if (allowedRoles.length > 0) {
-    const normalizedRole = String(userRole).toLowerCase();
-    const hasAccess = allowedRoles.some(role => 
-      normalizedRole.includes(role.toLowerCase())
-    );
+    const normalizedRole = normalizeRole(userRole);
+    const hasAccess = allowedRoles.map(normalizeRole).includes(normalizedRole);
     
     if (!hasAccess) {
       // مالوش صلاحية → روح الـ Dashboard بتاعه

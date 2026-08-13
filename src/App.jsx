@@ -24,6 +24,21 @@ import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
 import ProfilePage from './pages/merchant/profile/ProfilePage';
 
+import SuperAdminDashboard from './pages/super-admin/SuperAdminDashboard';
+import SuperAdminDiagnostics from './pages/super-admin/SuperAdminDiagnostics';
+import SuperAdminFeatures from './pages/super-admin/SuperAdminFeatures';
+import SuperAdminFeatureCreate from './pages/super-admin/SuperAdminFeatureCreate';
+import SuperAdminMerchants from './pages/super-admin/SuperAdminMerchants';
+import SuperAdminPlanCreate from './pages/super-admin/SuperAdminPlanCreate';
+import SuperAdminPlanDetails from './pages/super-admin/SuperAdminPlanDetails';
+import SuperAdminSubscriptions from './pages/super-admin/SuperAdminSubscriptions';
+import SuperAdminLayout from './components/layout/SuperAdminLayout';
+import SuperAdminAuditLogs from './pages/super-admin/SuperAdminAuditLogs';
+import SuperAdminModelsHealth from './pages/super-admin/SuperAdminModelsHealth';
+import SuperAdminPrompts from './pages/super-admin/SuperAdminPrompts';
+import SuperAdminBundles from './pages/super-admin/SuperAdminBundles';
+import SuperAdminAssistant from './pages/super-admin/SuperAdminAssistant';
+
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -100,8 +115,24 @@ function App() {
         </Route>
 
         {/* باقي الـ Dashboards */}
-        {/* Legacy admin dashboard was a bare overview page and could surface from browser history. */}
-        <Route path="/admin/dashboard" element={<Navigate to="/merchant/dashboard" replace />} />
+        <Route element={<ProtectedRoute allowedRoles={['super-admin']}><SuperAdminLayout /></ProtectedRoute>}>
+          <Route path="/admin/profile" element={<ProfilePage />} />
+          <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
+          <Route path="/admin/diagnostics" element={<SuperAdminDiagnostics />} />
+          <Route path="/admin/audit-logs" element={<SuperAdminAuditLogs />} />
+          <Route path="/admin/features" element={<SuperAdminFeatures />} />
+          <Route path="/admin/features/create" element={<SuperAdminFeatureCreate />} />
+          <Route path="/admin/merchants" element={<SuperAdminMerchants />} />
+          <Route path="/admin/models-health" element={<SuperAdminModelsHealth />} />
+          <Route path="/admin/prompts" element={<SuperAdminPrompts />} />
+          <Route path="/admin/bundles" element={<SuperAdminBundles />} />
+          <Route path="/admin/assistant" element={<SuperAdminAssistant />} />
+          <Route path="/admin/plan-details" element={<SuperAdminPlanDetails />} />
+          <Route path="/admin/subscriptions" element={<SuperAdminSubscriptions />} />
+          <Route path="/admin/subscriptions/:planId" element={<SuperAdminPlanDetails />} />
+          <Route path="/admin/plans/create" element={<SuperAdminPlanCreate />} />
+          <Route path="/admin/plans/:id/edit" element={<SuperAdminPlanDetails />} />
+        </Route>
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRoles={['user', 'seller', 'merchant', 'admin']}>
             <Dashboard />

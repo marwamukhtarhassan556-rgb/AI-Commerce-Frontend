@@ -78,12 +78,17 @@ export const decodeToken = (token) => {
 // بيرجع المسار حسب الـ Role
 export const normalizeRole = (role) => {
   if (!role) return 'seller';
-  return String(role).toLowerCase().trim();
+  const normalized = String(role).toLowerCase().trim();
+  if (normalized === 'superadmin' || normalized === 'super-admin' || normalized === 'super_admin') {
+    return 'super-admin';
+  }
+  return normalized;
 };
 
 export const getRedirectPathByRole = (role) => {
   if (!role) return '/merchant/dashboard';
   const lowerRole = normalizeRole(role);
+  if (lowerRole === 'super-admin') return '/admin/dashboard';
   if (lowerRole.includes('seller') || lowerRole.includes('merchant') || lowerRole.includes('admin')) {
     return '/merchant/dashboard';
   }
