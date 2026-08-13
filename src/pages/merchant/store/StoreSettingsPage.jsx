@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AlertTriangle, Globe, Info, KeyRound, Save } from 'lucide-react';
+import { AlertTriangle, Globe, Info, KeyRound, MessageCircle, Save } from 'lucide-react';
 import { storesApi } from '../../../api/integrationApi';
 import { refreshAccessToken } from '../../../api/axiosConfig';
 
@@ -11,7 +11,9 @@ export default function StoreSettingsPage() {
   const [loading, setLoading] = useState(Boolean(storeId));
   const [saving, setSaving] = useState(false);
   const [savingAdminInfo, setSavingAdminInfo] = useState(false);
+  const [savingDailyLimit, setSavingDailyLimit] = useState(false);
   const [adminInfo, setAdminInfo] = useState({ adminEmail: '', adminPassword: '' });
+  const [dailyAllowedMessage, setDailyAllowedMessage] = useState('10');
   const [message, setMessage] = useState(storeId ? '' : 'Select a store before managing its settings.');
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function StoreSettingsPage() {
       .then(({ data: storeData }) => {
         if (!mounted) return;
         setStore({ ...emptyStore, ...storeData });
+        setDailyAllowedMessage(String(storeData?.dailyAllowedMessage ?? 10));
       })
       .catch(() => mounted && setMessage('Store details could not be loaded.'))
       .finally(() => mounted && setLoading(false));
@@ -52,6 +55,21 @@ export default function StoreSettingsPage() {
   };
 
   const updateAdminInfo = (event) => setAdminInfo((value) => ({ ...value, [event.target.name]: event.target.value }));
+
+  const saveDailyMessageLimit = async () => {
+    const limit = Number(dailyAllowedMessage);
+    if (!storeId || !Number.isInteger(limit) || limit < 1) {
+      setMessage('Enter a whole number of at least 1 message per customer, per day.');
+      return;
+    }
+    setSavingDailyLimit(true); setMessage('');
+    try {
+      await storesApi.updateDailyAllowedMessage(storeId, limit);
+      setDailyAllowedMessage(String(limit));
+      setMessage('Daily customer message limit saved.');
+    } catch { setMessage('The daily message limit could not be saved. Please try again.'); }
+    finally { setSavingDailyLimit(false); }
+  };
 
   const saveAdminInfo = async () => {
     if (!storeId) return;
@@ -99,6 +117,12 @@ export default function StoreSettingsPage() {
               <Field label="Status"><select name="status" value={store.status} onChange={updateField} className="store-input"><option value="active">Active</option><option value="inactive">Inactive</option></select></Field>
             </div>
             <div className="flex justify-end border-t border-gray-200 px-6 py-4"><button onClick={saveDetails} disabled={saving || !storeId} className="store-primary-button"><Save className="h-4 w-4" />Save Details</button></div>
+          </section>
+
+          <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+            <SectionTitle icon={<MessageCircle className="h-5 w-5" />} title="Customer message limit" iconClass="bg-blue-100 text-blue-700" />
+            <div className="grid gap-5 p-6 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end"><div><h4 className="text-sm font-bold">Daily messages per customer</h4><p className="mt-1 text-sm text-gray-500">Set how many messages one customer can send to the storefront AI widget in one day. This helps prevent chat misuse.</p></div><Field label="Messages per day"><input type="number" min="1" step="1" value={dailyAllowedMessage} onChange={(event) => setDailyAllowedMessage(event.target.value)} className="store-input" /></Field></div>
+            <div className="flex justify-end border-t border-gray-200 px-6 py-4"><button onClick={saveDailyMessageLimit} disabled={savingDailyLimit || !storeId} className="store-primary-button"><Save className="h-4 w-4" />{savingDailyLimit ? 'Saving…' : 'Save message limit'}</button></div>
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">

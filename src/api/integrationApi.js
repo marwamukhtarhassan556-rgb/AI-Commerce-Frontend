@@ -117,6 +117,10 @@ export const storesApi = {
   updateSettings: (storeId, { currency, language, timezone }) =>
     api.put(`/api/stores/${storeId}/settings`, { currency, language, timezone }),
 
+  // PUT /api/stores/{storeId}/update-daily-allowed-message
+  updateDailyAllowedMessage: (storeId, dailyAllowedMessage) =>
+    api.put(`/api/stores/${storeId}/update-daily-allowed-message`, { dailyAllowedMessage }),
+
   // PUT /api/stores/{id}/admin-info
   updateAdminInfo: (storeId, { adminEmail, adminPassword }) =>
     api.put(`/api/stores/${storeId}/admin-info`, { adminEmail, adminPassword }),

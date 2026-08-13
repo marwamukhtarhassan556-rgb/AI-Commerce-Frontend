@@ -242,6 +242,10 @@
 .subscription-page__row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 0; }
 .subscription-page__row + .subscription-page__row { border-top: 1px solid var(--merchant-border); }
 .subscription-page__action-card { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.25rem 1.5rem; }
+.subscription-page__empty-state { display: flex; align-items: flex-start; gap: 1rem; border: 1px solid #bfdbfe; border-radius: 1rem; background: linear-gradient(135deg, #eff6ff, #f8fbff); padding: 1.5rem; color: #1e3a8a; box-shadow: var(--merchant-shadow); }
+.subscription-page__empty-icon { display: grid; width: 3rem; height: 3rem; flex: 0 0 auto; place-items: center; border-radius: .85rem; background: #2563eb; color: #fff; }
+.subscription-page__empty-state h2 { margin: 0; color: var(--color-on-surface); font-size: 1.1rem; font-weight: 800; }
+.subscription-page__empty-state p { max-width: 38rem; margin: .35rem 0 1rem; color: var(--color-on-surface-variant); font-size: .9rem; line-height: 1.55; }
 .subscription-page__action-buttons { display: flex; flex: none; gap: .65rem; }
 .subscription-page__disabled-action, .subscription-page__pay-action, .subscription-page__auto-renew, .subscription-page__cancel-action { flex: none; border-radius: .75rem; padding: .7rem 1rem; font-size: .875rem; font-weight: 700; }
 .subscription-page__disabled-action { border: 1px solid var(--merchant-border); background: var(--color-surface-container-high); color: var(--color-on-surface-variant); cursor: not-allowed; }
@@ -265,6 +269,7 @@
 @media (max-width: 480px) { .subscription-cancel-dialog__actions { flex-direction: column-reverse; } .subscription-cancel-dialog__keep, .subscription-cancel-dialog__confirm { width: 100%; } }
 @media (max-width: 640px) { .subscription-page__action-card { align-items: stretch; flex-direction: column; } .subscription-page__action-buttons { flex-direction: column; } .subscription-page__disabled-action, .subscription-page__pay-action, .subscription-page__auto-renew, .subscription-page__change-action { text-align: center; } }
 @media (max-width: 640px) { .subscription-page { width: min(calc(100% - 2rem), 52rem); margin: 1.25rem auto; } .subscription-page__row { align-items: flex-start; flex-direction: column; gap: .35rem; } }
+@media (max-width: 560px) { .subscription-page__empty-state { flex-direction: column; } }
 
 /* Auth pages: light mode uses the same Merchant Core surface and action colors. */
 :root[data-theme='light'] .auth-themed {
