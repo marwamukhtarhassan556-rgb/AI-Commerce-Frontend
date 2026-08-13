@@ -5,10 +5,71 @@ import { resolveProfilePicture, saveMerchantProfile } from '../../../utils/profi
 import { getUserErrorMessage } from '../../../utils/errorMessage';
 
 const errorMessage = (error, fallback) => getUserErrorMessage(error, fallback);
+const DEFAULT_COUNTRY_CODE = '+20';
+const COUNTRY_CODES = [
+  { code: '+20', country: 'Egypt' },
+  { code: '+966', country: 'Saudi Arabia' },
+  { code: '+971', country: 'United Arab Emirates' },
+  { code: '+965', country: 'Kuwait' },
+  { code: '+974', country: 'Qatar' },
+  { code: '+973', country: 'Bahrain' },
+  { code: '+968', country: 'Oman' },
+  { code: '+962', country: 'Jordan' },
+  { code: '+961', country: 'Lebanon' },
+  { code: '+212', country: 'Morocco' },
+  { code: '+216', country: 'Tunisia' },
+  { code: '+213', country: 'Algeria' },
+  { code: '+249', country: 'Sudan' },
+  { code: '+1', country: 'United States / Canada' },
+  { code: '+44', country: 'United Kingdom' },
+  { code: '+33', country: 'France' },
+  { code: '+49', country: 'Germany' },
+  { code: '+39', country: 'Italy' },
+  { code: '+34', country: 'Spain' },
+  { code: '+31', country: 'Netherlands' },
+  { code: '+90', country: 'Turkey' },
+  { code: '+91', country: 'India' },
+  { code: '+92', country: 'Pakistan' },
+  { code: '+880', country: 'Bangladesh' },
+  { code: '+86', country: 'China' },
+  { code: '+81', country: 'Japan' },
+  { code: '+82', country: 'South Korea' },
+  { code: '+62', country: 'Indonesia' },
+  { code: '+60', country: 'Malaysia' },
+  { code: '+63', country: 'Philippines' },
+  { code: '+61', country: 'Australia' },
+  { code: '+27', country: 'South Africa' },
+  { code: '+234', country: 'Nigeria' },
+  { code: '+254', country: 'Kenya' },
+  { code: '+55', country: 'Brazil' },
+  { code: '+52', country: 'Mexico' },
+  { code: '+54', country: 'Argentina' },
+];
+const COUNTRY_CODES_BY_LENGTH = [...COUNTRY_CODES].sort((a, b) => b.code.length - a.code.length);
+
+const splitPhoneNumber = (phoneNumber = '') => {
+  const value = String(phoneNumber).trim();
+  if (!value) return { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: '' };
+
+  const matchedCountry = COUNTRY_CODES_BY_LENGTH.find(({ code }) => value.startsWith(code));
+  if (!matchedCountry) return { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: value.replace(/^\+/, '') };
+
+  return { countryCode: matchedCountry.code, phoneNumber: value.slice(matchedCountry.code.length).trim() };
+};
+
+const buildPhoneNumber = ({ countryCode, phoneNumber }) => {
+  const localNumber = String(phoneNumber || '').trim();
+  if (!localNumber) return '';
+
+  const selectedCode = countryCode || DEFAULT_COUNTRY_CODE;
+  if (localNumber.startsWith(selectedCode)) return localNumber;
+
+  return `${selectedCode}${localNumber.replace(/^\+/, '')}`;
+};
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
-  const [form, setForm] = useState({ firstName: '', lastName: '', phoneNumber: '' });
+  const [form, setForm] = useState({ firstName: '', lastName: '', phoneNumber: { countryCode: DEFAULT_COUNTRY_CODE, phoneNumber: '' } });
   const [password, setPassword] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,8 +82,9 @@ export default function ProfilePage() {
     let active = true;
     profileApi.get().then(({ data }) => {
       if (!active) return;
+      const phone = splitPhoneNumber(data.phoneNumber);
       setProfile(data);
-      setForm({ firstName: data.firstName || '', lastName: data.lastName || '', phoneNumber: data.phoneNumber || '' });
+      setForm({ firstName: data.firstName || '', lastName: data.lastName || '', phoneNumber: phone });
       saveMerchantProfile({ firstName: data.firstName || '', lastName: data.lastName || '', email: data.email || '', profilePictureUrl: data.profilePictureUrl || '' });
     }).catch((requestError) => active && setError(errorMessage(requestError, 'Could not load your profile.'))).finally(() => active && setLoading(false));
     return () => { active = false; };
@@ -32,9 +94,12 @@ export default function ProfilePage() {
   const saveProfile = async (event) => {
     event.preventDefault(); setSaving(true); setError(''); setMessage('');
     try {
-      const { data } = await profileApi.update(form);
+      const payload = { ...form, phoneNumber: buildPhoneNumber(form.phoneNumber) };
+      const { data } = await profileApi.update(payload);
       const updated = data.profile || data.data || data;
+      const phone = splitPhoneNumber(updated.phoneNumber || payload.phoneNumber);
       setProfile(updated);
+      setForm({ firstName: updated.firstName || form.firstName, lastName: updated.lastName || form.lastName, phoneNumber: phone });
       saveMerchantProfile({ firstName: updated.firstName || form.firstName, lastName: updated.lastName || form.lastName, email: updated.email || profile?.email || '', profilePictureUrl: updated.profilePictureUrl || profile?.profilePictureUrl || '' });
       setMessage(data.message || 'Profile updated successfully.');
     } catch (requestError) { setError(errorMessage(requestError, 'Could not update your profile.')); }
@@ -79,4 +144,17 @@ export default function ProfilePage() {
   </div>;
 }
 
-function Field({ label, name, type = 'text', value, onChange, required = true }) { return <label className="block text-sm font-medium text-slate-700">{label}<input required={required} name={name} type={type} value={value} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600" /></label>; }
+function Field({ label, name, type = 'text', value, onChange, required = true }) {
+  if (name === 'phoneNumber') return <PhoneField label={label} value={value} onChange={onChange} />;
+
+  return <label className="block text-sm font-medium text-slate-700">{label}<input required={required} name={name} type={type} value={value} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600" /></label>;
+}
+
+function PhoneField({ label, value, onChange }) {
+  const phone = typeof value === 'object' && value ? value : splitPhoneNumber(value);
+  const updatePhone = (field) => (event) => {
+    onChange({ target: { name: 'phoneNumber', value: { ...phone, [field]: event.target.value } } });
+  };
+
+  return <label className="block text-sm font-medium text-slate-700">{label}<div className="mt-1.5 flex overflow-hidden rounded-lg border border-slate-200 focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600"><select value={phone.countryCode} onChange={updatePhone('countryCode')} className="w-32 shrink-0 border-r border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 outline-none">{COUNTRY_CODES.map(({ code, country }) => <option key={`${country}-${code}`} value={code}>{code} {country}</option>)}</select><input type="tel" value={phone.phoneNumber} onChange={updatePhone('phoneNumber')} className="min-w-0 flex-1 px-3 py-2.5 outline-none" placeholder="Phone number" /></div></label>;
+}
