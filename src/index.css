@@ -616,6 +616,27 @@ body {
 .schema-prompt-card { border: 1px solid #bfdbfe; border-radius: 1rem; background: #eff6ff; padding: 1.25rem; }
 .schema-prompt-card h2 { margin: 0; color: #123d86; font-size: 1rem; font-weight: 800; }.schema-prompt-card p { margin: .3rem 0 0; color: #52627a; font-size: .85rem; }.schema-prompt-card pre { max-height: 14rem; margin: 1rem 0 0; overflow: auto; border: 1px solid #dbeafe; border-radius: .75rem; background: #fff; padding: 1rem; color: #334155; font: .76rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; }
 
+.widget-framework-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.widget-framework-card { display: flex; min-height: 11.5rem; flex-direction: column; align-items: flex-start; gap: .65rem; border: 1px solid #dbe3f0; border-radius: 1rem; background: #fff; padding: 1.2rem; color: #0f172a; text-align: left; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.widget-framework-card:hover { transform: translateY(-3px); border-color: #60a5fa; box-shadow: 0 10px 26px rgba(37, 99, 235, .11); }
+.widget-framework-card.is-selected { border: 2px solid #2563eb; background: #eff6ff; box-shadow: 0 12px 28px rgba(37, 99, 235, .15); }
+.widget-framework-card svg { color: #2563eb; }
+.widget-framework-card > span { font-size: 1rem; font-weight: 800; }
+.widget-framework-card small { overflow-wrap: anywhere; color: #2563eb; font: .75rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.widget-framework-card em { margin-top: auto; color: #64748b; font-size: .78rem; font-style: normal; line-height: 1.45; }
+.widget-framework-selected { margin: 0 0 1rem; color: #1e40af; font-size: .9rem; }
+.widget-install-guide { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid #bfdbfe; border-radius: .9rem; background: #eff6ff; padding: 1rem; color: #334155; font-size: .88rem; line-height: 1.55; }
+.widget-install-step { margin: 0 0 .2rem; color: #1d4ed8; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.widget-install-guide p:not(.widget-install-step) { margin: 0; }
+.widget-install-guide code, .widget-install-target code { border-radius: .3rem; background: rgba(37, 99, 235, .1); padding: .1rem .3rem; color: #1d4ed8; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.widget-download-button { display: inline-flex; min-height: 2.5rem; flex: 0 0 auto; align-items: center; justify-content: center; gap: .45rem; border-radius: .6rem; background: #2563eb; padding: .55rem .85rem; color: #fff; font-size: .82rem; font-weight: 700; text-decoration: none; }
+.widget-download-button:hover { background: #1d4ed8; color: #fff; }
+.widget-install-target { display: flex; flex-direction: column; gap: .25rem; margin-top: .75rem; border-left: 3px solid #60a5fa; padding: .35rem 0 .35rem .8rem; color: #64748b; font-size: .84rem; }
+.widget-install-target b { color: #1e3a8a; }
+
+@media (max-width: 860px) { .widget-framework-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .widget-framework-grid { grid-template-columns: 1fr; } .widget-framework-card { min-height: 9rem; } .widget-install-guide { align-items: flex-start; flex-direction: column; } .widget-download-button { width: 100%; } }
+
 .integration-icon {
   display: grid;
   width: 5.5rem;
@@ -791,4 +812,5 @@ body {
 :root[data-theme='dark'] .onboarding-header { border-color:#1f426e; background:rgba(8, 24, 49, .88); }:root[data-theme='dark'] .onboarding-header h1 { color:#e9f3ff; }:root[data-theme='dark'] .onboarding-header__help { border-color:#28527f; background:#102d54; color:#8fc6ff; }
 :root[data-theme='dark'] .integration-step-heading { border-color:#263a5d; }:root[data-theme='dark'] .integration-step-heading h1 { color:#f1f6ff; }:root[data-theme='dark'] .integration-step-heading p { color:#b9c6d9; }
 :root[data-theme='dark'] .schema-prompt-card { border-color:#28527f; background:#0d2443; }:root[data-theme='dark'] .schema-prompt-card h2 { color:#dcecff; }:root[data-theme='dark'] .schema-prompt-card p { color:#b9c6d9; }:root[data-theme='dark'] .schema-prompt-card pre { border-color:#294b78; background:#07162d; color:#d9e8fb; }
+:root[data-theme='dark'] .widget-framework-card { border-color:#294b78; background:#102645; color:#edf5ff; }:root[data-theme='dark'] .widget-framework-card:hover { border-color:#4a8df1; box-shadow:0 10px 26px rgba(0,0,0,.25); }:root[data-theme='dark'] .widget-framework-card.is-selected { border-color:#60a5fa; background:#12355e; }:root[data-theme='dark'] .widget-framework-card em { color:#b9c6d9; }:root[data-theme='dark'] .widget-framework-selected { color:#9bcaff; }:root[data-theme='dark'] .widget-install-guide { border-color:#28527f; background:#0d2443; color:#cbd9eb; }:root[data-theme='dark'] .widget-install-guide code,:root[data-theme='dark'] .widget-install-target code { background:#173d6a; color:#a9d1ff; }:root[data-theme='dark'] .widget-install-target { border-color:#4a8df1; color:#b9c6d9; }:root[data-theme='dark'] .widget-install-target b { color:#dcecff; }
 :root[data-theme='dark'] .onboarding-plan-page > div > .grid > button { border-color:#294b78; background:#102645; color:#edf5ff; box-shadow:0 12px 28px rgba(0,0,0,.17); }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > div > span { color:#f4f8ff; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > ul { border-color:#294b78; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button::after { color:#9bcaff; border-color:#4788ed; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button:nth-child(2)::after { color:#fff; background:#2563eb; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-500,:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-600 { color:#b8c8de!important; }
