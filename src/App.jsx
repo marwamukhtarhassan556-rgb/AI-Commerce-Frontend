@@ -24,19 +24,6 @@ import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
 import ProfilePage from './pages/merchant/profile/ProfilePage';
 
-// Admin (Super Admin) imports
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminDiagnostics from './pages/admin/AdminDiagnostics';
-import AdminFeatures from './pages/admin/AdminFeatures';
-import AdminFeatureCreate from './pages/admin/AdminFeatureCreate';
-import AdminMerchants from './pages/admin/AdminMerchants';
-import AdminPlanCreate from './pages/admin/AdminPlanCreate';
-import AdminPlanDetails from './pages/admin/AdminPlanDetails';
-import AdminSubscriptions from './pages/admin/AdminSubscriptions';
-import AdminLayout from './pages/admin/components/AdminLayout';
-import AdminAuditLogs from './pages/admin/AdminAuditLogs';
-import AdminSettings from './pages/admin/AdminSettings';
-
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -112,23 +99,9 @@ function App() {
           <Route path="/merchant/profile" element={<ProfilePage />} />
         </Route>
 
-        {/* Super Admin routes */}
-        <Route element={<ProtectedRoute allowedRoles={['super-admin']}><AdminLayout /></ProtectedRoute>}>
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/diagnostics" element={<AdminDiagnostics />} />
-          <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          <Route path="/admin/features" element={<AdminFeatures />} />
-          <Route path="/admin/features/create" element={<AdminFeatureCreate />} />
-          <Route path="/admin/merchants" element={<AdminMerchants />} />
-          <Route path="/admin/plan-details" element={<AdminPlanDetails />} />
-          <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
-          <Route path="/admin/subscriptions/:planId" element={<AdminPlanDetails />} />
-          <Route path="/admin/plans/create" element={<AdminPlanCreate />} />
-          <Route path="/admin/plans/:id/edit" element={<AdminPlanDetails />} />
-        </Route>
-
         {/* باقي الـ Dashboards */}
+        {/* Legacy admin dashboard was a bare overview page and could surface from browser history. */}
+        <Route path="/admin/dashboard" element={<Navigate to="/merchant/dashboard" replace />} />
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRoles={['user', 'seller', 'merchant', 'admin']}>
             <Dashboard />
