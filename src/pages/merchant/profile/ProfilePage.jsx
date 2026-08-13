@@ -3,6 +3,7 @@ import { Camera, KeyRound, Loader2, Save, Store, UserCircle } from 'lucide-react
 import { profileApi } from '../../../api/profileApi';
 import { resolveProfilePicture, saveMerchantProfile } from '../../../utils/profilePicture';
 import { getUserErrorMessage } from '../../../utils/errorMessage';
+import WidgetAccessPanel from '../../../components/merchant/WidgetAccessPanel';
 
 const errorMessage = (error, fallback) => getUserErrorMessage(error, fallback);
 
@@ -75,6 +76,7 @@ export default function ProfilePage() {
       <form onSubmit={saveProfile} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="flex items-center gap-2 font-bold text-slate-900"><UserCircle className="h-5 w-5 text-indigo-600" />Personal details</h2><div className="mt-5 grid gap-4 sm:grid-cols-2"><Field label="First name" name="firstName" value={form.firstName} onChange={setField(setForm)} /><Field label="Last name" name="lastName" value={form.lastName} onChange={setField(setForm)} /><Field label="Phone number" name="phoneNumber" value={form.phoneNumber} onChange={setField(setForm)} required={false} /></div><button disabled={saving} className="mt-6 inline-flex min-h-10 items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"><Save className="h-4 w-4" />{saving ? 'Saving…' : 'Save profile'}</button></form>
     </div>
     <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="flex items-center gap-2 font-bold text-slate-900"><Store className="h-5 w-5 text-indigo-600" />Your stores</h2><div className="mt-4 grid gap-3 md:grid-cols-2">{stores.length ? stores.map((store) => <div key={store.storeId} className="rounded-xl border border-slate-100 p-4"><p className="font-semibold text-slate-900">{store.name}</p><p className="mt-1 text-sm text-slate-500">{store.platform || 'Custom'} · {store.status || 'Active'}</p><p className="mt-2 truncate text-xs text-slate-400">{store.shopDomain || store.description || 'No domain provided'}</p></div>) : <p className="text-sm text-slate-500">No stores found for this account.</p>}</div></section>
+    <WidgetAccessPanel />
     <form onSubmit={submitPassword} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><h2 className="flex items-center gap-2 font-bold text-slate-900"><KeyRound className="h-5 w-5 text-indigo-600" />Change password</h2><div className="mt-5 grid gap-4 md:grid-cols-3"><Field label="Current password" name="currentPassword" type="password" value={password.currentPassword} onChange={setField(setPassword)} /><Field label="New password" name="newPassword" type="password" value={password.newPassword} onChange={setField(setPassword)} /><Field label="Confirm new password" name="confirmPassword" type="password" value={password.confirmPassword} onChange={setField(setPassword)} /></div><button disabled={changingPassword} className="mt-6 inline-flex min-h-10 items-center gap-2 rounded-lg border border-indigo-600 px-4 py-2 text-sm font-semibold text-indigo-600 disabled:opacity-60">{changingPassword ? 'Updating…' : 'Change password'}</button></form>
   </div>;
 }

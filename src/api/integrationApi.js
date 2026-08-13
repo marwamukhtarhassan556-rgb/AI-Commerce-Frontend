@@ -238,6 +238,12 @@ export const bundlesApi = {
   track: (data) => aiApi.post('/admin/bundles/track', data),
 };
 
+export const widgetInstallationsApi = {
+  list: () => aiApi.get('/admin/widget-installations'),
+  create: ({ environment, allowedOrigins, scopes }) => aiApi.post('/admin/widget-installations', { environment, allowed_origins: allowedOrigins, scopes }),
+  disable: (widgetId) => aiApi.patch(`/admin/widget-installations/${widgetId}/disable`),
+};
+
 // ── Analytics ────────────────────────────────────────────────────────
 export const analyticsApi = {
   // GET /api/v1/analytics/sentiment-summary
