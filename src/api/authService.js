@@ -76,16 +76,18 @@ export const decodeToken = (token) => {
 };
 
 // بيرجع المسار حسب الـ Role
+export const normalizeRole = (role) => {
+  if (!role) return 'seller';
+  return String(role).toLowerCase().trim();
+};
+
 export const getRedirectPathByRole = (role) => {
   if (!role) return '/merchant/dashboard';
-  const lowerRole = String(role).toLowerCase();
-  if (lowerRole.includes('admin')) {
-    return '/admin/dashboard';
-  } else if (lowerRole.includes('seller') || lowerRole.includes('merchant')) {
+  const lowerRole = normalizeRole(role);
+  if (lowerRole.includes('seller') || lowerRole.includes('merchant') || lowerRole.includes('admin')) {
     return '/merchant/dashboard';
-  } else {
-    return '/dashboard';
   }
+  return '/dashboard';
 };
 
 // بيشيك لو المستخدم مسجل دخول والتوكين لسه صالح
