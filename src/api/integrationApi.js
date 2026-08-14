@@ -208,6 +208,14 @@ export const integrationApi = {
   // DELETE /api/v1/integration/connections/{id}
   deleteConnection: (connectionId) => aiApi.delete(`/integration/connections/${connectionId}`),
 
+  // PUT /api/v1/integration/connections/{id}/mappings
+  updateMappings: (connectionId, entityMappings) =>
+    aiApi.put(`/integration/connections/${connectionId}/mappings`, { entity_mappings: entityMappings }),
+
+  // PUT /api/v1/integration/connections/{id}/credentials
+  updateCredentials: (connectionId, { authConfig, credentials }) =>
+    aiApi.put(`/integration/connections/${connectionId}/credentials`, { auth_config: authConfig, credentials }),
+
   // POST /api/v1/integration/connections/{id}/sync
   syncConnection: (connectionId, entityTypes = []) =>
     aiApi.post(`/integration/connections/${connectionId}/sync`, { entity_types: entityTypes }),
