@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, Globe, Info, KeyRound, MessageCircle, Save } from 'lucide-react';
-import { storesApi } from '../../../api/integrationApi';
+import { analyticsApi, storesApi } from '../../../api/integrationApi';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 import { refreshAccessToken } from '../../../api/axiosConfig';
 
 const emptyStore = { name: '', description: '', platform: '', shopDomain: '', status: 'active', currency: '', language: '', timezone: '' };
@@ -19,11 +20,12 @@ export default function StoreSettingsPage() {
   useEffect(() => {
     if (!storeId) return;
     let mounted = true;
-    storesApi.getById(storeId)
-      .then(({ data: storeData }) => {
+    Promise.all([storesApi.getById(storeId), analyticsApi.getDailyMessageLimit().catch(() => null)])
+      .then(([storeResponse, limitResponse]) => {
         if (!mounted) return;
+        const storeData = storeResponse.data;
         setStore({ ...emptyStore, ...storeData });
-        setDailyAllowedMessage(String(storeData?.dailyAllowedMessage ?? 10));
+        setDailyAllowedMessage(String(limitResponse?.data?.daily_allowed_message ?? storeData?.dailyAllowedMessage ?? 10));
       })
       .catch(() => mounted && setMessage('Store details could not be loaded.'))
       .finally(() => mounted && setLoading(false));
@@ -64,10 +66,10 @@ export default function StoreSettingsPage() {
     }
     setSavingDailyLimit(true); setMessage('');
     try {
-      await storesApi.updateDailyAllowedMessage(storeId, limit);
-      setDailyAllowedMessage(String(limit));
-      setMessage('Daily customer message limit saved.');
-    } catch { setMessage('The daily message limit could not be saved. Please try again.'); }
+      const { data } = await analyticsApi.updateConsumerDailyLimit(limit);
+      setDailyAllowedMessage(String(data?.consumer_daily_message_limit ?? limit));
+      setMessage('Daily customer message limit saved and applied to the AI widget.');
+    } catch (error) { setMessage(getUserErrorMessage(error, 'The daily message limit could not be saved. Please try again.')); }
     finally { setSavingDailyLimit(false); }
   };
 

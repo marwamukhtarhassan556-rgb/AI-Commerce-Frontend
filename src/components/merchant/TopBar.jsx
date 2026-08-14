@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Bell, Clock3, Loader2, RefreshCw, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { integrationApi, storesApi, subscriptionsApi, ticketsApi } from '../../api/integrationApi';
+import { analyticsApi, integrationApi, storesApi, subscriptionsApi, ticketsApi } from '../../api/integrationApi';
 import { normalizeSubscription } from './subscription/subscriptionStatus';
 import LogoutButton from '../LogoutButton';
 import { resolveProfilePicture } from '../../utils/profilePicture';
@@ -16,6 +16,7 @@ export default function TopBar() {
   const [currentStoreId, setCurrentStoreId] = useState(() => localStorage.getItem('currentStoreId') || localStorage.getItem('storeId') || '');
   const [isSyncing, setIsSyncing] = useState(false);
   const [subscription, setSubscription] = useState(null);
+  const [aiUsage, setAiUsage] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
@@ -81,6 +82,15 @@ export default function TopBar() {
     return () => { mounted = false; };
   }, [currentStoreId]);
 
+  useEffect(() => {
+    if (!currentStoreId) { setAiUsage(null); return undefined; }
+    let mounted = true;
+    analyticsApi.getAIUsage(currentStoreId)
+      .then(({ data }) => mounted && setAiUsage(data))
+      .catch(() => mounted && setAiUsage(null));
+    return () => { mounted = false; };
+  }, [currentStoreId]);
+
   const currentStore = useMemo(() => stores.find((store) => store.id === currentStoreId), [stores, currentStoreId]);
   const handleSync = async () => {
     if (!currentStoreId) { window.alert('Select a store first.'); return; }
@@ -102,7 +112,7 @@ export default function TopBar() {
   return <header className="merchant-topbar fixed top-0 right-0 left-0 z-40 flex min-h-16 items-center gap-3 border-b border-slate-200 bg-white px-3 py-2 lg:left-[280px] sm:px-5">
     <div className="merchant-store-selector shrink-0 cursor-default"><span className="merchant-store-selector__icon"><Store className="h-4 w-4" /></span><span className="min-w-0 text-left"><span className="merchant-store-selector__label">Store</span><span className="merchant-store-selector__name">{currentStore?.name || 'Select a store'}</span></span></div>
     <button onClick={handleSync} disabled={isSyncing} className="flex shrink-0 items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-sm font-semibold text-indigo-600 hover:bg-indigo-100 disabled:opacity-50"><RefreshCw className={`h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} /><span className="hidden sm:inline">{isSyncing ? 'Syncing…' : 'Sync Now'}</span></button>
-    <div className="hidden min-w-0 flex-1 border-l border-slate-100 pl-3 md:block"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">AI Tokens</p><p className="text-xs text-slate-400">Usage endpoint not configured</p></div>
+    <div className="hidden min-w-0 flex-1 border-l border-slate-100 pl-3 md:block"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-500">AI Tokens</p><p className="truncate text-xs text-slate-400">{aiUsage ? `${Number(aiUsage.tokens?.used || 0).toLocaleString()} of ${Number(aiUsage.tokens?.limit || 0).toLocaleString()} used` : 'Usage unavailable'}</p></div>
     <div className="ml-auto flex shrink-0 items-center gap-1 text-slate-400">
       {subscription?.isTrialing && <Link to="/merchant/subscription" className={`hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold sm:inline-flex ${subscription.remainingDays <= 1 ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-300' : 'bg-blue-100 text-blue-700 ring-1 ring-blue-200'}`}><Clock3 className="h-3.5 w-3.5" />Trial · {subscription.remainingDays} {subscription.remainingDays === 1 ? 'day' : 'days'} left</Link>}
       {subscription?.isExpired && <Link to="/onboarding?step=3" className="hidden items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white sm:inline-flex"><Clock3 className="h-3.5 w-3.5" />Trial ended · Choose plan</Link>}

@@ -253,6 +253,20 @@ export const analyticsApi = {
   // GET /api/v1/analytics/sentiment-summary
   getSentimentSummary: (storeId) =>
     aiApi.get('/analytics/sentiment-summary', { params: { store_id: storeId } }),
+
+  // GET /api/v1/analytics/ai-usage
+  getAIUsage: (storeId) =>
+    aiApi.get('/analytics/ai-usage', { params: { store_id: storeId } }),
+
+  // GET /api/v1/analytics/ai-usage/daily-message-limit
+  getDailyMessageLimit: () => aiApi.get('/analytics/ai-usage/daily-message-limit'),
+
+  // PUT /api/v1/analytics/ai-usage/consumer-limit
+  updateConsumerDailyLimit: (limit) =>
+    aiApi.put('/analytics/ai-usage/consumer-limit', { consumer_daily_message_limit: limit }),
+
+  // GET /api/v1/analytics/ai-usage/subscription-plan
+  getSubscriptionPlan: () => aiApi.get('/analytics/ai-usage/subscription-plan'),
 };
 
 // ── Knowledge Base ───────────────────────────────────────────────────
