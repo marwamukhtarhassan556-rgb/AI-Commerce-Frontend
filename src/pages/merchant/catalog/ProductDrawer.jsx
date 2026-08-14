@@ -36,8 +36,11 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/50 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-2xl max-h-[92vh] overflow-hidden rounded-2xl bg-white border border-outline-variant/40 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div
+        className="overflow-hidden rounded-2xl bg-white border border-outline-variant/40 shadow-2xl flex flex-col"
+        style={{ width: 'min(760px, calc(100vw - 2rem))', maxHeight: '90vh', flexShrink: 0 }}
+      >
           
           {/* Header */}
           <div className="p-6 border-b border-outline-variant/30 flex items-center justify-between bg-surface-container-low">
