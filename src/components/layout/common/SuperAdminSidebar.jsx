@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { adminNavItems } from './SuperAdminNav';
 import { resolveProfilePicture } from '../../../utils/profilePicture';
+import BrandLogo from '../../BrandLogo';
 
 function SuperAdminSidebar({ isOpen = false, onClose = null }) {
   const { pathname } = useLocation();
@@ -22,23 +23,21 @@ function SuperAdminSidebar({ isOpen = false, onClose = null }) {
       className={`${isOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 transform overflow-y-auto flex flex-col transition-transform duration-300 shadow-2xl lg:translate-x-0 navi-sidebar`}
     >
       {/* ── Brand Header ── */}
-      <div className="flex items-center justify-between gap-3 px-5 py-5 border-b border-white/5">
-        <div className="w-full h-24 rounded-3xl overflow-hidden bg-slate-900 shadow-lg">
-          <img
-            src="/assets/logos/logo.png"
-            alt="Navi AI logo"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: 'center' }}
-          />
+      <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-200/20 dark:border-slate-800">
+        <div>
+          <BrandLogo tagline />
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mt-1">
+            Platform Administrator
+          </p>
         </div>
         {onClose ? (
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition hover:bg-white/20"
+            className="lg:hidden inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/40 text-slate-700 dark:text-slate-200 transition hover:bg-slate-100 dark:hover:bg-slate-800"
             aria-label="Close menu"
           >
-            <span className="material-symbols-outlined">close</span>
+            <span className="material-symbols-outlined text-lg">close</span>
           </button>
         ) : null}
       </div>
