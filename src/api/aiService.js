@@ -1,14 +1,17 @@
 import axios from 'axios';
 
-const AI_BASE = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai';
+const getAiBaseUrl = () => {
+  if (import.meta.env.VITE_AI_SERVICE_URL) {
+    return import.meta.env.VITE_AI_SERVICE_URL;
+  }
+  return '/api-ai';
+};
 
 const aiService = axios.create({
-  baseURL: AI_BASE,
+  baseURL: getAiBaseUrl(),
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-    'Cache-Control': 'no-cache',
-    'Pragma': 'no-cache',
   },
 });
 
@@ -21,14 +24,25 @@ aiService.interceptors.request.use((config) => {
 export const fetchAiLiveness = async () => {
   try {
     const r = await aiService.get('/health/', { params: { _t: Date.now() }, skipAuth: true });
+    if (r.data && typeof r.data === 'string' && r.data.trim().startsWith('<')) {
+      throw new Error('Received HTML index.html fallback instead of JSON');
+    }
     if (r.data) return r.data;
     throw new Error('Empty response');
   } catch (err) {
-    console.warn('[AI Service] Proxy liveness check failed, trying direct endpoint:', err);
-    const directRes = await fetch('https://aicommerce-ai-service-production.up.railway.app/health');
-    return await directRes.json();
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      try {
+        const directRes = await fetch(`https://aicommerce-ai-service-production.up.railway.app/health/?_t=${Date.now()}`);
+        return await directRes.json();
+      } catch (fallbackErr) {
+        console.warn('[AI Service] Direct fallback failed:', fallbackErr);
+      }
+    }
+    throw err;
   }
 };
+
+
 
 export const fetchAiAuditLogs = (skip = 0, limit = 50) =>
   aiService.get('/api/v1/auth/audit-logs', { params: { skip, limit } }).then((response) => response.data);

@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/api-ai/:path*",
+      "source": "/api-ai/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "no-store, no-cache, must-revalidate, proxy-revalidate" },
         { "key": "Pragma", "value": "no-cache" },
@@ -11,13 +11,18 @@
   ],
   "rewrites": [
     {
-      "source": "/api-ai/:path*",
-      "destination": "https://aicommerce-ai-service-production.up.railway.app/:path*"
+      "source": "/api-ai",
+      "destination": "https://aicommerce-ai-service-production.up.railway.app/"
     },
     {
-      "source": "/(.*)",
+      "source": "/api-ai/(.*)",
+      "destination": "https://aicommerce-ai-service-production.up.railway.app/$1"
+    },
+    {
+      "source": "/((?!api-ai).*)",
       "destination": "/index.html"
     }
   ]
 }
+
 
