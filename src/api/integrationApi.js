@@ -343,6 +343,17 @@ export const knowledgeApi = {
   generateSummary: (storeId, model = 'gemini-2.0-flash-001') =>
     aiApi.post(`/knowledge-base/summary?store_id=${storeId}`, { model, temperature: 0.3, max_tokens: 2048 }),
 
+  // POST /api/v1/knowledge-base/summary/regenerate
+  regenerateSummary: () => aiApi.post('/knowledge-base/summary/regenerate'),
+
+  // GET /api/v1/knowledge-base/summaries/history
+  getSummaryHistory: (page = 1, pageSize = 10) =>
+    aiApi.get('/knowledge-base/summaries/history', { params: { page, page_size: pageSize } }),
+
+  // POST /api/v1/knowledge-base/search/hybrid
+  hybridSearch: ({ query, storeId, organizationId, topK = 10 }) =>
+    aiApi.post('/knowledge-base/search/hybrid', { query, store_id: storeId, organization_id: organizationId, top_k: topK, use_hybrid: true }),
+
   // GET /api/v1/knowledge-base/jobs/{job_id}
   getJobStatus: (jobId) => aiApi.get(`/knowledge-base/jobs/${jobId}`),
 };

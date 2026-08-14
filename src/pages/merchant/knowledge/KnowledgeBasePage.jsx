@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bot, CheckCircle2, FileText, Pencil, Search, Sparkles, Trash2, Upload, X } from 'lucide-react';
+import { Bot, CheckCircle2, FileText, History, Pencil, RefreshCw, Search, Sparkles, Trash2, Upload, X } from 'lucide-react';
 import { knowledgeApi } from '../../../api/integrationApi';
 import { getUserErrorMessage } from '../../../utils/errorMessage';
 
@@ -16,6 +16,8 @@ export default function KnowledgeBasePage() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [summary, setSummary] = useState(null);
+  const [summaryHistory, setSummaryHistory] = useState([]);
+  const [useHybridSearch, setUseHybridSearch] = useState(false);
   const [loading, setLoading] = useState(Boolean(storeId));
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState(storeId ? '' : 'Select a store before managing its AI knowledge.');
@@ -34,9 +36,22 @@ export default function KnowledgeBasePage() {
     finally { setLoading(false); }
   };
 
+  const loadSummaryHistory = async () => {
+    if (!storeId) return;
+    try {
+      const { data } = await knowledgeApi.getSummaryHistory();
+      setSummaryHistory(data?.items || []);
+    } catch {
+      // History is an advanced enhancement; keep the core knowledge page available.
+      setSummaryHistory([]);
+    }
+  };
+
   // loadDocuments intentionally refreshes only when the selected store changes.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { void loadDocuments(); }, [storeId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { void loadSummaryHistory(); }, [storeId]);
 
   const upload = async (event) => {
     const file = event.target.files?.[0];
@@ -60,7 +75,20 @@ export default function KnowledgeBasePage() {
     try {
       const { data } = await knowledgeApi.generateSummary(storeId);
       setSummary(data);
+      await loadSummaryHistory();
     } catch (error) { setMessageType('error'); setMessage(errorMessage(error, 'Business summary could not be generated.')); }
+    finally { setBusy(''); }
+  };
+
+  const regenerateSummary = async () => {
+    if (!storeId) return;
+    setBusy('regenerate-summary'); setMessage('');
+    try {
+      const { data } = await knowledgeApi.regenerateSummary();
+      setSummary(data);
+      await loadSummaryHistory();
+      setMessageType('success'); setMessage('Business summary regenerated from your latest knowledge.');
+    } catch (error) { setMessageType('error'); setMessage(errorMessage(error, 'Business summary could not be regenerated.')); }
     finally { setBusy(''); }
   };
 
@@ -69,7 +97,9 @@ export default function KnowledgeBasePage() {
     if (!query.trim() || !storeId) return;
     setBusy('search'); setMessage('');
     try {
-      const { data } = await knowledgeApi.search({ query, storeId });
+      const { data } = useHybridSearch
+        ? await knowledgeApi.hybridSearch({ query, storeId, organizationId })
+        : await knowledgeApi.search({ query, storeId });
       setResults(data?.results || []);
     } catch (error) { setMessageType('error'); setMessage(errorMessage(error, 'Knowledge search could not be completed.')); }
     finally { setBusy(''); }
@@ -115,6 +145,7 @@ export default function KnowledgeBasePage() {
       <div className="divide-y divide-outline-variant/20">{loading ? <p className="p-6 text-sm text-on-surface-variant">Loading documents…</p> : documents.length ? documents.map((document) => <div key={document.id || document.document_id} className="flex items-center justify-between gap-4 px-6 py-4"><div><p className="text-sm font-bold">{document.title || document.filename || 'Untitled document'}</p><p className="mt-1 text-xs text-on-surface-variant">{document.status || 'active'} · {document.knowledge_scope || 'general'}</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-600">Ready</span></div>) : <p className="p-8 text-center text-sm text-on-surface-variant">No documents have been uploaded for this store yet.</p>}</div>
     </section>
     <section className="grid gap-6 lg:grid-cols-2"><div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm"><div className="mb-4 flex items-center gap-2"><Search className="h-5 w-5 text-primary" /><h3 className="font-bold">Search your knowledge</h3></div><form onSubmit={search} className="flex gap-2"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="e.g. What is our return policy?" className="min-w-0 flex-1 rounded-xl border border-outline-variant px-3 py-2.5 text-sm" /><button disabled={busy === 'search'} className="rounded-xl bg-primary px-4 text-sm font-bold text-white disabled:opacity-50">{busy === 'search' ? 'Searching…' : 'Search'}</button></form><div className="mt-5 space-y-3">{results.map((result) => <article key={result.chunk_id} className="rounded-xl bg-surface-container-low p-3"><p className="text-xs font-bold text-primary">{result.document_title}</p><p className="mt-1 text-sm text-on-surface">{result.content}</p><p className="mt-2 text-xs text-on-surface-variant">Match: {Math.round((result.score || 0) * 100)}%</p></article>)}</div></div><div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm"><div className="mb-4 flex items-center gap-2"><Bot className="h-5 w-5 text-primary" /><h3 className="font-bold">Business summary</h3></div>{summary ? <><h4 className="font-semibold">{summary.title}</h4><p className="mt-3 whitespace-pre-line text-sm leading-6 text-on-surface-variant">{summary.summary}</p></> : <p className="text-sm leading-6 text-on-surface-variant">Generate a summary after adding documents. It gives the AI a concise, current view of your store.</p>}</div></section>
+    <section className="grid gap-6 lg:grid-cols-2"><div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm"><div className="flex items-center justify-between gap-3"><div><div className="flex items-center gap-2"><Search className="h-5 w-5 text-primary" /><h3 className="font-bold">Advanced search</h3></div><p className="mt-1 text-sm text-on-surface-variant">Use hybrid search to combine keyword and semantic matches.</p></div><button type="button" onClick={() => setUseHybridSearch((current) => !current)} className={`rounded-full px-3 py-1.5 text-xs font-bold ${useHybridSearch ? 'bg-primary text-white' : 'bg-surface-container-high text-on-surface-variant'}`}>{useHybridSearch ? 'Hybrid on' : 'Semantic only'}</button></div><p className="mt-4 rounded-xl bg-surface-container-low px-3 py-2 text-xs leading-5 text-on-surface-variant">Search mode applies to the search box above. Hybrid mode is useful when you need an exact policy term as well as meaning-based matches.</p></div><div className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm"><div className="flex items-start justify-between gap-3"><div><div className="flex items-center gap-2"><History className="h-5 w-5 text-primary" /><h3 className="font-bold">Summary history</h3></div><p className="mt-1 text-sm text-on-surface-variant">Previous AI views of your business knowledge.</p></div><button type="button" onClick={regenerateSummary} disabled={Boolean(busy) || !storeId} className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-primary px-3 py-2 text-xs font-bold text-primary hover:bg-primary/5 disabled:opacity-50">{busy === 'regenerate-summary' ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}{busy === 'regenerate-summary' ? 'Regenerating…' : 'Regenerate'}</button></div><div className="mt-4 max-h-40 space-y-2 overflow-y-auto">{summaryHistory.length ? summaryHistory.map((item) => <button type="button" key={item.id} onClick={() => setSummary(item)} className="block w-full rounded-xl bg-surface-container-low px-3 py-2.5 text-left transition hover:bg-surface-container-high"><p className="truncate text-xs font-bold text-on-surface">{item.title || `Business summary v${item.version_number || ''}`}</p><p className="mt-1 text-[11px] text-on-surface-variant">Version {item.version_number || '—'} · {item.created_at ? new Date(item.created_at).toLocaleString() : 'Date unavailable'}</p></button>) : <p className="rounded-xl bg-surface-container-low px-3 py-4 text-center text-xs text-on-surface-variant">No previous summaries yet. Generate one to create a history.</p>}</div></div></section>
     {documents.length > 0 && <section className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm"><h3 className="font-bold">Manage documents</h3><p className="mt-1 text-sm text-on-surface-variant">Edit a document title and description, or permanently delete it.</p><div className="mt-4 space-y-2">{documents.map((document) => { const documentId = document.id || document.document_id; return <div key={documentId} className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-4 py-3"><p className="min-w-0 truncate text-sm font-semibold">{document.title || document.filename || 'Untitled document'}</p><div className="flex shrink-0 gap-2"><button type="button" disabled={Boolean(busy)} onClick={() => openUpdate(document)} className="inline-flex items-center gap-1 rounded-lg border border-primary px-3 py-1.5 text-xs font-bold text-primary disabled:opacity-50"><Pencil className="h-3.5 w-3.5" />Update</button><button type="button" disabled={Boolean(busy)} onClick={() => setDeletingDocument(document)} className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-3 py-1.5 text-xs font-bold text-red-600 disabled:opacity-50"><Trash2 className="h-3.5 w-3.5" />Delete</button></div></div>; })}</div></section>}
     {editingDocument && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"><form onSubmit={updateDocument} className="knowledge-document-modal"><div className="flex items-start justify-between"><div><h3 className="text-lg font-bold">Update document</h3><p className="mt-1 text-sm text-slate-500">Edit the document details.</p></div><button type="button" onClick={() => setEditingDocument(null)} className="rounded p-1 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button></div><label className="mt-5 block text-sm font-medium text-slate-700">Title<input required value={editForm.title} onChange={(event) => setEditForm((current) => ({ ...current, title: event.target.value }))} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><label className="mt-4 block text-sm font-medium text-slate-700">Description<textarea value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} rows="4" className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5" /></label><div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setEditingDocument(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</button><button disabled={busy.startsWith('update-')} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{busy.startsWith('update-') ? 'Saving…' : 'Save changes'}</button></div></form></div>}
     {deletingDocument && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"><div role="dialog" aria-modal="true" className="knowledge-document-modal knowledge-document-modal--delete"><h3 className="text-lg font-bold">Delete document?</h3><p className="mt-2 text-sm leading-6 text-slate-600">This permanently deletes <b>{deletingDocument.title || deletingDocument.filename || 'this document'}</b>, its uploaded file, and all linked chunks.</p><div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setDeletingDocument(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100">Cancel</button><button type="button" disabled={busy.startsWith('delete-')} onClick={deleteDocument} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{busy.startsWith('delete-') ? 'Deleting…' : 'Delete permanently'}</button></div></div></div>}
