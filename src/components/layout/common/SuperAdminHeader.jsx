@@ -19,7 +19,9 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
   const checkLiveness = async () => {
     try {
       const data = await fetchAiLiveness();
-      setLiveStatus(data?.status?.toLowerCase().includes('live') ? 'live' : 'offline');
+      const statusStr = typeof data === 'string' ? data : (data?.status || JSON.stringify(data || {}));
+      const isLive = statusStr.toLowerCase().includes('live') || statusStr.toLowerCase().includes('ok') || data?.status === true;
+      setLiveStatus(isLive ? 'live' : 'offline');
     } catch {
       setLiveStatus('offline');
     }

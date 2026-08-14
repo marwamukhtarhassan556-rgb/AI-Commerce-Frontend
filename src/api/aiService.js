@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-// A dedicated client for Super Admin AI endpoints. It is deliberately scoped
-// to this module so merchant integration requests keep using their existing
-// `aiApi` configuration unchanged.
+const AI_BASE = import.meta.env.VITE_AI_SERVICE_URL || '/api-ai';
+
 const aiService = axios.create({
-  baseURL: '/api-ai',
+  baseURL: AI_BASE,
   timeout: 30000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: {
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+  },
 });
 
 aiService.interceptors.request.use((config) => {
@@ -15,7 +18,18 @@ aiService.interceptors.request.use((config) => {
   return config;
 });
 
-export const fetchAiLiveness = () => aiService.get('/health/', { skipAuth: true }).then((r) => r.data);
+export const fetchAiLiveness = async () => {
+  try {
+    const r = await aiService.get('/health/', { params: { _t: Date.now() }, skipAuth: true });
+    if (r.data) return r.data;
+    throw new Error('Empty response');
+  } catch (err) {
+    console.warn('[AI Service] Proxy liveness check failed, trying direct endpoint:', err);
+    const directRes = await fetch('https://aicommerce-ai-service-production.up.railway.app/health');
+    return await directRes.json();
+  }
+};
+
 export const fetchAiAuditLogs = (skip = 0, limit = 50) =>
   aiService.get('/api/v1/auth/audit-logs', { params: { skip, limit } }).then((response) => response.data);
 export const fetchSentimentOverview = () =>
