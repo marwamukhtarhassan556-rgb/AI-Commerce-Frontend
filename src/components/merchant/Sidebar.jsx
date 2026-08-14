@@ -8,6 +8,7 @@ import {
   BookOpen,
   PlugZap,
   CreditCard,
+  BarChart3,
   UserCircle 
 } from 'lucide-react';
 
@@ -19,6 +20,7 @@ const navItems = [
   { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
   { name: 'Integrations', path: '/merchant/integrations', icon: PlugZap },
   { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
+  { name: 'AI Usage', path: '/merchant/ai-usage', icon: BarChart3 },
   { name: 'Profile', path: '/merchant/profile', icon: UserCircle },
 ];
 
