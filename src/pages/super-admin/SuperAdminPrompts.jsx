@@ -243,8 +243,8 @@ export default function SuperAdminPrompts() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
         <div>
-          <h2 className="text-slate-900 text-[1.75rem] font-bold m-0 tracking-tight">Prompt Manager</h2>
-          <p className="text-slate-600 text-sm mt-1">Create, edit, restore and version system prompts for the AI engine</p>
+          <h2 className="text-[1.75rem] font-bold m-0 tracking-tight" style={{ color: 'var(--color-on-surface)' }}>Prompt Manager</h2>
+          <p className="text-sm mt-1" style={{ color: 'var(--color-on-surface-variant)' }}>Create, edit, restore and version system prompts for the AI engine</p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={handleSeed} disabled={seeding} className="admin-button-secondary rounded-2xl text-sm font-semibold">
@@ -279,8 +279,8 @@ export default function SuperAdminPrompts() {
         <div className="text-center py-20 text-[#64748B] text-base">Loading prompts…</div>
       ) : prompts.length === 0 ? (
         <div className="text-center py-20 rounded-2xl admin-card admin-border">
-          <p className="text-base mb-2">No prompts found.</p>
-          <p className="text-sm text-[#94A3B8]">Click "Seed Defaults" to create the initial system prompts.</p>
+          <p className="text-base mb-2" style={{ color: 'var(--color-on-surface)' }}>No prompts found.</p>
+          <p className="text-sm" style={{ color: 'var(--color-on-surface-variant)' }}>Click "Seed Defaults" to create the initial system prompts.</p>
         </div>
       ) : (
         <div className="grid gap-5 md:grid-cols-3 xl:grid-cols-2">
@@ -291,8 +291,8 @@ export default function SuperAdminPrompts() {
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <p className="text-slate-900 font-semibold m-0 text-sm">{p.name || p.key}</p>
-                  <p className="text-slate-500 text-xs m-0 font-mono">{p.key}</p>
+                  <p className="font-semibold m-0 text-sm" style={{ color: 'var(--color-on-surface)' }}>{p.name || p.key}</p>
+                  <p className="text-xs m-0 font-mono" style={{ color: 'var(--color-on-surface-variant)' }}>{p.key}</p>
                 </div>
                 <span className="navi-badge navi-badge-info flex-shrink-0">
                   {p.type || 'system'}
@@ -300,7 +300,7 @@ export default function SuperAdminPrompts() {
               </div>
 
               {p.description && (
-                <p className="text-slate-600 text-sm leading-6 m-0">{p.description}</p>
+                <p className="text-sm leading-6 m-0" style={{ color: 'var(--color-on-surface-variant)' }}>{p.description}</p>
               )}
 
               <div className="rounded-xl p-3.5 bg-slate-100 border border-slate-200 overflow-hidden relative" style={{ maxHeight: '90px' }}>

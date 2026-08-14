@@ -32,21 +32,24 @@ function SuperAdminDiagnostics() {
             label: 'AI Service Health',
             value: healthRes?.status || 'Unknown',
             sub: healthRes?.details || 'N/A',
-            accent: healthRes?.status === 'healthy' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600',
+            iconBg: healthRes?.status === 'healthy' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+            iconColor: healthRes?.status === 'healthy' ? '#10B981' : '#EF4444',
             icon: 'pulse_alert'
           },
           {
             label: 'Default Provider',
             value: healthRes?.provider || 'N/A',
             sub: `Latency: ${healthRes?.latency_ms ? `${healthRes.latency_ms}ms` : 'N/A'}`,
-            accent: 'bg-indigo-50 text-indigo-600',
+            iconBg: 'rgba(99,102,241,0.15)',
+            iconColor: '#818CF8',
             icon: 'dns'
           },
           {
             label: 'Model Registry',
             value: `${modelsRes.length} Models`,
             sub: `Across ${providersRes.length} Providers`,
-            accent: 'bg-amber-50 text-amber-650',
+            iconBg: 'rgba(245,158,11,0.15)',
+            iconColor: '#F59E0B',
             icon: 'psychology'
           }
         ],
@@ -114,15 +117,15 @@ function SuperAdminDiagnostics() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
-              className="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm flex items-center space-x-4 hover:border-indigo-200 transition-colors"
+              className="admin-card admin-border rounded-2xl p-5 shadow-sm flex items-center space-x-4 hover:border-indigo-400/30 transition-colors"
             >
-              <div className={`p-3.5 rounded-xl ${gauge.accent}`}>
-                <span className="material-symbols-outlined text-xl">{gauge.icon}</span>
+              <div className="p-3.5 rounded-xl flex-shrink-0" style={{ background: gauge.iconBg }}>
+                <span className="material-symbols-outlined text-xl" style={{ color: gauge.iconColor }}>{gauge.icon}</span>
               </div>
               <div className="overflow-hidden">
-                <p className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">{gauge.label}</p>
-                <p className="text-xl font-black text-slate-900 mt-0.5">{gauge.value}</p>
-                {gauge.sub && <p className="text-[11px] text-slate-500 font-medium mt-0.5 truncate">{gauge.sub}</p>}
+                <p className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--color-on-surface-variant)' }}>{gauge.label}</p>
+                <p className="text-xl font-black mt-0.5" style={{ color: 'var(--color-on-surface)' }}>{gauge.value}</p>
+                {gauge.sub && <p className="text-[11px] font-medium mt-0.5 truncate" style={{ color: 'var(--color-on-surface-variant)' }}>{gauge.sub}</p>}
               </div>
             </motion.div>
           ))}
@@ -130,50 +133,50 @@ function SuperAdminDiagnostics() {
 
         {/* Secondary Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm">
-            <p className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">Sentiment Samples</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">{data?.sentimentTotal ?? 0}</p>
-            <p className="mt-1 text-[11px] text-slate-500 font-medium">From AI sentiment overview</p>
+          <div className="admin-card admin-border rounded-2xl p-5 shadow-sm">
+            <p className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--color-on-surface-variant)' }}>Sentiment Samples</p>
+            <p className="mt-1 text-2xl font-black" style={{ color: 'var(--color-on-surface)' }}>{data?.sentimentTotal ?? 0}</p>
+            <p className="mt-1 text-[11px] font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>From AI sentiment overview</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm">
-            <p className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">AI Providers</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">{data?.providerCount ?? 0}</p>
-            <p className="mt-1 text-[11px] text-slate-500 font-medium">Registered provider adapters</p>
+          <div className="admin-card admin-border rounded-2xl p-5 shadow-sm">
+            <p className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--color-on-surface-variant)' }}>AI Providers</p>
+            <p className="mt-1 text-2xl font-black" style={{ color: 'var(--color-on-surface)' }}>{data?.providerCount ?? 0}</p>
+            <p className="mt-1 text-[11px] font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>Registered provider adapters</p>
           </div>
-          <div className="bg-white rounded-2xl p-5 border border-slate-200/70 shadow-sm">
-            <p className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">AI Models</p>
-            <p className="mt-1 text-2xl font-black text-slate-900">{data?.modelCount ?? 0}</p>
-            <p className="mt-1 text-[11px] text-slate-500 font-medium">Models from registry</p>
+          <div className="admin-card admin-border rounded-2xl p-5 shadow-sm">
+            <p className="text-[11px] uppercase font-bold tracking-wider" style={{ color: 'var(--color-on-surface-variant)' }}>AI Models</p>
+            <p className="mt-1 text-2xl font-black" style={{ color: 'var(--color-on-surface)' }}>{data?.modelCount ?? 0}</p>
+            <p className="mt-1 text-[11px] font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>Models from registry</p>
           </div>
         </div>
 
         {/* Top Shopper Intents */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/70 shadow-sm space-y-4">
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Top Shopper Intents</h2>
+          <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--color-on-surface)' }}>Top Shopper Intents</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
             {data?.intents?.map((intent, idx) => (
-              <div key={idx} className="p-4 rounded-xl bg-slate-50/70 border border-slate-200/60 space-y-1.5 hover:bg-slate-50 transition-colors">
-                <span className="text-xs font-bold text-slate-800 block truncate">{intent.label}</span>
-                <div className="text-sm font-black text-indigo-600">{intent.tooltip} queries</div>
+              <div key={idx} className="p-4 rounded-xl border transition-colors" style={{ background: 'var(--color-surface-container-low)', borderColor: 'var(--admin-border)' }}>
+                <span className="text-xs font-bold block truncate" style={{ color: 'var(--color-on-surface)' }}>{intent.label}</span>
+                <div className="text-sm font-black" style={{ color: 'var(--color-primary)' }}>{intent.tooltip} queries</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Sentiment Distribution */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/70 shadow-sm space-y-4">
-          <h2 className="text-sm font-black text-slate-900 uppercase tracking-wider">Sentiment Distribution</h2>
+        <div className="admin-card admin-border rounded-2xl p-6 shadow-sm space-y-4">
+          <h2 className="text-sm font-black uppercase tracking-wider" style={{ color: 'var(--color-on-surface)' }}>Sentiment Distribution</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {data?.sentimentBreakdown?.map((item) => (
-              <div key={item.label} className="rounded-xl bg-slate-50/70 border border-slate-200/60 p-4 space-y-2">
+              <div key={item.label} className="rounded-xl border p-4 space-y-2" style={{ background: 'var(--color-surface-container-low)', borderColor: 'var(--admin-border)' }}>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-slate-900">{item.label}</span>
-                  <span className="font-black text-indigo-600">{item.value}%</span>
+                  <span className="font-bold" style={{ color: 'var(--color-on-surface)' }}>{item.label}</span>
+                  <span className="font-black" style={{ color: 'var(--color-primary)' }}>{item.value}%</span>
                 </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-200/60">
-                  <div className="h-full rounded-full bg-indigo-600" style={{ width: `${item.value}%` }} />
+                <div className="h-2 overflow-hidden rounded-full" style={{ background: 'var(--color-surface-container-high)' }}>
+                  <div className="h-full rounded-full bg-indigo-500" style={{ width: `${item.value}%` }} />
                 </div>
-                <p className="text-[11px] text-slate-500 font-medium">{item.count} conversations</p>
+                <p className="text-[11px] font-medium" style={{ color: 'var(--color-on-surface-variant)' }}>{item.count} conversations</p>
               </div>
             ))}
           </div>

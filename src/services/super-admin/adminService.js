@@ -337,21 +337,22 @@ export async function fetchAuditLogs(skip = 0, limit = 50) {
     const logs = await fetchAiAuditLogs(skip, limit);
     return mapAuditLogs(logs);
   } catch (err) {
-    console.warn('AI audit logs failed, falling back to backend audit logs:', err);
-    try {
-      const page = Math.floor(skip / limit) + 1;
-      const response = await api.get('/api/admin/audit-logs', { params: { page, pageSize: limit } });
-      return mapAuditLogs(readPagedItems(response.data, 'logs'));
-    } catch (fallbackErr) {
-      console.warn('Using fallback audit logs:', fallbackErr);
-      return mapAuditLogs([
-        { id: 'log-1', createdAt: new Date().toISOString(), userId: 'usr_89123', action: 'Updated Plan Pricing: Pro Plan', ipAddress: '192.168.1.1', userAgent: 'Mozilla/5.0' },
-        { id: 'log-2', createdAt: new Date(Date.now() - 3600000).toISOString(), userId: 'usr_12345', action: 'Created Feature: Custom LLM Persona', ipAddress: '10.0.0.4', userAgent: 'Mozilla/5.0' },
-        { id: 'log-3', createdAt: new Date(Date.now() - 86400000).toISOString(), userId: 'usr_99887', action: 'Activated Store: TechGizmo', ipAddress: '172.16.0.2', userAgent: 'Mozilla/5.0' },
-      ]);
-    }
+    console.warn('AI audit logs failed:', err);
+    throw err;
   }
 }
+
+export async function fetchPlatformAuditLogs(page = 1, pageSize = 50) {
+  try {
+    const response = await api.get('/api/admin/audit-logs', { params: { page, pageSize } });
+    const items = readPagedItems(response.data, 'logs');
+    return mapAuditLogs(items);
+  } catch (err) {
+    console.warn('Backend platform audit logs failed:', err);
+    throw err;
+  }
+}
+
 
 // ============================================================================
 // SETTINGS

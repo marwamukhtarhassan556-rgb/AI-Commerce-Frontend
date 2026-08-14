@@ -349,12 +349,254 @@ body {
 :root[data-theme='light'] .auth-brand .brand-logo__type { color: #10213f; }:root[data-theme='light'] .auth-brand .brand-logo__tagline { color: #52627a; }
 
 /* Shared light/dark surfaces for the app shells. */
-.admin-shell { min-height: 100vh; background: var(--color-background); color: var(--color-on-background); }
-.admin-sidebar { background: var(--color-surface-container-low); }
-:root[data-theme='dark'] .admin-shell .bg-white, :root[data-theme='dark'] .admin-shell .admin-glass-card { background-color: var(--merchant-card) !important; }
-:root[data-theme='dark'] .admin-shell .bg-\[\#f8f9ff\], :root[data-theme='dark'] .admin-sidebar .bg-\[\#eff4ff\] { background-color: var(--color-surface-container-low) !important; }
-:root[data-theme='dark'] .admin-shell .text-\[\#0b1c30\] { color: var(--color-on-surface) !important; }
-:root[data-theme='dark'] .admin-shell .hover\:bg-\[\#dce9ff\]:hover { background: var(--color-surface-container-high) !important; }
+.admin-shell,
+.super-admin-shell {
+  --admin-card: var(--merchant-card);
+  --admin-border: var(--merchant-border);
+  --admin-shadow: var(--merchant-shadow);
+  min-height: 100vh;
+  background: var(--color-background);
+  color: var(--color-on-background);
+}
+.admin-sidebar,
+.navi-sidebar { background: var(--color-surface-container-low); }
+.super-admin-main { background: var(--color-background); color: var(--color-on-background); }
+
+/* Super admin uses the same merchant color system. These classes came from an
+   external repo, so the skin is centralized here instead of restyling pages one by one. */
+.navi-sidebar {
+  border-right: 1px solid var(--merchant-border);
+  color: var(--color-on-surface);
+  box-shadow: var(--merchant-shadow);
+}
+.navi-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  min-height: 2.75rem;
+  padding: .7rem .95rem;
+  border-radius: .75rem;
+  color: var(--color-on-surface-variant);
+  font-size: .78rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .18s, color .18s, border-radius .18s;
+}
+.navi-sidebar-link:hover {
+  background: var(--color-surface-container-high);
+  color: var(--color-primary);
+}
+.navi-sidebar-link-active {
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .2);
+}
+.navi-sidebar-link .material-symbols-outlined { font-size: 1.25rem; }
+.navi-sidebar-footer-link:hover { background: var(--color-surface-container-high); }
+.navi-sidebar-footer-link p:first-child { color: var(--color-on-surface) !important; }
+.navi-sidebar-footer-link p:last-child { color: var(--color-on-surface-variant) !important; }
+.navi-sidebar-logout {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--color-on-surface-variant);
+  font-size: .78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s, color .18s;
+}
+.navi-sidebar-logout:hover { background: var(--color-surface-container-high); color: var(--color-primary); }
+.navi-topbar {
+  border-bottom: 1px solid var(--merchant-border);
+  background: color-mix(in srgb, var(--merchant-card) 92%, transparent);
+  color: var(--color-on-surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+  backdrop-filter: blur(18px);
+}
+.navi-status-pill {
+  align-items: center;
+  gap: .45rem;
+  min-height: 2.25rem;
+  padding: 0 .75rem;
+  border: 1px solid var(--merchant-border);
+  border-radius: 999px;
+  background: var(--color-surface-container-lowest);
+}
+.navi-status-dot { width: .45rem; height: .45rem; border-radius: 999px; }
+.admin-card,
+.admin-glass-card {
+  border: 1px solid var(--admin-border);
+  background: var(--admin-card);
+  color: var(--color-on-surface);
+}
+.admin-border { border-color: var(--admin-border); }
+.admin-cta-btn,
+.navi-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  border: 1px solid transparent;
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .22);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .18s, box-shadow .18s, transform .18s;
+}
+.admin-cta-btn:hover,
+.navi-button-primary:hover {
+  background: var(--color-primary-container);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, .28);
+  transform: translateY(-1px);
+}
+.admin-button-secondary,
+.navi-button-secondary {
+  border: 1px solid var(--admin-border);
+  background: var(--admin-card);
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.admin-button-secondary:hover,
+.navi-button-secondary:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface-container-low);
+  color: var(--color-primary-container);
+}
+.admin-input,
+.navi-input {
+  border: 1px solid var(--admin-border);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+}
+.admin-input:focus,
+.navi-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+.super-admin-shell .bg-white { background-color: var(--admin-card) !important; }
+.super-admin-shell .bg-\[\#f8f9ff\],
+.super-admin-shell .bg-slate-50,
+.super-admin-shell .bg-slate-50\/70,
+.super-admin-shell .bg-slate-50\/50,
+.super-admin-shell .hover\:bg-\[\#f8f9ff\]\/50:hover,
+.super-admin-shell .hover\:bg-slate-50:hover { background-color: var(--color-surface-container-low) !important; }
+.super-admin-shell .text-\[\#0b1c30\],
+.super-admin-shell .text-slate-900,
+.super-admin-shell .text-slate-800,
+.super-admin-shell .text-slate-700 { color: var(--color-on-surface) !important; }
+.super-admin-shell .text-\[\#414753\],
+.super-admin-shell .text-slate-600,
+.super-admin-shell .text-slate-500,
+.super-admin-shell .text-slate-400 { color: var(--color-on-surface-variant) !important; }
+.super-admin-shell .border-\[\#e0e2ec\],
+.super-admin-shell .border-slate-200,
+.super-admin-shell .border-slate-200\/80,
+.super-admin-shell .border-slate-200\/70,
+.super-admin-shell .border-slate-100 { border-color: var(--admin-border) !important; }
+.super-admin-shell .shadow-sm { box-shadow: var(--admin-shadow) !important; }
+.super-admin-shell .bg-indigo-600,
+.super-admin-shell .bg-indigo-700,
+.super-admin-shell .bg-violet-600 { background-color: var(--color-primary) !important; }
+.super-admin-shell .hover\:bg-indigo-700:hover,
+.super-admin-shell .hover\:bg-violet-700:hover { background-color: var(--color-primary-container) !important; }
+.super-admin-shell .bg-indigo-50,
+.super-admin-shell .bg-indigo-50\/40,
+.super-admin-shell .bg-indigo-50\/50,
+.super-admin-shell .bg-indigo-50\/90,
+.super-admin-shell .bg-violet-50,
+.super-admin-shell .bg-violet-50\/50 { background-color: var(--color-primary-fixed) !important; }
+.super-admin-shell .text-indigo-600,
+.super-admin-shell .text-indigo-700,
+.super-admin-shell .text-violet-600,
+.super-admin-shell .text-violet-700,
+.super-admin-shell .hover\:text-indigo-600:hover,
+.super-admin-shell .group:hover .group-hover\:text-indigo-600 { color: var(--color-primary) !important; }
+.super-admin-shell .text-indigo-100 { color: #dbeafe !important; }
+.super-admin-shell .text-indigo-950 { color: var(--color-on-primary-fixed) !important; }
+.super-admin-shell .border-indigo-100,
+.super-admin-shell .border-indigo-200,
+.super-admin-shell .border-violet-100,
+.super-admin-shell .border-violet-200 { border-color: #bfdbfe !important; }
+.super-admin-shell .border-indigo-600,
+.super-admin-shell .border-violet-600,
+.super-admin-shell .hover\:border-indigo-200:hover,
+.super-admin-shell .hover\:border-indigo-300:hover { border-color: var(--color-primary) !important; }
+.super-admin-shell .focus\:border-indigo-600:focus,
+.super-admin-shell .focus\:border-violet-600:focus,
+.super-admin-shell .focus\:border-primary:focus { border-color: var(--color-primary) !important; }
+.super-admin-shell .focus\:ring-indigo-500\/20:focus,
+.super-admin-shell .focus\:ring-indigo-600\/10:focus,
+.super-admin-shell .focus\:ring-indigo-600\/20:focus,
+.super-admin-shell .focus\:ring-violet-600\/20:focus { --tw-ring-color: rgba(37, 99, 235, .16) !important; }
+.super-admin-shell .shadow-indigo-200,
+.super-admin-shell .shadow-indigo-500\/25,
+.super-admin-shell .shadow-indigo-600\/20 { --tw-shadow-color: rgba(37, 99, 235, .22) !important; }
+.super-admin-shell .from-indigo-500\/30 { --tw-gradient-from: rgba(37, 99, 235, .3) var(--tw-gradient-from-position) !important; --tw-gradient-to: rgba(37, 99, 235, 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.super-admin-shell .via-purple-500\/30 { --tw-gradient-to: rgba(14, 165, 233, 0) var(--tw-gradient-to-position) !important; --tw-gradient-stops: var(--tw-gradient-from), rgba(14, 165, 233, .24) var(--tw-gradient-via-position), var(--tw-gradient-to) !important; }
+.super-admin-shell .to-pink-500\/30 { --tw-gradient-to: rgba(96, 165, 250, .28) var(--tw-gradient-to-position) !important; }
+.admin-chat-area {
+  border: 1px solid var(--admin-border);
+  background: color-mix(in srgb, var(--admin-card) 82%, var(--color-surface-container-low));
+  color: var(--color-on-surface);
+  box-shadow: var(--admin-shadow);
+}
+.admin-chat-input,
+.admin-chat-composer-input {
+  border: 1px solid var(--admin-border);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+}
+.admin-chat-input::placeholder,
+.admin-chat-composer-input::placeholder { color: var(--color-on-surface-variant); opacity: .85; }
+.admin-chat-input:focus,
+.admin-chat-composer-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+}
+.admin-chat-user {
+  border: 1px solid color-mix(in srgb, var(--color-primary) 82%, #fff);
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
+}
+.admin-chat-assistant {
+  border: 1px solid var(--admin-border);
+  background: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
+}
+.admin-chat-avatar {
+  background: linear-gradient(135deg, var(--color-primary), #38bdf8);
+  color: #fff;
+}
+.admin-pill {
+  border: 1px solid var(--admin-border);
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+}
+:root[data-theme='dark'] .super-admin-shell table thead,
+:root[data-theme='dark'] .super-admin-shell table thead tr {
+  border-color: var(--merchant-border) !important;
+  background-color: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface-variant) !important;
+}
+:root[data-theme='dark'] .super-admin-shell table thead th {
+  color: var(--color-on-surface-variant) !important;
+}
+:root[data-theme='dark'] .admin-shell .bg-white,
+:root[data-theme='dark'] .admin-shell .admin-glass-card,
+:root[data-theme='dark'] .super-admin-shell .bg-white,
+:root[data-theme='dark'] .super-admin-shell .admin-glass-card { background-color: var(--merchant-card) !important; }
+:root[data-theme='dark'] .admin-shell .bg-\[\#f8f9ff\],
+:root[data-theme='dark'] .admin-sidebar .bg-\[\#eff4ff\],
+:root[data-theme='dark'] .super-admin-shell .bg-\[\#f8f9ff\],
+:root[data-theme='dark'] .navi-sidebar .bg-\[\#eff4ff\] { background-color: var(--color-surface-container-low) !important; }
+:root[data-theme='dark'] .admin-shell .text-\[\#0b1c30\],
+:root[data-theme='dark'] .super-admin-shell .text-\[\#0b1c30\] { color: var(--color-on-surface) !important; }
+:root[data-theme='dark'] .admin-shell .hover\:bg-\[\#dce9ff\]:hover,
+:root[data-theme='dark'] .super-admin-shell .hover\:bg-\[\#dce9ff\]:hover { background: var(--color-surface-container-high) !important; }
 :root[data-theme='dark'] .glass-card, :root[data-theme='dark'] .bento-card { border-color: var(--merchant-border); background: var(--merchant-card); }
 :root[data-theme='dark'] .onboarding-shell { background: var(--color-background); }
 :root[data-theme='dark'] .onboarding-shell::before { background: linear-gradient(rgba(2, 6, 23, .9), rgba(8, 18, 37, .94)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1800&q=85') center / cover; }
@@ -819,3 +1061,449 @@ body {
 :root[data-theme='dark'] .schema-prompt-card { border-color:#28527f; background:#0d2443; }:root[data-theme='dark'] .schema-prompt-card h2 { color:#dcecff; }:root[data-theme='dark'] .schema-prompt-card p { color:#b9c6d9; }:root[data-theme='dark'] .schema-prompt-card pre { border-color:#294b78; background:#07162d; color:#d9e8fb; }
 :root[data-theme='dark'] .widget-framework-card { border-color:#294b78; background:#102645; color:#edf5ff; }:root[data-theme='dark'] .widget-framework-card:hover { border-color:#4a8df1; box-shadow:0 10px 26px rgba(0,0,0,.25); }:root[data-theme='dark'] .widget-framework-card.is-selected { border-color:#60a5fa; background:#12355e; }:root[data-theme='dark'] .widget-framework-card em { color:#b9c6d9; }:root[data-theme='dark'] .widget-framework-selected { color:#9bcaff; }:root[data-theme='dark'] .widget-install-guide { border-color:#28527f; background:#0d2443; color:#cbd9eb; }:root[data-theme='dark'] .widget-install-guide code,:root[data-theme='dark'] .widget-install-target code { background:#173d6a; color:#a9d1ff; }:root[data-theme='dark'] .widget-install-target { border-color:#4a8df1; color:#b9c6d9; }:root[data-theme='dark'] .widget-install-target b { color:#dcecff; }
 :root[data-theme='dark'] .onboarding-plan-page > div > .grid > button { border-color:#294b78; background:#102645; color:#edf5ff; box-shadow:0 12px 28px rgba(0,0,0,.17); }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > div > span { color:#f4f8ff; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button > ul { border-color:#294b78; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button::after { color:#9bcaff; border-color:#4788ed; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button:nth-child(2)::after { color:#fff; background:#2563eb; }:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-500,:root[data-theme='dark'] .onboarding-plan-page > div > .grid > button .text-slate-600 { color:#b8c8de!important; }
+
+/* =====================================================================
+   SUPER-ADMIN UNIVERSAL THEME FIX
+   Fixes hardcoded colors across ALL super-admin pages for both
+   light mode and dark mode. Covers: Dashboard, Merchants, AuditLogs,
+   Subscriptions, ModelsHealth, Bundles, Prompts, Features, Analytics.
+   ===================================================================== */
+
+/* ── Shared card/section base (bg-white, border-[#E2E8F0]) ─────────── */
+.super-admin-shell article.rounded-xl,
+.super-admin-shell section.rounded-xl,
+.super-admin-shell .rounded-xl.border,
+.super-admin-shell .rounded-2xl.border,
+.super-admin-shell .rounded-xl.bg-white,
+.super-admin-shell .rounded-2xl.bg-white,
+.super-admin-shell .rounded-xl.border.bg-white,
+.super-admin-shell .rounded-2xl.border.bg-white {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Page heading colors (#0D1B2A / #0b1c30) ────────────────────────── */
+.super-admin-shell h1,
+.super-admin-shell h2,
+.super-admin-shell h3,
+.super-admin-shell h4,
+.super-admin-shell .text-\[\#0D1B2A\],
+.super-admin-shell .text-\[\#0d1b2a\],
+.super-admin-shell .text-\[\#0b1c30\] {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Muted paragraph text (#64748B / #414753) ───────────────────────── */
+.super-admin-shell .text-\[\#64748B\],
+.super-admin-shell .text-\[\#64748b\],
+.super-admin-shell .text-\[\#414753\] {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Table: header row backgrounds ──────────────────────────────────── */
+.super-admin-shell table thead,
+.super-admin-shell table thead tr,
+.super-admin-shell thead.bg-\[\#F8FAFC\],
+.super-admin-shell tr.bg-slate-50,
+.super-admin-shell tr.bg-slate-50\/70,
+.super-admin-shell tr.bg-\[\#f8f9ff\] {
+  background-color: var(--color-surface-container) !important;
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Table: header text ─────────────────────────────────────────────── */
+.super-admin-shell table thead th,
+.super-admin-shell table thead .text-\[\#64748B\],
+.super-admin-shell table thead .text-slate-400,
+.super-admin-shell table thead .text-slate-500,
+.super-admin-shell table thead .text-slate-600,
+.super-admin-shell table thead .text-\[\#414753\] {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Table: body rows ───────────────────────────────────────────────── */
+.super-admin-shell table tbody,
+.super-admin-shell table tbody tr,
+.super-admin-shell tbody.bg-white {
+  background-color: var(--admin-card) !important;
+}
+
+/* ── Table: body cell text ──────────────────────────────────────────── */
+.super-admin-shell table tbody td {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell table tbody td.text-slate-500,
+.super-admin-shell table tbody td.text-slate-600,
+.super-admin-shell table tbody td.text-\[\#64748B\],
+.super-admin-shell table tbody .text-\[\#64748B\] {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Table: hover rows ──────────────────────────────────────────────── */
+.super-admin-shell table tbody tr:hover,
+.super-admin-shell .hover\:bg-\[\#F8FAFC\]:hover,
+.super-admin-shell .hover\:bg-slate-50:hover {
+  background-color: var(--color-surface-container-low) !important;
+}
+
+/* ── Table: divide lines ────────────────────────────────────────────── */
+.super-admin-shell .divide-y.divide-\[\#E2E8F0\] > * + *,
+.super-admin-shell .divide-y.divide-slate-200 > * + *,
+.super-admin-shell .divide-y.divide-slate-100 > * + * {
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Inline text color overrides inside table cells ─────────────────── */
+.super-admin-shell table .text-\[\#0D1B2A\],
+.super-admin-shell table .text-\[\#0d1b2a\],
+.super-admin-shell table .text-\[\#0b1c30\],
+.super-admin-shell table .text-slate-900,
+.super-admin-shell table .text-slate-800,
+.super-admin-shell table .font-semibold,
+.super-admin-shell table .font-bold {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Store "Platform" badge in Audit Logs ───────────────────────────── */
+.super-admin-shell .bg-slate-100.border.border-slate-200\/60 {
+  background-color: var(--color-surface-container-high) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Cards with hardcoded bg-white inside sections ──────────────────── */
+.super-admin-shell section.bg-white,
+.super-admin-shell div.bg-white.rounded-xl,
+.super-admin-shell div.bg-white.rounded-2xl,
+.super-admin-shell div.bg-white\/95 {
+  background: var(--admin-card) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── AI Insight banner (gradient wrapper + inner card) ───────────────── */
+.super-admin-shell .bg-white\/95.backdrop-blur-md,
+.super-admin-shell .bg-white\/95 {
+  background: color-mix(in srgb, var(--admin-card) 95%, transparent) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Filter bar / search card ────────────────────────────────────────── */
+.super-admin-shell .bg-white.p-4,
+.super-admin-shell div.bg-white.p-4,
+.super-admin-shell div.bg-white.p-5 {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Inputs & selects inside super-admin ─────────────────────────────── */
+.super-admin-shell input:not([type='checkbox']):not([type='radio']):not([type='range']),
+.super-admin-shell select,
+.super-admin-shell textarea {
+  background: var(--color-surface-container-lowest) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell input::placeholder,
+.super-admin-shell textarea::placeholder {
+  color: var(--color-on-surface-variant) !important;
+  opacity: 0.75;
+}
+
+/* ── Pagination buttons (Prev/Next in Audit Logs) ────────────────────── */
+.super-admin-shell button.bg-white,
+.super-admin-shell button.h-9.bg-white {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell button.bg-white:hover {
+  background: var(--color-surface-container-low) !important;
+}
+
+/* ── Toggle filter button (Show top only in Bundles) ─────────────────── */
+.super-admin-shell button.border.bg-white {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Prompt card: content preview box ────────────────────────────────── */
+.super-admin-shell .bg-slate-100.border.border-slate-200 {
+  background: var(--color-surface-container) !important;
+  border-color: var(--admin-border) !important;
+}
+.super-admin-shell .bg-slate-100.border.border-slate-200 p {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Prompt / Bundles: config input boxes ────────────────────────────── */
+.super-admin-shell input.border.border-\[\#CBD5E1\].bg-white,
+.super-admin-shell label.border.border-\[\#CBD5E1\].bg-white {
+  background: var(--color-surface-container-lowest) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Modal panel (Prompt editor modal) ──────────────────────────────── */
+.super-admin-shell .admin-modal-panel {
+  background: var(--admin-card) !important;
+  border: 1px solid var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell .admin-modal-panel .border-b.border-slate-200,
+.super-admin-shell .admin-modal-panel .border-t.border-slate-200 {
+  border-color: var(--admin-border) !important;
+}
+.super-admin-shell .admin-modal-panel label {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Dashboard KPI cards (bg-white rounded-2xl) ──────────────────────── */
+.super-admin-shell .grid > div.bg-white.rounded-2xl {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+
+/* ── KPI card text ───────────────────────────────────────────────────── */
+.super-admin-shell .grid > div.bg-white.rounded-2xl .text-slate-900,
+.super-admin-shell .grid > div.bg-white.rounded-2xl .text-slate-500,
+.super-admin-shell .grid > div.bg-white.rounded-2xl span {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell .grid > div.bg-white.rounded-2xl .text-slate-500,
+.super-admin-shell .grid > div.bg-white.rounded-2xl .uppercase {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Pie chart center white donut ────────────────────────────────────── */
+.super-admin-shell .absolute.inset-8.bg-white.rounded-full {
+  background: var(--color-surface-container-lowest) !important;
+}
+.super-admin-shell .absolute.inset-8.bg-white.rounded-full .text-slate-400 {
+  color: var(--color-on-surface-variant) !important;
+}
+.super-admin-shell .absolute.inset-8.bg-white.rounded-full .text-slate-800 {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Platform distribution legend rows ───────────────────────────────── */
+.super-admin-shell .bg-slate-50\/70.px-3.py-2 {
+  background: var(--color-surface-container-low) !important;
+  border-color: var(--admin-border) !important;
+}
+.super-admin-shell .bg-slate-50\/70.px-3.py-2 .text-slate-700 {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell .bg-slate-50\/70.px-3.py-2 .text-slate-900 {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Dashboard border-b separator ────────────────────────────────────── */
+.super-admin-shell .border-b.border-slate-200\/80,
+.super-admin-shell .border-b.border-slate-200 {
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Recent Stores cards (gradient from-white to-slate-50) ───────────── */
+.super-admin-shell .from-white.to-slate-50\/40,
+.super-admin-shell .bg-gradient-to-b.from-white {
+  background: var(--admin-card) !important;
+}
+.super-admin-shell .from-white.to-slate-50\/40 .text-slate-900,
+.super-admin-shell .from-white.to-slate-50\/40 .text-slate-500,
+.super-admin-shell .from-white.to-slate-50\/40 .text-slate-400 {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell .from-white.to-slate-50\/40 .text-slate-500,
+.super-admin-shell .from-white.to-slate-50\/40 .text-slate-400 {
+  color: var(--color-on-surface-variant) !important;
+}
+.super-admin-shell .from-white.to-slate-50\/40 .border-t.border-slate-100 {
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Subscriptions: "Active Tiers" plan price text ───────────────────── */
+.super-admin-shell .text-slate-900.leading-none {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Subscriptions: Users badge (bg-slate-100) ───────────────────────── */
+.super-admin-shell .bg-slate-100.text-slate-700.rounded-full {
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Subscriptions: Recent Transactions table row hover ─────────────── */
+.super-admin-shell .hover\:bg-slate-50.transition-colors:hover {
+  background: var(--color-surface-container-low) !important;
+}
+
+/* ── Subscriptions: bg-slate-100 thead ──────────────────────────────── */
+.super-admin-shell .bg-slate-100.border-b {
+  background: var(--color-surface-container) !important;
+  border-color: var(--admin-border) !important;
+}
+.super-admin-shell .bg-slate-100.border-b th {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Models Health: provider cards & overall card ────────────────────── */
+.super-admin-shell article.bg-white,
+.super-admin-shell section.bg-white {
+  background: var(--admin-card) !important;
+  border-color: var(--admin-border) !important;
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell section.bg-white .text-\[\#0D1B2A\],
+.super-admin-shell article.bg-white .text-\[\#0D1B2A\],
+.super-admin-shell section.bg-white .font-semibold,
+.super-admin-shell article.bg-white .font-semibold {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell section.bg-white .text-\[\#64748B\],
+.super-admin-shell article.bg-white .text-\[\#64748B\] {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Models Capability Matrix: table & header ────────────────────────── */
+.super-admin-shell .border-b.border-\[\#E2E8F0\] {
+  border-color: var(--admin-border) !important;
+}
+.super-admin-shell .border-b.border-\[\#E2E8F0\] h3 {
+  color: var(--color-on-surface) !important;
+}
+.super-admin-shell thead.bg-\[\#F8FAFC\] {
+  background: var(--color-surface-container) !important;
+}
+.super-admin-shell thead.bg-\[\#F8FAFC\] th {
+  color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Capability Badge: "No" badge in light mode ──────────────────────── */
+:root:not([data-theme='dark']) .super-admin-shell .px-2.py-0\.5.rounded-full[style*="rgba(100,116,139,0.12)"] {
+  background: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+/* ── AI Models page title in dark bg ─────────────────────────────────── */
+:root[data-theme='dark'] .super-admin-shell .text-\[\#0D1B2A\] {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Status dot in Merchants: fix dark bg-gray-900 ───────────────────── */
+.super-admin-shell .bg-gray-900 {
+  background-color: var(--color-on-surface-variant) !important;
+}
+
+/* ── Merchants: "Change Status" select in light mode ─────────────────── */
+:root:not([data-theme='dark']) .super-admin-shell select.text-\[\#0b1c30\] {
+  background: #fff !important;
+  color: #10213f !important;
+}
+
+/* ── admin-modal-panel CSS class definition ──────────────────────────── */
+.admin-modal-panel {
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  color: var(--color-on-surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+/* ── admin-tag CSS class definition ─────────────────────────────────── */
+.admin-tag {
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+  border: 1px solid var(--admin-border);
+}
+
+/* ── navi-admin-button CSS class definition ──────────────────────────── */
+.navi-admin-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.65rem;
+  background: var(--admin-card);
+  color: var(--color-on-surface);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s;
+}
+.navi-admin-button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface-container-low);
+  color: var(--color-primary);
+}
+
+/* ── navi-badge variants ─────────────────────────────────────────────── */
+.navi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: capitalize;
+}
+.navi-badge-info {
+  background: var(--color-primary-fixed);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+/* ── Prompt card border separators ───────────────────────────────────── */
+.super-admin-shell .border-t.border-slate-200,
+.super-admin-shell .border-b.border-slate-200 {
+  border-color: var(--admin-border) !important;
+}
+
+/* ── Light mode: make sure tables inside admin-card are visible ──────── */
+:root:not([data-theme='dark']) .super-admin-shell table {
+  color: #10213f;
+}
+:root:not([data-theme='dark']) .super-admin-shell table thead th {
+  color: #52627a !important;
+  background: #eef2ff !important;
+}
+:root:not([data-theme='dark']) .super-admin-shell table tbody td {
+  color: #10213f !important;
+}
+:root:not([data-theme='dark']) .super-admin-shell table tbody tr:hover {
+  background: #f1f5ff !important;
+}
+
+/* ── Dark mode explicit table overrides ──────────────────────────────── */
+:root[data-theme='dark'] .super-admin-shell table thead th {
+  background: var(--color-surface-container-high) !important;
+  color: var(--color-on-surface-variant) !important;
+}
+:root[data-theme='dark'] .super-admin-shell table tbody {
+  background: var(--admin-card) !important;
+}
+:root[data-theme='dark'] .super-admin-shell table tbody td {
+  color: var(--color-on-surface) !important;
+}
+:root[data-theme='dark'] .super-admin-shell table tbody tr:hover {
+  background: var(--color-surface-container-low) !important;
+}
+
+/* ── AI Models page: title was invisible in dark mode ────────────────── */
+:root[data-theme='dark'] .super-admin-shell h2.text-2xl,
+:root[data-theme='dark'] .super-admin-shell h1.text-2xl,
+:root[data-theme='dark'] .super-admin-shell h1.text-3xl {
+  color: var(--color-on-surface) !important;
+}
+
+/* ── Metrics card value ───────────────────────────────────────────────── */
+.metric-card-value { color: var(--color-on-surface) !important; }
+
+/* ── Subscriptions: plan feature list text ───────────────────────────── */
+.super-admin-shell .text-on-surface { color: var(--color-on-surface) !important; }
+.super-admin-shell .text-on-surface-variant { color: var(--color-on-surface-variant) !important; }

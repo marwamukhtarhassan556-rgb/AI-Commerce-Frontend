@@ -58,15 +58,15 @@ function SuperAdminFeatureCreate() {
         
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-2 text-xs font-semibold text-slate-500">
-          <Link to="/admin/subscriptions" className="hover:text-indigo-600 transition-colors">
+          <Link to="/admin/subscriptions" className="hover:text-primary transition-colors">
             Subscriptions & Plans
           </Link>
           <span className="material-symbols-outlined text-sm text-slate-400">chevron_right</span>
-          <Link to="/admin/features" className="hover:text-indigo-600 transition-colors">
+          <Link to="/admin/features" className="hover:text-primary transition-colors">
             Features
           </Link>
           <span className="material-symbols-outlined text-sm text-slate-400">chevron_right</span>
-          <span className="text-indigo-600 font-bold">Create New Feature</span>
+          <span className="text-primary font-bold">Create New Feature</span>
         </nav>
 
         {/* Page Header */}
@@ -90,7 +90,7 @@ function SuperAdminFeatureCreate() {
               type="submit"
               disabled={creating}
               form="feature-create-form"
-              className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold shadow-md shadow-indigo-600/20 hover:bg-indigo-700 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60"
+              className="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-semibold shadow-md hover:bg-primary-container active:scale-95 transition-all flex items-center gap-2 disabled:opacity-60"
             >
               {creating ? (
                 <>
@@ -120,7 +120,7 @@ function SuperAdminFeatureCreate() {
         {/* Main Form Card */}
         <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-200/80 shadow-sm space-y-6">
           <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600">
+            <div className="p-2.5 rounded-xl bg-primary-fixed text-primary">
               <span className="material-symbols-outlined text-2xl">add_box</span>
             </div>
             <div>
@@ -154,7 +154,7 @@ function SuperAdminFeatureCreate() {
                     if (validationError) setValidationError(null);
                   }}
                   placeholder="e.g. AI Smart Recommendation"
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all outline-none font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none font-medium"
                 />
               </div>
 
@@ -168,7 +168,7 @@ function SuperAdminFeatureCreate() {
                     setForm((prev) => ({ ...prev, status: e.target.value }));
                     if (validationError) setValidationError(null);
                   }}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all outline-none cursor-pointer font-medium"
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none cursor-pointer font-medium"
                 >
                   <option value="Active">Active (Enabled)</option>
                   <option value="Inactive">Inactive (Disabled)</option>
@@ -189,7 +189,7 @@ function SuperAdminFeatureCreate() {
                   if (validationError) setValidationError(null);
                 }}
                 placeholder="Explain what this feature provides to the platform users..."
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all outline-none resize-none leading-relaxed font-medium"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-900 focus:bg-white focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none resize-none leading-relaxed font-medium"
               />
             </div>
           </form>

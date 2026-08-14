@@ -1,23 +1,31 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { fetchAuditLogs } from '../../services/super-admin/adminService';
+import { fetchAuditLogs, fetchPlatformAuditLogs } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 
 function SuperAdminAuditLogs() {
+  const [activeTab, setActiveTab] = useState('ai'); // 'ai' | 'platform'
   const [logs, setLogs] = useState([]);
   const [skip, setSkip] = useState(0);
   const [limit, setLimit] = useState(50);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const loadData = async (nextSkip = skip, nextLimit = limit) => {
+  const loadData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetchAuditLogs(nextSkip, nextLimit);
-      setLogs(res || []);
+      if (activeTab === 'ai') {
+        const res = await fetchAuditLogs(skip, limit);
+        setLogs(res || []);
+      } else {
+        const pageNumber = Math.floor(skip / limit) + 1;
+        const res = await fetchPlatformAuditLogs(pageNumber, limit);
+        setLogs(res || []);
+      }
     } catch (err) {
-      setError(err.message || 'Failed to load audit logs');
+      setError(err.message || `Failed to load ${activeTab === 'ai' ? 'AI Service' : 'Platform'} audit logs`);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -41,7 +49,13 @@ function SuperAdminAuditLogs() {
 
   useEffect(() => {
     loadData();
-  }, [skip, limit]);
+  }, [activeTab, skip, limit]);
+
+  const handleTabChange = (tab) => {
+    if (tab === activeTab) return;
+    setActiveTab(tab);
+    setSkip(0);
+  };
 
   return (
     <AdminPageState loading={loading} error={error} onRetry={loadData}>
@@ -58,7 +72,9 @@ function SuperAdminAuditLogs() {
               System Audit Logs
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Security and administrative activity trail from the AI service first.
+              {activeTab === 'ai'
+                ? 'Security and administrative activity trail from the AI microservice.'
+                : 'Core platform operations and administrative activity trail from the .NET backend API.'}
             </p>
           </div>
 
@@ -97,6 +113,35 @@ function SuperAdminAuditLogs() {
           </div>
         </div>
 
+        {/* Audit Source Sub-Navbar Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-200/80 pb-3">
+          <button
+            type="button"
+            onClick={() => handleTabChange('ai')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'ai'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 dark:bg-slate-800 dark:text-slate-300'
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">auto_awesome</span>
+            AI Service Audit Logs
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabChange('platform')}
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'platform'
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 dark:bg-slate-800 dark:text-slate-300'
+            }`}
+          >
+            <span className="material-symbols-outlined text-sm">dns</span>
+            Platform (.NET) Audit Logs
+          </button>
+        </div>
+
         {/* Table Container */}
         <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
@@ -115,7 +160,7 @@ function SuperAdminAuditLogs() {
                 {logs.length > 0 ? (
                   logs.map((log) => (
                     <motion.tr 
-                      key={log.id} 
+                      key={log.id || `${log.time}-${log.activity}`} 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="hover:bg-indigo-50/30 transition-colors"
@@ -139,7 +184,7 @@ function SuperAdminAuditLogs() {
                 ) : (
                   <tr>
                     <td colSpan="6" className="py-12 text-center text-xs text-slate-400 font-medium">
-                      No audit logs found.
+                      No audit logs found for {activeTab === 'ai' ? 'AI Service' : 'Platform (.NET)'}.
                     </td>
                   </tr>
                 )}
@@ -153,4 +198,4 @@ function SuperAdminAuditLogs() {
   );
 }
 
-export default SuperAdminAuditLogs;
+export default SuperAdminAuditLogs;

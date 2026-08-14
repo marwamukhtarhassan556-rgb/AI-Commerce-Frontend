@@ -15,7 +15,7 @@ aiService.interceptors.request.use((config) => {
   return config;
 });
 
-export const fetchAiLiveness = () => aiService.get('/health/').then((response) => response.data);
+export const fetchAiLiveness = () => aiService.get('/health/', { skipAuth: true }).then((r) => r.data);
 export const fetchAiAuditLogs = (skip = 0, limit = 50) =>
   aiService.get('/api/v1/auth/audit-logs', { params: { skip, limit } }).then((response) => response.data);
 export const fetchSentimentOverview = () =>

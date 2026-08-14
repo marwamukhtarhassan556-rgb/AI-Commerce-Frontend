@@ -192,7 +192,7 @@ export default function SuperAdminAssistant() {
           onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
           placeholder="Ask about platform data, stores, AI models... (Enter to send)"
           rows={2}
-          className="flex-1 resize-none rounded-2xl bg-transparent border-0 px-3 py-3 text-sm text-[#E2E8F0] outline-none leading-6"
+          className="admin-chat-composer-input flex-1 resize-none rounded-2xl px-3 py-3 text-sm outline-none leading-6"
         />
         <button
           onClick={send}
