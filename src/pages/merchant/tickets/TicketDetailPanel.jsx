@@ -1,6 +1,8 @@
-import { Sparkles, Edit, RotateCcw, Send } from 'lucide-react';
+import { useState } from 'react';
+import { AlertTriangle, CheckCircle2, Loader2, Sparkles, Send } from 'lucide-react';
 
-export default function TicketDetailPanel({ ticket, onStatusChange, updatingStatus }) {
+export default function TicketDetailPanel({ ticket, onStatusChange, updatingStatus, onSendSuggestedResponse, onResolve, onEscalate, ticketAction }) {
+  const [escalationPriority, setEscalationPriority] = useState('high');
   if (!ticket) {
     return (
       <div className="hidden lg:flex lg:col-span-7 items-center justify-center bg-white border border-outline-variant/40 rounded-xl p-8 text-on-surface-variant">
@@ -29,11 +31,14 @@ export default function TicketDetailPanel({ ticket, onStatusChange, updatingStat
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between border-t border-outline-variant/30 pt-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant/30 pt-3">
           <span className="text-xs font-bold uppercase text-outline">Ticket status</span>
-          <select value={ticket.status || 'open'} onChange={(event) => onStatusChange(event.target.value)} disabled={updatingStatus} className="rounded-lg border border-outline-variant/50 bg-white px-3 py-1.5 text-xs font-bold text-on-surface disabled:opacity-50">
-            <option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option>
-          </select>
+          <div className="flex flex-wrap items-center justify-end gap-2"><select value={ticket.status || 'open'} onChange={(event) => onStatusChange(event.target.value)} disabled={updatingStatus || Boolean(ticketAction)} className="rounded-lg border border-outline-variant/50 bg-white px-3 py-1.5 text-xs font-bold text-on-surface disabled:opacity-50"><option value="open">Open</option><option value="in_progress">In progress</option><option value="resolved">Resolved</option><option value="closed">Closed</option></select><button type="button" onClick={onResolve} disabled={Boolean(ticketAction) || ticket.status === 'resolved'} className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50">{ticketAction === 'resolving' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}{ticketAction === 'resolving' ? 'Resolving…' : 'Resolve'}</button></div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2.5">
+          <div><p className="text-xs font-bold text-amber-900">Need human follow-up?</p><p className="text-[11px] text-amber-700">Escalate this ticket to your support workflow.</p></div>
+          <div className="flex items-center gap-2"><select value={escalationPriority} onChange={(event) => setEscalationPriority(event.target.value)} disabled={Boolean(ticketAction)} className="rounded-lg border border-amber-200 bg-white px-2 py-1.5 text-xs font-semibold text-amber-900"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="urgent">Urgent</option></select><button type="button" onClick={() => onEscalate(escalationPriority)} disabled={Boolean(ticketAction)} className="inline-flex items-center gap-1.5 rounded-lg border border-amber-500 bg-white px-3 py-1.5 text-xs font-bold text-amber-800 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50">{ticketAction === 'escalating' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <AlertTriangle className="h-3.5 w-3.5" />}{ticketAction === 'escalating' ? 'Escalating…' : 'Escalate'}</button></div>
         </div>
 
         <div className="border-t border-outline-variant/30 pt-3">
@@ -83,23 +88,10 @@ export default function TicketDetailPanel({ ticket, onStatusChange, updatingStat
           </div>
         </div>
 
-        <div className="flex justify-between items-center">
-          <div className="flex gap-2">
-            <button className="p-2 border border-outline-variant/50 rounded-lg hover:bg-surface-container-low transition-colors">
-              <Edit className="w-4 h-4 text-on-surface-variant" />
-            </button>
-            <button className="p-2 border border-outline-variant/50 rounded-lg hover:bg-surface-container-low transition-colors">
-              <RotateCcw className="w-4 h-4 text-on-surface-variant" />
-            </button>
-          </div>
-          <div className="flex gap-2">
-            <button className="px-4 py-2 border border-primary text-primary font-bold rounded-full hover:bg-primary/5 text-xs">
-              Draft Internal Note
-            </button>
-            <button className="px-4 py-2 bg-primary text-white font-bold rounded-full hover:shadow-md transition-all text-xs flex items-center gap-1.5">
-              Approve & Send <Send className="w-3.5 h-3.5" />
-            </button>
-          </div>
+        <div className="flex justify-end">
+          <button type="button" onClick={onSendSuggestedResponse} disabled={Boolean(ticketAction) || !ticket.aiSuggestion} className="px-4 py-2 bg-primary text-white font-bold rounded-full hover:shadow-md transition-all text-xs flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-50">
+            {ticketAction === 'sending' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}{ticketAction === 'sending' ? 'Sending…' : 'Approve & Send'}
+          </button>
         </div>
       </div>
 

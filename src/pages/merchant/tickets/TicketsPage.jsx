@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Ticket, TrendingUp, Star } from 'lucide-react';
 import { ticketsApi } from '../../../api/integrationApi';
+import { getUserErrorMessage } from '../../../utils/errorMessage';
 import TicketList from './TicketList';
 import TicketDetailPanel from './TicketDetailPanel';
 
@@ -50,6 +51,7 @@ export default function TicketsPage() {
   const [loading, setLoading] = useState(Boolean(storeId));
   const [error, setError] = useState(storeId ? '' : 'Select a store before viewing tickets.');
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [ticketAction, setTicketAction] = useState('');
 
   useEffect(() => {
     if (!storeId) return;
@@ -77,9 +79,43 @@ export default function TicketsPage() {
       const resolutionType = status === 'resolved' ? 'human' : status === 'closed' ? 'unresolved' : undefined;
       const { data } = await ticketsApi.updateStatus(activeTicket.id, status, resolutionType);
       setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, status }) : ticket));
-    } catch {
-      setError('Ticket status could not be updated. Check your AI service permissions and try again.');
+    } catch (error) {
+      setError(getUserErrorMessage(error, 'Ticket status could not be updated. Please try again.'));
     } finally { setUpdatingStatus(false); }
+  };
+
+  const sendSuggestedResponse = async () => {
+    if (!activeTicket?.aiSuggestion) return;
+    setTicketAction('sending'); setError('');
+    try {
+      await ticketsApi.addMessage(activeTicket.id, { sender: 'agent', content: activeTicket.aiSuggestion });
+      const sentMessage = { text: activeTicket.aiSuggestion, sender: 'Navi AI', time: new Date().toLocaleString() };
+      setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? { ...ticket, messages: [...(ticket.messages || []), sentMessage] } : ticket));
+    } catch (error) {
+      setError(getUserErrorMessage(error, 'We could not send the suggested response. Please try again.'));
+    } finally { setTicketAction(''); }
+  };
+
+  const resolveTicket = async () => {
+    if (!activeTicket) return;
+    setTicketAction('resolving'); setError('');
+    try {
+      const { data } = await ticketsApi.resolve(activeTicket.id, { resolutionType: 'human' });
+      setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, status: 'resolved' }) : ticket));
+    } catch (error) {
+      setError(getUserErrorMessage(error, 'We could not resolve this ticket. Please try again.'));
+    } finally { setTicketAction(''); }
+  };
+
+  const escalateTicket = async (priority) => {
+    if (!activeTicket) return;
+    setTicketAction('escalating'); setError('');
+    try {
+      const { data } = await ticketsApi.escalate(activeTicket.id, { priority, message: 'Escalated by the merchant.' });
+      setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, priority, status: data?.status || 'in_progress' }) : ticket));
+    } catch (error) {
+      setError(getUserErrorMessage(error, 'We could not escalate this ticket. Please try again.'));
+    } finally { setTicketAction(''); }
   };
 
   return <div className="p-6 space-y-6">
@@ -89,6 +125,6 @@ export default function TicketsPage() {
       <div className="bg-white border border-outline-variant/40 p-5 rounded-xl shadow-sm"><p className="text-xs font-medium text-on-surface-variant">Resolution Rate</p><div className="mt-2 flex items-end gap-2"><span className="text-3xl font-bold text-on-surface">{Number(resolutionRate).toFixed(1)}%</span><span className="mb-1 flex items-center text-emerald-600 text-xs font-bold"><TrendingUp className="w-3.5 h-3.5 mr-0.5" /> AI + Human</span></div></div>
       <div className="bg-white border border-outline-variant/40 p-5 rounded-xl shadow-sm flex justify-between items-center"><div><p className="text-xs font-medium text-on-surface-variant">AI Resolved</p><div className="mt-2 flex items-center gap-2"><span className="text-3xl font-bold text-on-surface">{metrics?.ai_resolved ?? 0}</span><div className="flex text-amber-400">{[...Array(5)].map((_, index) => <Star key={index} className="w-4 h-4 fill-amber-400" />)}</div></div></div><p className="text-xs text-on-surface-variant">Human: {metrics?.human_resolved ?? 0}</p></div>
     </div>
-    {loading ? <div className="rounded-xl bg-white p-8 text-center text-sm text-on-surface-variant">Loading tickets…</div> : <div className="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]"><TicketList tickets={tickets} activeTicketId={activeTicketId} onSelectTicket={setActiveTicketId} /><TicketDetailPanel ticket={activeTicket} onStatusChange={updateTicketStatus} updatingStatus={updatingStatus} /></div>}
+    {loading ? <div className="rounded-xl bg-white p-8 text-center text-sm text-on-surface-variant">Loading tickets…</div> : <div className="grid grid-cols-12 gap-4 h-[calc(100vh-280px)]"><TicketList tickets={tickets} activeTicketId={activeTicketId} onSelectTicket={setActiveTicketId} /><TicketDetailPanel ticket={activeTicket} onStatusChange={updateTicketStatus} updatingStatus={updatingStatus} onSendSuggestedResponse={sendSuggestedResponse} onResolve={resolveTicket} onEscalate={escalateTicket} ticketAction={ticketAction} /></div>}
   </div>;
 }

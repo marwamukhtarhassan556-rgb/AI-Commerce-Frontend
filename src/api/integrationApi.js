@@ -81,6 +81,18 @@ export const ticketsApi = {
   updateStatus: (ticketId, status, resolutionType) =>
     aiApi.patch(`/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
 
+  // POST /api/v1/tickets/{id}/messages
+  addMessage: (ticketId, { sender = 'agent', content }) =>
+    aiApi.post(`/tickets/${ticketId}/messages`, { sender, content }),
+
+  // POST /api/v1/tickets/{id}/resolve
+  resolve: (ticketId, { resolutionType = 'human', message = null } = {}) =>
+    aiApi.post(`/tickets/${ticketId}/resolve`, { resolution_type: resolutionType, message }),
+
+  // POST /api/v1/tickets/{id}/escalate
+  escalate: (ticketId, { priority = 'high', assignedTo = null, eta = null, message = null } = {}) =>
+    aiApi.post(`/tickets/${ticketId}/escalate`, { priority, assigned_to: assignedTo, eta, message }),
+
   // DELETE /api/v1/tickets/{id}
   delete: (ticketId) => aiApi.delete(`/tickets/${ticketId}`),
 
