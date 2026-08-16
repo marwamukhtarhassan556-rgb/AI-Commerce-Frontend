@@ -81,6 +81,18 @@ export const ticketsApi = {
   updateStatus: (ticketId, status, resolutionType) =>
     aiApi.patch(`/tickets/${ticketId}/status`, { status, resolution_type: resolutionType }),
 
+  // POST /api/v1/tickets/{id}/messages
+  addMessage: (ticketId, { sender = 'agent', content }) =>
+    aiApi.post(`/tickets/${ticketId}/messages`, { sender, content }),
+
+  // POST /api/v1/tickets/{id}/resolve
+  resolve: (ticketId, { resolutionType = 'human', message = null } = {}) =>
+    aiApi.post(`/tickets/${ticketId}/resolve`, { resolution_type: resolutionType, message }),
+
+  // POST /api/v1/tickets/{id}/escalate
+  escalate: (ticketId, { priority = 'high', assignedTo = null, eta = null, message = null } = {}) =>
+    aiApi.post(`/tickets/${ticketId}/escalate`, { priority, assigned_to: assignedTo, eta, message }),
+
   // DELETE /api/v1/tickets/{id}
   delete: (ticketId) => aiApi.delete(`/tickets/${ticketId}`),
 
@@ -196,6 +208,14 @@ export const integrationApi = {
   // DELETE /api/v1/integration/connections/{id}
   deleteConnection: (connectionId) => aiApi.delete(`/integration/connections/${connectionId}`),
 
+  // PUT /api/v1/integration/connections/{id}/mappings
+  updateMappings: (connectionId, entityMappings) =>
+    aiApi.put(`/integration/connections/${connectionId}/mappings`, { entity_mappings: entityMappings }),
+
+  // PUT /api/v1/integration/connections/{id}/credentials
+  updateCredentials: (connectionId, { authConfig, credentials }) =>
+    aiApi.put(`/integration/connections/${connectionId}/credentials`, { auth_config: authConfig, credentials }),
+
   // POST /api/v1/integration/connections/{id}/sync
   syncConnection: (connectionId, entityTypes = []) =>
     aiApi.post(`/integration/connections/${connectionId}/sync`, { entity_types: entityTypes }),
@@ -253,6 +273,20 @@ export const analyticsApi = {
   // GET /api/v1/analytics/sentiment-summary
   getSentimentSummary: (storeId) =>
     aiApi.get('/analytics/sentiment-summary', { params: { store_id: storeId } }),
+
+  // GET /api/v1/analytics/ai-usage
+  getAIUsage: (storeId) =>
+    aiApi.get('/analytics/ai-usage', { params: { store_id: storeId } }),
+
+  // GET /api/v1/analytics/ai-usage/daily-message-limit
+  getDailyMessageLimit: () => aiApi.get('/analytics/ai-usage/daily-message-limit'),
+
+  // PUT /api/v1/analytics/ai-usage/consumer-limit
+  updateConsumerDailyLimit: (limit) =>
+    aiApi.put('/analytics/ai-usage/consumer-limit', { consumer_daily_message_limit: limit }),
+
+  // GET /api/v1/analytics/ai-usage/subscription-plan
+  getSubscriptionPlan: () => aiApi.get('/analytics/ai-usage/subscription-plan'),
 };
 
 // ── Knowledge Base ───────────────────────────────────────────────────
@@ -308,6 +342,17 @@ export const knowledgeApi = {
   // POST /api/v1/knowledge-base/summary
   generateSummary: (storeId, model = 'gemini-2.0-flash-001') =>
     aiApi.post(`/knowledge-base/summary?store_id=${storeId}`, { model, temperature: 0.3, max_tokens: 2048 }),
+
+  // POST /api/v1/knowledge-base/summary/regenerate
+  regenerateSummary: () => aiApi.post('/knowledge-base/summary/regenerate'),
+
+  // GET /api/v1/knowledge-base/summaries/history
+  getSummaryHistory: (page = 1, pageSize = 10) =>
+    aiApi.get('/knowledge-base/summaries/history', { params: { page, page_size: pageSize } }),
+
+  // POST /api/v1/knowledge-base/search/hybrid
+  hybridSearch: ({ query, storeId, organizationId, topK = 10 }) =>
+    aiApi.post('/knowledge-base/search/hybrid', { query, store_id: storeId, organization_id: organizationId, top_k: topK, use_hybrid: true }),
 
   // GET /api/v1/knowledge-base/jobs/{job_id}
   getJobStatus: (jobId) => aiApi.get(`/knowledge-base/jobs/${jobId}`),

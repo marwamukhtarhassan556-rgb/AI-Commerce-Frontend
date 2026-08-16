@@ -36,18 +36,20 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/40 backdrop-blur-sm transition-opacity">
-      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white border-l border-outline-variant/40 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm">
+      <div
+        className="overflow-hidden rounded-2xl bg-white border border-outline-variant/40 shadow-2xl flex flex-col"
+        style={{ width: 'min(760px, calc(100vw - 2rem))', maxHeight: '90vh', flexShrink: 0 }}
+      >
           
           {/* Header */}
           <div className="p-6 border-b border-outline-variant/30 flex items-center justify-between bg-surface-container-low">
             <div>
               <h3 className="text-lg font-bold text-on-surface">
-                {product ? 'Edit Product' : 'Add New Product'}
+                {product ? 'Product details' : 'Product details'}
               </h3>
               <p className="text-xs text-on-surface-variant">
-                {product ? `SKU: ${product.sku || 'LM-204-W'}` : 'Fill in product details below'}
+                {product ? `SKU: ${product.sku || product.id || 'Not available'}` : 'Product information'}
               </p>
             </div>
             <button
@@ -247,7 +249,6 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
           </div>
 
         </div>
-      </div>
     </div>
   );
 }

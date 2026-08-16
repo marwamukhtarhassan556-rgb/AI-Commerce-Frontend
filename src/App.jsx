@@ -19,10 +19,12 @@ import CatalogPage from './pages/merchant/catalog/CatalogPage';
 import TicketsPage from './pages/merchant/tickets/TicketsPage';
 import StoreSettingsPage from './pages/merchant/store/StoreSettingsPage';
 import KnowledgeBasePage from './pages/merchant/knowledge/KnowledgeBasePage';
+import IntegrationPage from './pages/merchant/integration/IntegrationPage';
 import CheckoutSuccessPage from './pages/checkout/CheckoutSuccessPage';
 import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
 import ProfilePage from './pages/merchant/profile/ProfilePage';
+import AIUsagePage from './pages/merchant/usage/AIUsagePage';
 
 import SuperAdminDashboard from './pages/super-admin/SuperAdminDashboard';
 import SuperAdminDiagnostics from './pages/super-admin/SuperAdminDiagnostics';
@@ -110,8 +112,10 @@ function App() {
           <Route path="/merchant/tickets" element={<TicketsPage />} />
           <Route path="/merchant/store" element={<StoreSettingsPage />} />
           <Route path="/merchant/knowledge" element={<KnowledgeBasePage />} />
+          <Route path="/merchant/integrations" element={<IntegrationPage />} />
           <Route path="/merchant/subscription" element={<SubscriptionDetailsPage />} />
           <Route path="/merchant/profile" element={<ProfilePage />} />
+          <Route path="/merchant/ai-usage" element={<AIUsagePage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}
