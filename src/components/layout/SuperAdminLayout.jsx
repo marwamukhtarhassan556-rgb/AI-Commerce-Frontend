@@ -14,10 +14,10 @@ function getHeaderConfig(pathname) {
   if (pathname.startsWith('/admin/subscriptions'))   return { title: 'Subscriptions & Plans' };
   if (pathname.startsWith('/admin/models-health'))   return { title: 'AI Models & Health' };
   if (pathname.startsWith('/admin/prompts'))         return { title: 'Prompt Manager' };
-  if (pathname.startsWith('/admin/bundles'))         return { title: 'Bundle Promos' };
+  //if (pathname.startsWith('/admin/bundles'))         return { title: 'Bundle Promos' };
   if (pathname.startsWith('/admin/diagnostics'))     return { title: 'AI Analytics' };
   if (pathname.startsWith('/admin/audit-logs'))      return { title: 'Audit Logs' };
-  if (pathname.startsWith('/admin/assistant'))       return { title: 'Navi Assistant' };
+  //if (pathname.startsWith('/admin/assistant'))       return { title: 'Navi Assistant' };
   // if (pathname.startsWith('/admin/settings'))        return { title: 'Settings' };
   if (pathname.startsWith('/admin/plan-details'))    return { title: 'Plan Details' };
   return { title: 'Admin Panel' };

@@ -5,10 +5,10 @@ export const adminNavItems = [
   { id: 'features',      label: 'Features',            icon: 'extension',              path: '/admin/features' },
   { id: 'models',        label: 'AI Models & Health',  icon: 'smart_toy',              path: '/admin/models-health' },
   { id: 'prompts',       label: 'Prompt Manager',      icon: 'edit_note',              path: '/admin/prompts' },
-  { id: 'bundles',       label: 'Bundle Promos',       icon: 'redeem',                 path: '/admin/bundles' },
+ // { id: 'bundles',       label: 'Bundle Promos',       icon: 'redeem',                 path: '/admin/bundles' },
   { id: 'diagnostics',   label: 'AI Analytics',        icon: 'analytics',              path: '/admin/diagnostics' },
   { id: 'audit',         label: 'Audit Logs',          icon: 'receipt_long',           path: '/admin/audit-logs' },
-  { id: 'assistant',     label: 'Navi Assistant',      icon: 'forum',                  path: '/admin/assistant' },
+ // { id: 'assistant',     label: 'Navi Assistant',      icon: 'forum',                  path: '/admin/assistant' },
   // { id: 'settings',      label: 'Settings',            icon: 'settings',               path: '/admin/settings' },
 ];
 

@@ -58,7 +58,7 @@ function SuperAdminAuditLogs() {
   };
 
   return (
-    <AdminPageState loading={loading} error={error} onRetry={loadData}>
+    <AdminPageState loading={loading} error={null} onRetry={loadData}>
       <motion.div 
         initial={{ opacity: 0, y: 10 }} 
         animate={{ opacity: 1, y: 0 }} 
@@ -141,6 +141,23 @@ function SuperAdminAuditLogs() {
             Platform (.NET) Audit Logs
           </button>
         </div>
+
+        {/* Friendly Error Warning Banner */}
+        {error && (
+          <div className="p-4 rounded-xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-medium flex items-center justify-between gap-3 shadow-sm dark:bg-amber-950/40 dark:border-amber-800/60 dark:text-amber-200">
+            <div className="flex items-center gap-2.5">
+              <span className="material-symbols-outlined text-lg text-amber-600 dark:text-amber-400">warning</span>
+              <span>{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={loadData}
+              className="px-3 py-1.5 rounded-lg bg-amber-200/80 hover:bg-amber-300 text-amber-900 font-bold transition-all text-xs dark:bg-amber-800 dark:text-amber-100 shrink-0"
+            >
+              Retry
+            </button>
+          </div>
+        )}
 
         {/* Table Container */}
         <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm overflow-hidden">

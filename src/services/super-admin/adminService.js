@@ -337,8 +337,18 @@ export async function fetchAuditLogs(skip = 0, limit = 50) {
     const logs = await fetchAiAuditLogs(skip, limit);
     return mapAuditLogs(logs);
   } catch (err) {
-    console.warn('AI audit logs failed:', err);
-    throw err;
+    const status = err.response?.status;
+    let message = 'Failed to fetch AI audit logs.';
+    if (status === 500) {
+      message = 'AI Microservice on Railway returned (500 Internal Server Error). The AI backend database or server handler encountered an internal error.';
+    } else if (status === 401 || status === 403) {
+      message = 'Unauthorized (401/403). AI service session token is invalid or expired.';
+    } else if (err.message) {
+      message = `AI Microservice Error: ${err.message}`;
+    }
+    const errorObj = new Error(message);
+    errorObj.status = status;
+    throw errorObj;
   }
 }
 
