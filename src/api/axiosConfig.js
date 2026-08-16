@@ -114,7 +114,11 @@ aiApi.interceptors.request.use((config) => {
 aiApi.interceptors.response.use(
   (res) => res,
   async (error) => {
-    console.error('[AI Service Error]', error.response?.status, error.response?.data);
+    // Suppress expected errors (404 Not Found, 422 Validation) to avoid console noise
+    const status = error.response?.status;
+    if (status !== 404 && status !== 422) {
+      console.error('[AI Service Error]', status, error.response?.data);
+    }
     prepareUserError(error);
     return retryAfterRefresh(error, aiApi);
   }

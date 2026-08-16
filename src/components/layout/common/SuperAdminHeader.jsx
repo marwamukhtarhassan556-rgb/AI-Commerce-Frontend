@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ADMIN_AVATAR } from './SuperAdminNav';
 import { fetchAiLiveness } from '../../../api/aiService';
-import { resolveProfilePicture } from '../../../utils/profilePicture';
+import { resolveProfilePicture, fetchAndUpdateProfile } from '../../../utils/profilePicture';
 import ThemeToggle from '../../ui/ThemeToggle';
 
 function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null }) {
@@ -33,6 +33,10 @@ function SuperAdminHeader({ title, searchPlaceholder = null, onMenuToggle = null
     const refreshProfile = () => {
       try { setAdminProfile(JSON.parse(localStorage.getItem('merchantProfile') || '{}')); } catch { setAdminProfile({}); }
     };
+    refreshProfile();
+    fetchAndUpdateProfile().then((profile) => {
+      if (profile) setAdminProfile(profile);
+    });
     window.addEventListener('merchant-profile-updated', refreshProfile);
     return () => {
       clearInterval(interval);

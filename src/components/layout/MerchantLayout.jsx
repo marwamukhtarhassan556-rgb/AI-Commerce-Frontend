@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../merchant/Sidebar';
 import TopBar from '../merchant/TopBar';
+import { fetchAndUpdateProfile } from '../../utils/profilePicture';
 
 export default function MerchantLayout() {
+  useEffect(() => {
+    fetchAndUpdateProfile();
+  }, []);
+
   return (
     <div className="merchant-shell flex min-h-screen">
       {/* Sidebar ثابت على الشمال */}

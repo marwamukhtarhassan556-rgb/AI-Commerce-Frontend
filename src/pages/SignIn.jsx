@@ -67,12 +67,15 @@ const SignIn = () => {
           localStorage.removeItem('currentStoreId');
         }
         const user = response.data.user || response.data.profile || {};
+        const profilePic = response.data.profilePictureUrl || response.data.profile_picture_url || response.data.profilePicture || user.profilePictureUrl || user.profile_picture_url || user.profilePicture || user.avatarUrl || user.avatar || '';
         localStorage.setItem('merchantProfile', JSON.stringify({
           firstName: response.data.firstName || response.data.first_name || user.firstName || user.first_name || '',
           lastName: response.data.lastName || response.data.last_name || user.lastName || user.last_name || '',
           name: response.data.name || user.name || [response.data.firstName || response.data.first_name || user.firstName || user.first_name || '', response.data.lastName || response.data.last_name || user.lastName || user.last_name || ''].filter(Boolean).join(' ') || '',
           email: response.data.email || user.email || formData.email,
+          profilePictureUrl: profilePic,
         }));
+        window.dispatchEvent(new Event('merchant-profile-updated'));
         const role = normalizeRole(
           response.data.role || decodeToken(accessToken)?.role || localStorage.getItem('userRole') || 'seller',
         );
@@ -98,8 +101,8 @@ const SignIn = () => {
   };
 
   const handleGoogleSignIn = () => {
-    // توجيه المستخدم لمسار Google OAuth الخاص بالباك إند
-    window.location.href = `${api.defaults.baseURL}/api/auth/google`;
+    const currentOrigin = window.location.origin;
+    window.location.href = `${api.defaults.baseURL}/api/auth/google?redirectUrl=${encodeURIComponent(currentOrigin)}`;
   };
 
   return (

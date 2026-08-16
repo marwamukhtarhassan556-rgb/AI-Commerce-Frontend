@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { fetchSubscriptions, fetchPlans } from '../../services/super-admin/adminService';
+import { fetchSubscriptions, fetchPlans, deletePlan } from '../../services/super-admin/adminService';
 import AdminPageState from '../../components/ui/AdminPageState';
 import axios from 'axios';
 
@@ -33,7 +33,6 @@ function SuperAdminSubscriptions() {
     loadData();
   }, []);
 
-  // دالة حذف البلان المربوطة بالـ API الفعلي
   const handleDeletePlan = async (planId) => {
     if (!window.confirm('Are you sure you want to delete this plan?')) {
       return;
@@ -41,13 +40,7 @@ function SuperAdminSubscriptions() {
 
     setDeletingId(planId);
     try {
-      const token = localStorage.getItem('token') || localStorage.getItem('accessToken');
-      const headers = { Authorization: `Bearer ${token}` };
-
-      // إرسال طلب الحذف للـ API الأساسي (مع مراعاة الـ Base URL أو الرابط كاملاً حسب إعدادات الـ Axios لديك)
-      await axios.delete(`https://aisales123.runasp.net/api/admin/plans/${planId}`, { headers });
-
-      // تحديث القائمة محلياً بعد نجاح الحذف من السيرفر
+      await deletePlan(planId);
       setPlans((prevPlans) => prevPlans.filter((p) => p.id !== planId));
     } catch (err) {
       alert(err.response?.data?.message || err.message || 'Failed to delete the plan.');

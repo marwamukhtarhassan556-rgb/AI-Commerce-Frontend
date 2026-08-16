@@ -41,25 +41,35 @@ function SuperAdminMerchants() {
     setDrawerOpen(true);
   };
 
-  // دالة تغيير حالة المتجر عبر الـ Endpoint الجديدة
   const handleStatusChange = async (storeId, newStatus, e) => {
-    e.stopPropagation(); // لمنع فتح الـ Drawer عند اختيار القائمة المنسدلة
+    if (e?.stopPropagation) e.stopPropagation();
+    if (e?.preventDefault) e.preventDefault();
     setUpdatingId(storeId);
     setActionError(null);
 
     try {
-      // إرسال البيانات بالشكل المطلوب حسب الـ Schema: { status, reason }
       await updateStoreStatus(storeId, {
         status: newStatus,
         reason: 'Updated by super admin from merchants list'
       });
 
-      // تحديث الحالة محلياً في الستايت لكي تظهر النتيجة فوراً دون الحاجة لإعادة تحميل الصفحة
+      // Update state locally so result shows immediately without reload
       setMerchants((prev) =>
-        prev.map((m) => (m.id === storeId ? { ...m, status: newStatus } : m))
+        prev.map((m) => (m.id === storeId ? { ...m, status: newStatus.charAt(0).toUpperCase() + newStatus.slice(1).toLowerCase() } : m))
       );
     } catch (err) {
-      setActionError(err.message || 'Failed to update store status');
+      // Log full error details to browser console for debugging
+      console.error('[updateStoreStatus] failed:', {
+        storeId,
+        newStatus,
+        httpStatus: err?.cause?.response?.status,
+        responseData: err?.cause?.response?.data,
+        message: err.message,
+      });
+      const msg = err.message || 'Failed to update store status';
+      setActionError(msg);
+      // Auto-dismiss error after 6 seconds
+      setTimeout(() => setActionError(null), 6000);
     } finally {
       setUpdatingId('');
     }
@@ -145,9 +155,14 @@ function SuperAdminMerchants() {
 
         {/* Action Error Alert */}
         {actionError && (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700 font-medium flex items-center gap-2 shadow-sm">
-            <span className="material-symbols-outlined text-lg text-rose-500">error</span>
-            {actionError}
+          <div className="rounded-2xl border border-rose-200 bg-rose-50/80 px-4 py-3 text-sm text-rose-700 font-medium flex items-center justify-between gap-2 shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-lg text-rose-500">error</span>
+              <span>{actionError}</span>
+            </div>
+            <button type="button" onClick={() => setActionError(null)} className="text-rose-400 hover:text-rose-700 transition-colors">
+              <span className="material-symbols-outlined text-base">close</span>
+            </button>
           </div>
         )}
 

@@ -1,3 +1,5 @@
+import { profileApi } from '../api/profileApi';
+
 const BACKEND_URL = import.meta.env.VITE_MAIN_API_URL || 'https://aisales123.runasp.net';
 
 export const resolveProfilePicture = (value) => {
@@ -13,4 +15,20 @@ export const saveMerchantProfile = (updates = {}) => {
   localStorage.setItem('merchantProfile', JSON.stringify(profile));
   window.dispatchEvent(new Event('merchant-profile-updated'));
   return profile;
+};
+
+export const fetchAndUpdateProfile = async () => {
+  if (!localStorage.getItem('token')) return null;
+  try {
+    const { data } = await profileApi.get();
+    if (!data) return null;
+    return saveMerchantProfile({
+      firstName: data.firstName || data.first_name || '',
+      lastName: data.lastName || data.last_name || '',
+      email: data.email || '',
+      profilePictureUrl: data.profilePictureUrl || data.profile_picture_url || '',
+    });
+  } catch {
+    return null;
+  }
 };

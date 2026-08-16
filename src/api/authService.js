@@ -6,19 +6,28 @@ const normalizeMerchantProfile = (profile = {}) => {
   const lastName = profile.lastName || profile.last_name || '';
   const name = profile.name || [firstName, lastName].filter(Boolean).join(' ') || '';
   const email = profile.email || profile.userEmail || '';
+  const profilePictureUrl = profile.profilePictureUrl || profile.profile_picture_url || profile.profilePicture || profile.avatarUrl || profile.avatar || '';
 
   return {
     firstName,
     lastName,
     name,
     email,
+    profilePictureUrl,
   };
 };
 
 const saveMerchantProfile = (profile = {}) => {
   const normalizedProfile = normalizeMerchantProfile(profile);
-  localStorage.setItem('merchantProfile', JSON.stringify(normalizedProfile));
-  return normalizedProfile;
+  let current = {};
+  try { current = JSON.parse(localStorage.getItem('merchantProfile') || '{}'); } catch { /* ignore */ }
+  const merged = { ...current, ...normalizedProfile };
+  if (!normalizedProfile.profilePictureUrl && current.profilePictureUrl) {
+    merged.profilePictureUrl = current.profilePictureUrl;
+  }
+  localStorage.setItem('merchantProfile', JSON.stringify(merged));
+  window.dispatchEvent(new Event('merchant-profile-updated'));
+  return merged;
 };
 
 const firstDefined = (...values) =>

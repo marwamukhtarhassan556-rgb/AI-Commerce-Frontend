@@ -156,14 +156,54 @@ export async function fetchStoreById(storeId) {
 }
 
 export async function updateStoreStatus(storeId, statusOrData, reason = 'Updated by Super Admin') {
-  // دعم الطريقتين: سواء اتبعتت كـ Object أو كـ قيم منفصلة
-  const payload = 
+  const payload =
     typeof statusOrData === 'object' && statusOrData !== null
-      ? statusOrData 
+      ? statusOrData
       : { status: statusOrData, reason };
 
-  const response = await api.patch(`/api/admin/stores/${storeId}/status`, payload);
-  return response.data;
+  // .NET backends typically expect PascalCase enum values (Active / Inactive / Suspended)
+  if (payload.status && typeof payload.status === 'string') {
+    const s = payload.status.trim().toLowerCase();
+    payload.status = s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  // Try PATCH, then POST, then PUT (to bypass WebDAV / CORS HTTP verb restrictions on IIS hosting)
+  const methods = [
+    () => api.patch(`/api/admin/stores/${storeId}/status`, payload),
+    () => api.post(`/api/admin/stores/${storeId}/status`, payload),
+    () => api.put(`/api/admin/stores/${storeId}/status`, payload),
+  ];
+
+  let lastErr = null;
+  for (const method of methods) {
+    try {
+      const response = await method();
+      return response.data;
+    } catch (err) {
+      lastErr = err;
+      const httpStatus = err?.response?.status;
+      if (httpStatus === 422 || httpStatus === 400) {
+        const fallbackPayload = { ...payload, status: payload.status?.toLowerCase() };
+        try {
+          const response = await api.post(`/api/admin/stores/${storeId}/status`, fallbackPayload);
+          return response.data;
+        } catch { /* ignore */ }
+      }
+    }
+  }
+
+  const patchErr = lastErr;
+  const httpStatus = patchErr?.response?.status;
+  const msg =
+    patchErr?.response?.data?.message ||
+    patchErr?.response?.data?.title ||
+    patchErr?.response?.data?.detail ||
+    (Array.isArray(patchErr?.response?.data?.errors)
+      ? Object.values(patchErr.response.data.errors).flat().join(', ')
+      : null) ||
+    patchErr?.message ||
+    `Store status update failed (HTTP ${httpStatus ?? 'unknown'})`;
+  throw new Error(msg);
 }
 
 // ============================================================================

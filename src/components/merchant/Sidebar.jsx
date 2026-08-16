@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import BrandLogo from '../BrandLogo';
+import { resolveProfilePicture, fetchAndUpdateProfile } from '../../utils/profilePicture';
 import { 
   LayoutDashboard, 
   Package, 
@@ -25,6 +27,26 @@ const navItems = [
 ];
 
 const Sidebar = () => {
+  const [merchantProfile, setMerchantProfile] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('merchantProfile') || '{}'); } catch { return {}; }
+  });
+
+  useEffect(() => {
+    const refreshProfile = () => {
+      try { setMerchantProfile(JSON.parse(localStorage.getItem('merchantProfile') || '{}')); } catch { setMerchantProfile({}); }
+    };
+    refreshProfile();
+    fetchAndUpdateProfile().then((profile) => {
+      if (profile) setMerchantProfile(profile);
+    });
+    window.addEventListener('merchant-profile-updated', refreshProfile);
+    return () => window.removeEventListener('merchant-profile-updated', refreshProfile);
+  }, []);
+
+  const merchantName = [merchantProfile.firstName, merchantProfile.lastName].filter(Boolean).join(' ') || merchantProfile.name || merchantProfile.email || 'Merchant';
+  const merchantInitials = merchantName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'M';
+  const profilePicture = resolveProfilePicture(merchantProfile.profilePictureUrl || '');
+
   return (
     <aside className="fixed h-full w-70 left-0 top-0 bg-surface-container-low border-r border-outline-variant z-50 hidden lg:flex flex-col py-6">
       {/* Header */}
@@ -59,9 +81,15 @@ const Sidebar = () => {
       {/* User Profile Footer */}
       <div className="mt-auto px-4">
         <NavLink to="/merchant/profile" className="flex items-center gap-3 rounded-xl bg-surface-container-highest/50 p-4 transition hover:bg-surface-container-high">
-          <UserCircle className="w-8 h-8 text-primary" />
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-on-surface">{(() => { try { const profile = JSON.parse(localStorage.getItem('merchantProfile') || '{}'); return [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.name || profile.email || 'Merchant'; } catch { return 'Merchant'; } })()}</span>
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-indigo-600 text-xs font-bold text-white">
+            {profilePicture ? (
+              <img src={profilePicture} alt="" className="h-full w-full object-cover" />
+            ) : (
+              merchantInitials
+            )}
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="truncate text-xs font-bold text-on-surface">{merchantName}</span>
             <span className="text-[10px] uppercase tracking-wider text-outline">Manage Account</span>
           </div>
         </NavLink>

@@ -4,7 +4,8 @@ import { Link } from 'react-router-dom';
 import { analyticsApi, integrationApi, storesApi, subscriptionsApi, ticketsApi } from '../../api/integrationApi';
 import { normalizeSubscription } from './subscription/subscriptionStatus';
 import LogoutButton from '../LogoutButton';
-import { resolveProfilePicture } from '../../utils/profilePicture';
+import { profileApi } from '../../api/profileApi';
+import { resolveProfilePicture, saveMerchantProfile } from '../../utils/profilePicture';
 import { getUserErrorMessage } from '../../utils/errorMessage';
 
 const normalizeStores = (data) => Array.isArray(data) ? data : data?.items || data?.data?.items || data?.data || data?.result?.items || data?.result || [];
@@ -32,6 +33,20 @@ export default function TopBar() {
       try { setMerchantProfile(JSON.parse(localStorage.getItem('merchantProfile') || '{}')); } catch { setMerchantProfile({}); }
     };
     window.addEventListener('merchant-profile-updated', refreshProfile);
+
+    if (localStorage.getItem('token')) {
+      profileApi.get().then(({ data }) => {
+        if (!data) return;
+        const updated = saveMerchantProfile({
+          firstName: data.firstName || data.first_name || '',
+          lastName: data.lastName || data.last_name || '',
+          email: data.email || '',
+          profilePictureUrl: data.profilePictureUrl || data.profile_picture_url || '',
+        });
+        if (updated) setMerchantProfile(updated);
+      }).catch(() => { /* silent fallback */ });
+    }
+
     return () => window.removeEventListener('merchant-profile-updated', refreshProfile);
   }, []);
 
@@ -62,18 +77,20 @@ export default function TopBar() {
     const loadNotifications = async () => {
       setNotificationsLoading(true);
       try {
-        const { data } = await ticketsApi.list({ storeId: currentStoreId, pageSize: 20 });
-        const tickets = normalizeTickets(data).slice(0, 20);
-        const results = await Promise.all(tickets.map(async (ticket) => {
-          const ticketId = ticket.id || ticket.ticket_id;
-          if (!ticketId) return { items: [], unread: 0 };
-          const response = await ticketsApi.listNotifications(ticketId, { unreadOnly: true, limit: 10 });
-          const items = response.data?.items || [];
-          return { items, unread: Number(response.data?.unread ?? items.length) };
-        }));
+        const { data } = await ticketsApi.list({ storeId: currentStoreId, pageSize: 50 });
+        const tickets = normalizeTickets(data);
         if (!mounted) return;
-        setNotifications(results.flatMap((result) => result.items).sort((first, second) => new Date(second.created_at) - new Date(first.created_at)).slice(0, 20));
-        setUnreadNotifications(results.reduce((total, result) => total + result.unread, 0));
+        // Show open/in-progress tickets as notifications
+        const openTickets = tickets.filter((t) => t.status === 'open' || t.status === 'in_progress');
+        const mapped = openTickets.slice(0, 20).map((t) => ({
+          id: t.id || t.ticket_id,
+          message: t.summary || t.category || 'New ticket',
+          created_at: t.created_at || t.analyzed_at,
+          priority: t.priority,
+          status: t.status,
+        }));
+        setNotifications(mapped);
+        setUnreadNotifications(openTickets.length);
       } catch {
         if (mounted) { setNotifications([]); setUnreadNotifications(0); }
       } finally { if (mounted) setNotificationsLoading(false); }
@@ -116,7 +133,7 @@ export default function TopBar() {
     <div className="ml-auto flex shrink-0 items-center gap-1 text-slate-400">
       {subscription?.isTrialing && <Link to="/merchant/subscription" className={`hidden items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold sm:inline-flex ${subscription.remainingDays <= 1 ? 'bg-amber-100 text-amber-800 ring-1 ring-amber-300' : 'bg-blue-100 text-blue-700 ring-1 ring-blue-200'}`}><Clock3 className="h-3.5 w-3.5" />Trial · {subscription.remainingDays} {subscription.remainingDays === 1 ? 'day' : 'days'} left</Link>}
       {subscription?.isExpired && <Link to="/onboarding?step=3" className="hidden items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-bold text-white sm:inline-flex"><Clock3 className="h-3.5 w-3.5" />Trial ended · Choose plan</Link>}
-      <div className="relative hidden sm:block"><button type="button" onClick={() => setIsNotificationsOpen((open) => !open)} aria-label="Ticket notifications" className="relative rounded-full p-2 hover:bg-slate-50"><Bell className="h-5 w-5" />{unreadNotifications > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{unreadNotifications > 99 ? '99+' : unreadNotifications}</span>}</button>{isNotificationsOpen && <div className="absolute right-0 top-11 z-50 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"><div className="flex items-center justify-between border-b border-slate-100 px-4 py-3"><p className="text-sm font-bold text-slate-900">Ticket notifications</p><Link to="/merchant/tickets" onClick={() => setIsNotificationsOpen(false)} className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">View tickets</Link></div><div className="max-h-80 overflow-y-auto">{notificationsLoading ? <div className="flex justify-center p-6"><Loader2 className="h-5 w-5 animate-spin text-indigo-600" /></div> : notifications.length ? notifications.map((notification) => <Link key={notification.id} to="/merchant/tickets" onClick={() => setIsNotificationsOpen(false)} className="block border-b border-slate-100 px-4 py-3 last:border-0 hover:bg-slate-50"><p className="text-sm font-medium text-slate-800">{notification.message}</p><p className="mt-1 text-xs text-slate-400">{notificationTime(notification.created_at || notification.eta)}</p></Link>) : <p className="px-4 py-8 text-center text-sm text-slate-500">No unread ticket notifications.</p>}</div></div>}</div>
+      <div className="relative hidden sm:block"><button type="button" onClick={() => setIsNotificationsOpen((open) => !open)} aria-label="Open tickets" className="relative rounded-full p-2 hover:bg-slate-50"><Bell className="h-5 w-5" />{unreadNotifications > 0 && <span className="absolute right-0 top-0 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">{unreadNotifications > 99 ? '99+' : unreadNotifications}</span>}</button>{isNotificationsOpen && <div className="absolute right-0 top-11 z-50 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl"><div className="flex items-center justify-between border-b border-slate-100 px-4 py-3"><p className="text-sm font-bold text-slate-900">Open Tickets</p><Link to="/merchant/tickets" onClick={() => setIsNotificationsOpen(false)} className="text-xs font-semibold text-indigo-600 hover:text-indigo-700">View all</Link></div><div className="max-h-80 overflow-y-auto">{notificationsLoading ? <div className="flex justify-center p-6"><Loader2 className="h-5 w-5 animate-spin text-indigo-600" /></div> : notifications.length ? notifications.map((notification) => <Link key={notification.id} to="/merchant/tickets" onClick={() => setIsNotificationsOpen(false)} className="flex items-start gap-3 border-b border-slate-100 px-4 py-3 last:border-0 hover:bg-slate-50"><span className={`mt-0.5 inline-flex h-2 w-2 shrink-0 rounded-full ${notification.priority === 'urgent' || notification.priority === 'p1' ? 'bg-rose-500' : notification.priority === 'high' || notification.priority === 'p2' ? 'bg-amber-500' : 'bg-indigo-400'}`} /><div className="min-w-0 flex-1"><p className="truncate text-sm font-medium text-slate-800">{notification.message}</p><p className="mt-0.5 text-xs text-slate-400">{notification.priority ? `${notification.priority} · ` : ''}{notificationTime(notification.created_at)}</p></div></Link>) : <p className="px-4 py-8 text-center text-sm text-slate-500">No open tickets 🎉</p>}</div></div>}</div>
       <div className="hidden border-l border-slate-100 pl-3 text-right lg:block"><p className="max-w-40 truncate text-sm font-bold text-slate-900">{merchantName}</p><p className="text-[10px] text-slate-400">MANAGE ACCOUNT</p></div><div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-indigo-600 text-sm font-bold text-white">{merchantProfile.profilePictureUrl ? <img src={resolveProfilePicture(merchantProfile.profilePictureUrl)} alt="" className="h-full w-full object-cover" /> : merchantInitials}</div><LogoutButton variant="ghost" className="px-2 py-2 text-xs" />
     </div>
   </header>;

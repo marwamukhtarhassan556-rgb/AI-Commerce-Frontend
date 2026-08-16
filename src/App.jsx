@@ -4,6 +4,7 @@ import RegisterPage from './pages/Register';
 import RegisterStep2Page from './pages/RegisterStep2';
 import RegisterStep3Page from './pages/RegisterStep3';
 import SignInPage from './pages/SignIn';
+import GoogleAuthCallback from './pages/GoogleAuthCallback';
 import ForgotPasswordPage from './pages/ForgotPassword';
 import ResetPasswordPage from './pages/ResetPassword';
 import VerifyEmailPage from './pages/VerifyEmail';
@@ -82,6 +83,10 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+        {/* Google OAuth Callback — backend redirects here after Google login */}
+        <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+        <Route path="/auth/callback" element={<GoogleAuthCallback />} />
 
         {/* 🔹 صفحات Onboarding و Diagnostic المربوطة بـ ProtectedRoute 🔹 */}
         <Route path="/onboarding" element={<OnboardingFlow />} />
