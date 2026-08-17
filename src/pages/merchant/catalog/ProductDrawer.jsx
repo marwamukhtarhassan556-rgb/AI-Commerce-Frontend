@@ -6,11 +6,13 @@ import { getUserErrorMessage } from '../../../utils/errorMessage';
 export default function ProductDrawer({ isOpen, onClose, product, storeId, onDiscountUpdated }) {
   const [maxAllowedDiscount, setMaxAllowedDiscount] = useState('0');
   const [discountError, setDiscountError] = useState('');
+  const [discountSaved, setDiscountSaved] = useState(false);
   const [savingDiscount, setSavingDiscount] = useState(false);
 
   useEffect(() => {
     setMaxAllowedDiscount(product?.maxAllowedDiscount ?? product?.max_allowed_discount ?? 0);
     setDiscountError('');
+    setDiscountSaved(false);
   }, [product]);
 
   if (!isOpen) return null;
@@ -24,10 +26,12 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
 
     setSavingDiscount(true);
     setDiscountError('');
+    setDiscountSaved(false);
     try {
       const { data } = await productsApi.updateMaxDiscount(product.id, storeId, discount);
       setMaxAllowedDiscount(data?.maxAllowedDiscount ?? discount);
       onDiscountUpdated?.(product.id, data?.maxAllowedDiscount ?? discount);
+      setDiscountSaved(true);
     } catch (error) {
       setDiscountError(getUserErrorMessage(error, 'We could not update the allowed discount. Please try again.'));
     } finally {
@@ -36,10 +40,15 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-950/45 p-4 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 bg-slate-950/45 backdrop-blur-sm"
+      style={{ display: 'grid', placeItems: 'start center', overflow: 'hidden', padding: '5rem 1rem 1rem' }}
+      onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}
+    >
       <div
         className="overflow-hidden rounded-2xl bg-white border border-outline-variant/40 shadow-2xl flex flex-col"
-        style={{ width: 'min(760px, calc(100vw - 2rem))', maxHeight: '90vh', flexShrink: 0 }}
+        style={{ width: 'min(760px, calc(100vw - 2rem))', maxHeight: 'calc(100dvh - 6rem)', flexShrink: 0 }}
+        onMouseDown={(event) => event.stopPropagation()}
       >
           
           {/* Header */}
@@ -192,6 +201,7 @@ export default function ProductDrawer({ isOpen, onClose, product, storeId, onDis
                 </button>
               </div>
               {discountError && <p id="max-discount-help" className="mt-2 text-xs text-error">{discountError}</p>}
+              {discountSaved && <p className="mt-2 text-xs font-medium text-emerald-700">Maximum discount saved successfully.</p>}
             </div>
 
             {/* Status Select */}
