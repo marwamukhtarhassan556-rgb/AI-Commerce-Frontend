@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Bot, FileJson2, KeyRound, Loader2, RefreshCw, Save, Trash2, Upload } from 'lucide-react';
+import YAML from 'yaml';
 import { integrationApi } from '../../../api/integrationApi';
 import { getUserErrorMessage } from '../../../utils/errorMessage';
 
@@ -54,13 +55,21 @@ export default function IntegrationPage() {
     setReport(null);
     try {
       const contents = await file.text();
-      const parsedSpec = JSON.parse(contents);
+      let parsedSpec = null;
+      try {
+        parsedSpec = JSON.parse(contents);
+      } catch {
+        parsedSpec = YAML.parse(contents);
+      }
+      if (!parsedSpec || typeof parsedSpec !== 'object') {
+        throw new Error('Invalid file content');
+      }
       setRawSpec(parsedSpec);
       setFileName(file.name);
     } catch {
       setRawSpec(null);
       setFileName('');
-      setMessage('Please upload a valid OpenAPI JSON file. YAML support can be added when its parser is available.');
+      setMessage('Please upload a valid OpenAPI JSON or YAML (.yaml / .yml) file.');
     } finally {
       event.target.value = '';
     }
