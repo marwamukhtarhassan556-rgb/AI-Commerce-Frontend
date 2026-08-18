@@ -114,9 +114,9 @@ aiApi.interceptors.request.use((config) => {
 aiApi.interceptors.response.use(
   (res) => res,
   async (error) => {
-    // Suppress expected errors (404 Not Found, 422 Validation) to avoid console noise
+    // Suppress expected errors (404 Not Found, 409 Conflict Limit, 422 Validation) to avoid console noise
     const status = error.response?.status;
-    if (status !== 404 && status !== 422) {
+    if (status !== 404 && status !== 422 && status !== 409) {
       console.error('[AI Service Error]', status, error.response?.data);
     }
     prepareUserError(error);

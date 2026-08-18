@@ -159,11 +159,11 @@ export default function IntegrationPage() {
       <section className="rounded-2xl border border-outline-variant/40 bg-white p-6 shadow-sm">
         <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
           <label className="block text-sm font-semibold">Platform name<input value={platformName} onChange={(event) => setPlatformName(event.target.value)} placeholder="e.g. Shopify or Custom API" className="mt-2 w-full rounded-xl border border-outline-variant px-3 py-2.5 text-sm" /></label>
-          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary px-4 py-2.5 text-sm font-bold text-primary hover:bg-blue-50"><Upload className="h-4 w-4" />Upload OpenAPI JSON<input type="file" accept="application/json,.json" className="hidden" onChange={selectFile} /></label>
+          <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-primary px-4 py-2.5 text-sm font-bold text-primary hover:bg-blue-50"><Upload className="h-4 w-4" />Upload OpenAPI (JSON / YAML)<input type="file" accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml" className="hidden" onChange={selectFile} /></label>
         </div>
 
         <div className="mt-5 rounded-xl bg-surface-container-low p-4">
-          <div className="flex items-center gap-3"><FileJson2 className="h-5 w-5 text-primary" /><div><p className="text-sm font-bold">{fileName || 'No schema selected'}</p><p className="text-xs text-on-surface-variant">{rawSpec ? 'Ready for AI analysis.' : 'Export your OpenAPI specification as a JSON file, then upload it here.'}</p></div></div>
+          <div className="flex items-center gap-3"><FileJson2 className="h-5 w-5 text-primary" /><div><p className="text-sm font-bold">{fileName || 'No schema selected'}</p><p className="text-xs text-on-surface-variant">{rawSpec ? 'Ready for AI analysis.' : 'Export your OpenAPI specification as a JSON or YAML file, then upload it here.'}</p></div></div>
         </div>
 
         <button type="button" disabled={!rawSpec || loading} onClick={analyzeSchema} className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-50">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}{loading ? 'Analyzing schema…' : 'Analyze with AI'}</button>

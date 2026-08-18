@@ -23,7 +23,7 @@ const mapTicket = (ticket) => {
   }));
   return {
     ...ticket,
-    id: ticket.id || ticket.ticket_id,
+    id: ticket.ticket_id || ticket.id,
     code: ticket.ticket_id || ticket.id,
     priority: titleCase(ticket.priority),
     title: titleCase(ticket.category || 'Support request'),
