@@ -26,6 +26,7 @@ import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
 import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
 import ProfilePage from './pages/merchant/profile/ProfilePage';
 import AIUsagePage from './pages/merchant/usage/AIUsagePage';
+import BundlesPage from './pages/merchant/bundles/BundlesPage';
 
 import SuperAdminDashboard from './pages/super-admin/SuperAdminDashboard';
 import SuperAdminDiagnostics from './pages/super-admin/SuperAdminDiagnostics';
@@ -121,6 +122,7 @@ function App() {
           <Route path="/merchant/subscription" element={<SubscriptionDetailsPage />} />
           <Route path="/merchant/profile" element={<ProfilePage />} />
           <Route path="/merchant/ai-usage" element={<AIUsagePage />} />
+          <Route path="/merchant/bundles" element={<BundlesPage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}

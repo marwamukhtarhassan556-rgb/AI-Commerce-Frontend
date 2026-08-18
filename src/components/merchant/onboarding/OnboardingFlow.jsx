@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Atom, Braces, Check, ChevronLeft, Code2, Component, Copy, FileJson, FileText, HelpCircle, Loader2, Sparkles, Triangle, Upload, X } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, Code2, Copy, FileJson, FileText, HelpCircle, Loader2, Sparkles, Upload, X } from 'lucide-react';
 import { parse as parseYaml } from 'yaml';
 import api, { refreshAccessToken } from '../../../api/axiosConfig';
 import { contactApi, integrationApi, knowledgeApi, subscriptionsApi } from '../../../api/integrationApi';
@@ -9,6 +9,14 @@ import { getUserErrorMessage } from '../../../utils/errorMessage';
 import WidgetAccessPanel from '../../merchant/WidgetAccessPanel';
 
 const initialStore = { name: '', description: '', platform: 'custom', shopDomain: '', ecommerceEmail: '', ecommercePassword: '', currency: 'USD', language: 'en', timezone: 'UTC' };
+const ONBOARDING_STATE_KEY = 'merchantOnboardingState';
+
+const savedOnboardingState = () => {
+  try {
+    const state = JSON.parse(localStorage.getItem(ONBOARDING_STATE_KEY) || '{}');
+    return state && typeof state === 'object' ? state : {};
+  } catch { return {}; }
+};
 
 const messageFor = (error, fallback) => getUserErrorMessage(error, fallback);
 
@@ -74,18 +82,26 @@ export default function OnboardingFlow() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedStep = Number(searchParams.get('step'));
-  const [step, setStep] = useState(() => ([3, 4, 5, 6, 7, 8].includes(requestedStep) ? requestedStep : 3));
-  const [store, setStore] = useState(initialStore);
+  const [step, setStep] = useState(() => {
+    const saved = savedOnboardingState();
+    return [3, 4, 5, 6, 7, 8].includes(requestedStep) ? requestedStep : ([3, 4, 5, 6, 7, 8].includes(saved.step) ? saved.step : 3);
+  });
+  const [store, setStore] = useState(() => ({ ...initialStore, ...savedOnboardingState().store, ecommercePassword: '' }));
   const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(() => savedOnboardingState().selectedPlan || null);
   const [trialStatus, setTrialStatus] = useState(null);
   const [hasUsedFreeTrial, setHasUsedFreeTrial] = useState(null);
   const [loading, setLoading] = useState(false);
   const [plansLoading, setPlansLoading] = useState(false);
-  const [integrationProgress, setIntegrationProgress] = useState({ schema: false, policies: false, widget: false });
+  const [integrationProgress, setIntegrationProgress] = useState(() => ({ schema: false, policies: false, widget: false, ...savedOnboardingState().integrationProgress }));
   const [integrationLoading, setIntegrationLoading] = useState({ schema: false, policies: false });
   const [developerModalOpen, setDeveloperModalOpen] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const { ecommercePassword, ...safeStore } = store;
+    localStorage.setItem(ONBOARDING_STATE_KEY, JSON.stringify({ step, store: safeStore, selectedPlan, integrationProgress }));
+  }, [step, store, selectedPlan, integrationProgress]);
 
   useEffect(() => {
     if (!localStorage.getItem('token') || requestedStep === 1 || requestedStep === 2) {
@@ -207,16 +223,10 @@ export default function OnboardingFlow() {
       const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
-      const accessToken = localStorage.getItem('token');
-      if (!accessToken) throw new Error('Your session is missing an access token. Please sign in again.');
-      const { data } = await integrationApi.agentSync({
-        platform_name: platformName,
-        raw_spec: rawSpec,
-        store_id: storeId,
-        name: `${platformName} connection`,
-        credentials: { Authorization: `Bearer ${accessToken}` },
-        auto_sync: true,
-      });
+      // Schema upload must only validate and analyze the document. agent-sync
+      // also tries to call the merchant API immediately, which fails before
+      // store-specific credentials are configured.
+      const { data } = await integrationApi.parseSchema(platformName, rawSpec);
       if (data?.error || data?.user_friendly_error) throw new Error(data.user_friendly_error || data.error);
       setIntegrationProgress((current) => ({ ...current, schema: true }));
     } catch (requestError) {
@@ -252,7 +262,7 @@ export default function OnboardingFlow() {
       {step === 5 && <SchemaGuideStep onBack={back} onContinue={() => setStep(6)} onAskDeveloper={() => setDeveloperModalOpen(true)} />}
       {step === 6 && <SchemaUploadStep complete={integrationProgress.schema} loading={integrationLoading.schema} onBack={back} onUpload={uploadSchema} onContinue={() => setStep(7)} />}
       {step === 7 && <PoliciesUploadStep complete={integrationProgress.policies} loading={integrationLoading.policies} onBack={back} onUpload={uploadPolicies} onContinue={() => setStep(8)} />}
-      {step === 8 && <WidgetSetupStep onBack={back} onFinish={() => navigate('/merchant/dashboard')} />}
+      {step === 8 && <WidgetSetupStep onBack={back} onFinish={() => { localStorage.removeItem(ONBOARDING_STATE_KEY); navigate('/merchant/dashboard'); }} />}
     </section>
     {selectedPlan && <PlanModal plan={selectedPlan} trialStatus={trialStatus} hasUsedFreeTrial={hasUsedFreeTrial} loading={loading} onClose={() => { setSelectedPlan(null); setError(''); }} onStartFreeTrial={startFreeTrial} onCheckout={createCheckoutSession} />}
     {developerModalOpen && <DeveloperModal plans={plans} store={store} onClose={() => setDeveloperModalOpen(false)} />}
@@ -265,24 +275,24 @@ function Back({ onClick }) { return <button type="button" onClick={onClick} clas
 function Fields({ fields, value, onChange }) { return <div className="space-y-4">{fields.map(([name, label, type, autoComplete]) => <label key={name} className="block text-sm font-medium text-slate-700">{label}<input required name={name} type={type} autoComplete={autoComplete} value={value[name]} onChange={onChange} className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2.5 outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600" /></label>)}</div>; }
 function PlansStep({ plans, trialStatus, loading, onSelect, onCreateStore, onBack }) { const trialMessage = trialStatus?.remainingDays > 0 ? `${trialStatus.remainingDays} day(s) remaining` : trialStatus?.trialEndDate ? 'Your trial ends today' : 'Your trial is active'; return <div><Back onClick={onBack} /><h1 className="text-2xl font-bold">Choose a subscription plan</h1><p className="mt-2 mb-3 text-sm text-slate-500">Select a plan to view its complete details.</p>{trialStatus?.isTrialing && <div className="mb-6 flex flex-col gap-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 sm:flex-row sm:items-center sm:justify-between"><div><b>Free trial active</b><p className="mt-1">{trialMessage}{trialStatus.remainingDays > 0 && trialStatus.trialEndDate ? `, ending ${new Date(trialStatus.trialEndDate).toLocaleDateString()}` : ''}.</p></div><button type="button" onClick={onCreateStore} disabled={loading} className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60">Build your store</button></div>}{trialStatus?.isActive && <div className="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900"><b>Active subscription</b><p className="mt-1">Your current plan is {trialStatus.planName || 'active'}.</p></div>}{trialStatus?.isExpired && <div className="mb-6 rounded-xl border border-slate-300 bg-slate-50 p-4 text-sm text-slate-900"><b>Your free trial has ended</b><p className="mt-1">Choose a plan to continue using paid features.</p></div>}{loading ? <div className="flex justify-center py-12"><Loader2 className="animate-spin text-blue-600" /></div> : <div className="grid gap-3">{plans.map((plan) => <button type="button" key={plan.id} onClick={() => onSelect(plan)} className="rounded-xl border border-slate-200 p-4 text-left transition hover:border-blue-600 hover:shadow-sm"><div className="flex items-start justify-between gap-4"><h2 className="font-bold">{plan.planName}</h2><span className="font-semibold text-blue-600">${plan.planPrice}/mo</span></div><p className="mt-2 text-sm text-slate-500">{(plan.numOfTokens || 0).toLocaleString()} tokens</p><ul className="mt-3 space-y-1 text-sm text-slate-600">{(plan.features || []).slice(0, 3).map((feature) => <li key={feature.featureId} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-blue-600" />{feature.featureName}</li>)}</ul></button>)}{!plans.length && <p className="py-8 text-center text-sm text-slate-500">No subscription plans are available right now.</p>}</div>}</div>; }
 function PlanModal({ plan, trialStatus, hasUsedFreeTrial, loading, onClose, onStartFreeTrial, onCheckout }) { const eligibilityKnown = hasUsedFreeTrial !== null; const canStartTrial = eligibilityKnown && !hasUsedFreeTrial && trialStatus?.canStartTrial !== false; const hasSubscription = trialStatus && !canStartTrial; return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"><div className="onboarding-plan-modal max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"><button type="button" onClick={onClose} className="float-right rounded p-1 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button><h2 className="text-2xl font-bold">{plan.planName}</h2><p className="mt-2 text-slate-600">{plan.planDescription}</p><div className="mt-5 rounded-lg bg-slate-50 p-4 text-sm"><b>{(plan.numOfTokens || 0).toLocaleString()} tokens</b></div><h3 className="mt-5 font-semibold">Included features</h3><div className="mt-3 space-y-3">{(plan.features || []).map((feature) => <div key={feature.featureId} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" /><div><p className="text-sm font-medium">{feature.featureName}</p><p className="text-xs text-slate-500">{feature.featureDescription}</p></div></div>)}</div>{canStartTrial ? <Button className="mt-6" loading={loading} onClick={onStartFreeTrial}>Start Free Trial</Button> : <p className="mt-6 rounded-lg bg-slate-100 p-3 text-sm text-slate-700">{!eligibilityKnown ? 'Checking free-trial eligibility…' : hasSubscription ? 'Your account already has a trial or subscription. Choose a plan below to pay.' : 'Free trial is not available for this account.'}</p>}<button type="button" disabled={loading} onClick={onCheckout} className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-lg border border-blue-600 px-4 py-2.5 text-sm font-semibold text-blue-600 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60">Continue to Checkout</button></div></div>; }
-function StoreStep({ value, onChange, onSubmit, loading, onBack }) { return <form onSubmit={onSubmit} autoComplete="off"><Back onClick={onBack} /><h1 className="text-2xl font-bold">Create your store</h1><p className="mt-2 mb-6 text-sm text-slate-500">Add your store details and the login credentials for your own e-commerce platform.</p><Fields fields={[['name', 'Store Name', 'text', 'off'], ['description', 'Description', 'text', 'off'], ['shopDomain', 'Website Domain', 'text', 'url'], ['ecommerceEmail', 'Your e-commerce admin email', 'email', 'off'], ['ecommercePassword', 'Your e-commerce admin password', 'password', 'new-password'], ['currency', 'Currency', 'text', 'off'], ['language', 'Language', 'text', 'off'], ['timezone', 'Timezone', 'text', 'off']]} value={value} onChange={onChange} /><p className="mt-3 text-xs text-slate-500">Enter only your domain, for example <b>mystore.com</b> — you do not need to add https://. Use the email and password you use to access your own store platform. These are not your Navi account credentials and are never saved in the browser.</p><Button className="mt-6" loading={loading} type="submit">Create Store</Button></form>; }
+function StoreStep({ value, onChange, onSubmit, loading, onBack }) {
+  const [showSystemAccountHelp, setShowSystemAccountHelp] = useState(false);
+  return <form onSubmit={onSubmit} autoComplete="off"><Back onClick={onBack} /><h1 className="text-2xl font-bold">Create your store</h1><p className="mt-2 mb-6 text-sm text-slate-500">Add your store details and the login credentials for your own e-commerce platform.</p>
+    <Fields fields={[['name', 'Store Name', 'text', 'off'], ['description', 'Description', 'text', 'off'], ['shopDomain', 'Website Domain', 'text', 'url']]} value={value} onChange={onChange} />
+    <div className="mt-5 rounded-xl border border-blue-100 bg-blue-50/60 p-4"><div className="mb-3 flex items-center justify-between gap-3"><div><p className="text-sm font-semibold text-slate-900">System account credentials</p><p className="mt-0.5 text-xs text-slate-500">The login used to access your own store system.</p></div><button type="button" onClick={() => setShowSystemAccountHelp(true)} className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-white text-blue-600 transition hover:bg-blue-100" aria-label="Why we need system account access"><HelpCircle className="h-4 w-4" /></button></div><Fields fields={[['ecommerceEmail', 'System account email', 'email', 'off'], ['ecommercePassword', 'System account password', 'password', 'new-password']]} value={value} onChange={onChange} /></div>
+    <div className="mt-4"><Fields fields={[['currency', 'Currency', 'text', 'off'], ['language', 'Language', 'text', 'off'], ['timezone', 'Timezone', 'text', 'off']]} value={value} onChange={onChange} /></div>
+    <p className="mt-3 text-xs text-slate-500">Enter only your domain, for example <b>mystore.com</b> — you do not need to add https://. These are not your Navi account credentials and are never saved in the browser.</p><Button className="mt-6" loading={loading} type="submit">Create Store</Button>
+    {showSystemAccountHelp && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowSystemAccountHelp(false); }}><div className="rounded-2xl bg-white p-6 shadow-2xl" style={{ width: 'min(640px, calc(100vw - 2rem))', maxHeight: 'calc(100dvh - 2rem)', overflowY: 'auto', flexShrink: 0 }} onMouseDown={(event) => event.stopPropagation()}><div className="flex items-start justify-between gap-4"><div><h2 className="text-xl font-bold text-slate-900">Why we need system account access</h2><p className="mt-4 text-sm leading-6 text-slate-600">To enable the full AI experience, we need access to your store data (products, categories, orders, and more) so the assistant can understand your business and provide accurate responses.</p></div><button type="button" onClick={() => setShowSystemAccountHelp(false)} className="rounded-lg p-1 text-slate-500 hover:bg-slate-100"><X className="h-5 w-5" /></button></div><div className="mt-5 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-900"><p className="font-semibold">Your data is safe with us:</p><ul className="mt-2 list-disc space-y-1 pl-5"><li>We only use it to provide AI features.</li><li>We do not modify your store or affect your existing system.</li><li>You can use a separate system for your AI assistant as long as it contains the required data.</li></ul></div><p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">⚠️ Without the required access, some features may not work properly because the AI will not be able to retrieve the needed information.</p><button type="button" onClick={() => setShowSystemAccountHelp(false)} className="mt-5 inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">I understand</button></div></div>}
+  </form>;
+}
 function StepHeading({ icon: Icon, eyebrow, title, copy, action }) { return <div className="integration-single-step"><div className="integration-step-heading"><div className="integration-step-heading__copy"><span className="integration-step-heading__eyebrow"><Icon className="h-4 w-4" />{eyebrow}</span><h1>{title}</h1><p>{copy}</p></div>{action && <div className="integration-step-heading__action">{action}</div>}</div></div>; }
 function SchemaGuideStep({ onBack, onContinue, onAskDeveloper }) { const [copied, setCopied] = useState(false); const copyPrompt = async () => { try { await navigator.clipboard.writeText(OPENAPI_SCHEMA_PROMPT); setCopied(true); window.setTimeout(() => setCopied(false), 1800); } catch { setCopied(false); } }; return <div><Back onClick={onBack} /><StepHeading icon={Sparkles} eyebrow="Integration · 1 of 4" title="Generate your OpenAPI schema" copy="Copy this ready-made prompt into ChatGPT, Claude, or Copilot. Add only your real store API details, then save the generated result as a YAML or JSON file." action={<button type="button" onClick={onAskDeveloper} className="rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600">Ask for Developer</button>} /><div className="mt-6 grid gap-4 md:grid-cols-3">{[['1', 'Copy the prompt', 'Use the prompt below to ask an AI tool for a valid OpenAPI 3.0.3 file.'], ['2', 'Give real details', 'Paste your real API URL, endpoints, login request, and response samples.'], ['3', 'Save and upload', 'Save the result as .yaml, .yml, or .json. The next page is the actual upload step.']].map(([number, title, copy]) => <div key={number} className="rounded-xl border border-slate-200 bg-slate-50 p-5"><span className="text-2xl font-extrabold text-blue-600">{number}</span><h2 className="mt-3 font-bold text-slate-900">{title}</h2><p className="mt-1 text-sm leading-6 text-slate-500">{copy}</p></div>)}</div><div className="schema-prompt-card mt-6"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2>OpenAPI schema generation prompt</h2><p>Ready to copy — no GitHub page required.</p></div><button type="button" onClick={copyPrompt} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white"><Copy className="h-4 w-4" />{copied ? 'Prompt copied' : 'Copy prompt'}</button></div><pre>{OPENAPI_SCHEMA_PROMPT}</pre></div><Button className="mt-5" onClick={onContinue}>Continue to upload schema <ArrowRight className="h-4 w-4" /></Button></div>; }
 function SchemaUploadStep({ complete, loading, onBack, onUpload, onContinue }) { return <div><Back onClick={onBack} /><StepHeading icon={FileJson} eyebrow="Integration · 2 of 4" title="Upload OpenAPI schema" copy="Upload the YAML file you generated. We will analyze the endpoints, create the connection, and start the first sync." /><div className="mt-6 rounded-2xl border border-dashed border-blue-200 bg-blue-50/50 p-8 text-center"><FileJson className="mx-auto h-10 w-10 text-blue-600" /><h2 className="mt-4 font-bold text-slate-900">OpenAPI 3.0 file</h2><p className="mt-2 text-sm text-slate-500">Accepted formats: .yaml, .yml, and .json</p><div className="mt-5 flex justify-center"><FilePicker accept=".json,.yaml,.yml,application/json,application/yaml,text/yaml" loading={loading} label={complete ? 'Upload another schema' : 'Choose schema file'} onChange={onUpload} /></div>{complete && <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"><Check className="h-4 w-4" />Schema analyzed and connection started.</p>}</div><Button className="mt-6" disabled={!complete} onClick={onContinue}>Continue to policies <ArrowRight className="h-4 w-4" /></Button></div>; }
 function PoliciesUploadStep({ complete, loading, onBack, onUpload, onContinue }) { return <div><Back onClick={onBack} /><StepHeading icon={FileText} eyebrow="Integration · 3 of 4" title="Add store knowledge" copy="Give the assistant your return policy, shipping details, FAQs, and product guides so it can answer customers accurately." /><div className="mt-6 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/40 p-8 text-center"><FileText className="mx-auto h-10 w-10 text-indigo-600" /><h2 className="mt-4 font-bold text-slate-900">Policies and FAQs</h2><p className="mt-2 text-sm text-slate-500">Accepted formats: PDF, DOCX, CSV, and TXT</p><div className="mt-5 flex justify-center"><FilePicker accept=".pdf,.docx,.csv,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/csv" loading={loading} label={complete ? 'Upload another document' : 'Choose a document'} onChange={onUpload} /></div>{complete && <p className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-emerald-700"><Check className="h-4 w-4" />Document uploaded and processing started.</p>}</div><Button className="mt-6" disabled={!complete} onClick={onContinue}>Continue to widget setup <ArrowRight className="h-4 w-4" /></Button></div>; }
-const widgetFrameworks = [
-  { id: 'react', name: 'React', icon: Atom, file: 'public/widget.js', detail: 'Use the project root index.html.' },
-  { id: 'angular', name: 'Angular', icon: Component, file: 'src/assets/widget.js', detail: 'Use src/index.html.' },
-  { id: 'vanilla', name: 'Vanilla JS', icon: Braces, file: 'widget.js beside index.html', detail: 'Use your main index.html.' },
-  { id: 'vue', name: 'Vue', icon: Triangle, file: 'public/widget.js', detail: 'Use the project root index.html.' },
-];
-
 function WidgetSetupStep({ onBack, onFinish }) {
-  const [framework, setFramework] = useState('');
-  return <div><Back onClick={onBack} /><StepHeading icon={Code2} eyebrow="Integration · 4 of 4" title="Install your storefront widget" copy="Choose the framework your store uses. We will show you exactly where to put the widget file and the matching installation code." />
-    <div className="widget-framework-grid mt-6">{widgetFrameworks.map((item) => { const Icon = item.icon; const selected = framework === item.id; return <button key={item.id} type="button" onClick={() => setFramework(item.id)} className={`widget-framework-card ${selected ? 'is-selected' : ''}`}><Icon className="h-7 w-7" /><span>{item.name}</span><small>{item.file}</small><em>{item.detail}</em></button>; })}</div>
-    {framework ? <div className="mt-6"><p className="widget-framework-selected">Selected: <b>{widgetFrameworks.find((item) => item.id === framework)?.name}</b>. Complete the three steps below.</p><WidgetAccessPanel framework={framework} /></div> : <p className="mt-5 rounded-xl border border-dashed border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">Choose your framework to see the correct file path and installation code.</p>}
-    <Button className="mt-6" disabled={!framework} onClick={onFinish}>Open Merchant Dashboard <ArrowRight className="h-4 w-4" /></Button></div>;
+  return <div><Back onClick={onBack} /><StepHeading icon={Code2} eyebrow="Integration · 4 of 4" title="Install your storefront widget" copy="Create a secure widget key, then copy one script into your store HTML. The same script works with any framework." />
+    <div className="mt-6"><WidgetAccessPanel /></div>
+    <Button className="mt-6" onClick={onFinish}>Open Merchant Dashboard <ArrowRight className="h-4 w-4" /></Button></div>;
 }
 
 function FilePicker({ accept, loading, label, onChange }) { return <label className={`inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-lg border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-50 ${loading ? 'pointer-events-none opacity-60' : ''}`}><Upload className="h-4 w-4" />{loading ? 'Working…' : label}<input className="sr-only" type="file" accept={accept} onChange={(event) => { void onChange(event.target.files?.[0]); event.target.value = ''; }} /></label>; }

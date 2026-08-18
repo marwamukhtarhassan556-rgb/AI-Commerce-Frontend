@@ -54,6 +54,7 @@ export default function TicketDetailPanel({ ticket, onStatusChange, updatingStat
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/20">
+                {!ticket.recentOrders?.length && <tr><td colSpan="4" className="px-3 py-4 text-center text-xs text-on-surface-variant">No recent orders are linked to this customer.</td></tr>}
                 {ticket.recentOrders?.map((order) => (
                   <tr key={order.id} className={order.status === 'Delivered' ? 'opacity-60' : ''}>
                     <td className="py-2.5 px-3 font-bold">{order.id}</td>
@@ -83,16 +84,14 @@ export default function TicketDetailPanel({ ticket, onStatusChange, updatingStat
 
         <div className="bg-surface-container-low p-4 rounded-xl border border-primary/20 mb-4 relative">
           <p className="text-xs text-on-surface leading-relaxed">"{ticket.aiSuggestion}"</p>
-          <div className="absolute -bottom-2 -right-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded">
+          {typeof ticket.matchPercentage === 'number' && <div className="absolute -bottom-2 -right-2 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded">
             {ticket.matchPercentage}% Match
-          </div>
+          </div>}
         </div>
 
-        <div className="flex justify-end">
-          <button type="button" onClick={onSendSuggestedResponse} disabled={Boolean(ticketAction) || !ticket.aiSuggestion} className="px-4 py-2 bg-primary text-white font-bold rounded-full hover:shadow-md transition-all text-xs flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-50">
-            {ticketAction === 'sending' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}{ticketAction === 'sending' ? 'Sending…' : 'Approve & Send'}
-          </button>
-        </div>
+        <div className="flex flex-col items-end gap-2"><p className="text-xs text-on-surface-variant">This sends the suggested reply directly to the customer conversation.</p><button type="button" onClick={onSendSuggestedResponse} disabled={Boolean(ticketAction) || !ticket.aiSuggestion} className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-on-primary-fixed-variant hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50">
+            {ticketAction === 'sending' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="w-4 h-4" />}{ticketAction === 'sending' ? 'Sending reply…' : 'Send AI reply to customer'}
+          </button></div>
       </div>
 
       {/* 3. Conversation History */}

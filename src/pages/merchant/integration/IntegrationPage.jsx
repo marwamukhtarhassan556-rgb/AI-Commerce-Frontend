@@ -147,7 +147,7 @@ export default function IntegrationPage() {
         <p className="mt-1 text-sm text-on-surface-variant">Upload an OpenAPI schema and let AI identify endpoints, entities, and setup notes.</p>
       </div>
 
-      {message && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600" role="alert">{message}</p>}
+      {message && <p className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700" role="status">{message}</p>}
 
       <section className="overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-sm">
         <div className="flex flex-col gap-3 border-b border-outline-variant/30 p-5 sm:flex-row sm:items-center sm:justify-between"><div><h3 className="text-lg font-bold">Your connections</h3><p className="mt-1 text-sm text-on-surface-variant">Sync your data or update the connection details when your store API changes.</p></div><button type="button" onClick={loadConnections} disabled={connectionsLoading} className="inline-flex items-center justify-center gap-2 rounded-lg border border-outline-variant px-3 py-2 text-xs font-bold hover:bg-surface-container-low disabled:opacity-50"><RefreshCw className={`h-4 w-4 ${connectionsLoading ? 'animate-spin' : ''}`} />Refresh</button></div>
