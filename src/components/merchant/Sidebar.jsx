@@ -11,6 +11,7 @@ import {
   PlugZap,
   CreditCard,
   BarChart3,
+  Gift,
   UserCircle 
 } from 'lucide-react';
 
@@ -23,6 +24,7 @@ const navItems = [
   { name: 'Integrations', path: '/merchant/integrations', icon: PlugZap },
   { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
   { name: 'AI Usage', path: '/merchant/ai-usage', icon: BarChart3 },
+  { name: 'Bundles', path: '/merchant/bundles', icon: Gift },
   { name: 'Profile', path: '/merchant/profile', icon: UserCircle },
 ];
 
