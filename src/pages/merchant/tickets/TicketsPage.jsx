@@ -10,11 +10,12 @@ const titleCase = (value = '') => value ? `${value.charAt(0).toUpperCase()}${val
 const mapTicket = (ticket) => {
   const customer = ticket.customer || {};
   const customerName = [customer.first_name, customer.last_name].filter(Boolean).join(' ') || customer.email || 'Customer';
-  const recentOrders = (ticket.recent_orders || []).map((order) => ({
-    id: order.id,
-    date: order.created_at ? new Date(order.created_at).toLocaleDateString() : '—',
-    amount: `${order.currency || ''} ${Number(order.total_price || 0).toFixed(2)}`.trim(),
-    status: titleCase(order.financial_status),
+  const orderRows = ticket.recent_orders || ticket.recentOrders || ticket.orders || ticket.customer?.recent_orders || ticket.customer?.recentOrders || ticket.customer?.orders || ticket.context?.recent_orders || ticket.context?.recentOrders || ticket.context?.orders || ticket.customer_context?.recent_orders || ticket.customer_context?.recentOrders || ticket.customer_context?.orders || ticket.metadata?.recent_orders || ticket.metadata?.orders || [];
+  const recentOrders = (Array.isArray(orderRows) ? orderRows : orderRows.items || orderRows.data || []).map((order, index) => ({
+    id: order.id || order.order_id || order.orderId || order.order_number || order.orderNumber || `Order ${index + 1}`,
+    date: order.created_at || order.createdAt || order.order_date || order.orderDate || order.date ? new Date(order.created_at || order.createdAt || order.order_date || order.orderDate || order.date).toLocaleDateString() : '—',
+    amount: `${order.currency || order.currency_code || order.currencyCode || ''} ${Number(order.total_price ?? order.total ?? order.total_amount ?? order.totalAmount ?? order.amount ?? order.grand_total ?? 0).toFixed(2)}`.trim(),
+    status: titleCase(order.financial_status || order.financialStatus || order.status || order.order_status || order.orderStatus || order.payment_status || order.paymentStatus),
   }));
   const messages = (ticket.conversation?.recent_messages || []).map((message) => ({
     text: message.content || message.text || String(message),
