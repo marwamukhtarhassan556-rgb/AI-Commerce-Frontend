@@ -17,14 +17,27 @@ const mapTicket = (ticket) => {
     amount: `${order.currency || order.currency_code || order.currencyCode || ''} ${Number(order.total_price ?? order.total ?? order.total_amount ?? order.totalAmount ?? order.amount ?? order.grand_total ?? 0).toFixed(2)}`.trim(),
     status: titleCase(order.financial_status || order.financialStatus || order.status || order.order_status || order.orderStatus || order.payment_status || order.paymentStatus),
   }));
-  const messages = (ticket.conversation?.recent_messages || []).map((message) => ({
-    text: message.content || message.text || String(message),
-    sender: message.sender_name || message.role || customerName,
-    time: message.created_at ? new Date(message.created_at).toLocaleString() : '',
-  }));
+  const rawMessages = (Array.isArray(ticket.messages) && ticket.messages.length)
+    ? ticket.messages
+    : (ticket.conversation?.recent_messages || []);
+  const messages = (Array.isArray(rawMessages) ? rawMessages : []).map((message) => {
+    if (typeof message === 'string') {
+      return { text: message, sender: 'customer', time: '' };
+    }
+    return {
+      text: message.content || message.text || message.message || String(message || ''),
+      sender: message.sender || message.sender_name || message.role || customerName,
+      time: message.created_at || message.createdAt ? new Date(message.created_at || message.createdAt).toLocaleString() : '',
+    };
+  });
+  const rawSuggested = ticket.suggested_response || ticket.suggestedResponse || ticket.ai_suggestion || ticket.aiSuggestion;
+  const aiSuggestion = (typeof rawSuggested === 'string' && rawSuggested.trim()) ? rawSuggested.trim() : '';
+
   return {
     ...ticket,
-    id: ticket.ticket_id || ticket.id,
+    id: ticket.id || ticket.ticket_id,
+    mongo_id: ticket.id,
+    ticket_id: ticket.ticket_id || ticket.id,
     code: ticket.ticket_id || ticket.id,
     priority: titleCase(ticket.priority),
     title: titleCase(ticket.category || 'Support request'),
@@ -37,7 +50,7 @@ const mapTicket = (ticket) => {
     lifetimeValue: '—',
     timeAgo: ticket.updated_at ? new Date(ticket.updated_at).toLocaleString() : '',
     unassigned: !ticket.customer_id,
-    aiSuggestion: ticket.suggested_response || 'No AI suggestion is available for this ticket.',
+    aiSuggestion,
     matchPercentage: null,
     recentOrders,
     messages,
@@ -78,7 +91,8 @@ export default function TicketsPage() {
     setUpdatingStatus(true); setError('');
     try {
       const resolutionType = status === 'resolved' ? 'human' : status === 'closed' ? 'unresolved' : undefined;
-      const { data } = await ticketsApi.updateStatus(activeTicket.id, status, resolutionType);
+      const targetId = activeTicket.mongo_id || activeTicket.id;
+      const { data } = await ticketsApi.updateStatus(targetId, status, resolutionType);
       setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, status }) : ticket));
     } catch (error) {
       setError(getUserErrorMessage(error, 'Ticket status could not be updated. Please try again.'));
@@ -89,7 +103,8 @@ export default function TicketsPage() {
     if (!activeTicket?.aiSuggestion) return;
     setTicketAction('sending'); setError('');
     try {
-      await ticketsApi.addMessage(activeTicket.id, { sender: 'agent', content: activeTicket.aiSuggestion });
+      const targetId = activeTicket.ticket_id || activeTicket.id;
+      await ticketsApi.addMessage(targetId, { sender: 'agent', content: activeTicket.aiSuggestion });
       const sentMessage = { text: activeTicket.aiSuggestion, sender: 'Navi AI', time: new Date().toLocaleString() };
       setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? { ...ticket, messages: [...(ticket.messages || []), sentMessage] } : ticket));
     } catch (error) {
@@ -101,7 +116,8 @@ export default function TicketsPage() {
     if (!activeTicket) return;
     setTicketAction('resolving'); setError('');
     try {
-      const { data } = await ticketsApi.resolve(activeTicket.id, { resolutionType: 'human' });
+      const targetId = activeTicket.ticket_id || activeTicket.id;
+      const { data } = await ticketsApi.resolve(targetId, { resolutionType: 'human' });
       setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, status: 'resolved' }) : ticket));
     } catch (error) {
       setError(getUserErrorMessage(error, 'We could not resolve this ticket. Please try again.'));
@@ -112,7 +128,8 @@ export default function TicketsPage() {
     if (!activeTicket) return;
     setTicketAction('escalating'); setError('');
     try {
-      const { data } = await ticketsApi.escalate(activeTicket.id, { priority, message: 'Escalated by the merchant.' });
+      const targetId = activeTicket.ticket_id || activeTicket.id;
+      const { data } = await ticketsApi.escalate(targetId, { priority, message: 'Escalated by the merchant.' });
       setTickets((current) => current.map((ticket) => ticket.id === activeTicket.id ? mapTicket({ ...ticket, ...data, priority, status: data?.status || 'in_progress' }) : ticket));
     } catch (error) {
       setError(getUserErrorMessage(error, 'We could not escalate this ticket. Please try again.'));

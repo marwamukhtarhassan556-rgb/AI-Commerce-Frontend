@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Check, ChevronLeft, Code2, Copy, FileJson, FileText, HelpCircle, Loader2, Sparkles, Upload, X } from 'lucide-react';
 import { parse as parseYaml } from 'yaml';
 import api, { refreshAccessToken } from '../../../api/axiosConfig';
-import { contactApi, integrationApi, knowledgeApi, subscriptionsApi } from '../../../api/integrationApi';
+import { contactApi, integrationApi, knowledgeApi, storesApi, subscriptionsApi } from '../../../api/integrationApi';
 import { normalizeSubscription } from '../subscription/subscriptionStatus';
 import { getUserErrorMessage } from '../../../utils/errorMessage';
 import WidgetAccessPanel from '../../merchant/WidgetAccessPanel';
@@ -19,6 +19,30 @@ const savedOnboardingState = () => {
 };
 
 const messageFor = (error, fallback) => getUserErrorMessage(error, fallback);
+
+// Retry a transient AI-model error (503, 500, or "overloaded" in the message)
+// up to `maxAttempts` times with exponential back-off.
+const isTransientError = (err) => {
+  const status = err?.response?.status || err?.status || 0;
+  if ([500, 502, 503, 504].includes(status)) return true;
+  const text = String(err?.response?.data?.detail || err?.response?.data?.message || err?.message || '').toLowerCase();
+  return /overload|unavailable|service.?error|model.?api|server error/i.test(text);
+};
+
+const withRetry = async (fn, { maxAttempts = 3, baseDelayMs = 2000, onRetry } = {}) => {
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      if (!isTransientError(err) || attempt === maxAttempts) throw err;
+      if (onRetry) onRetry(attempt, maxAttempts);
+      await new Promise((resolve) => setTimeout(resolve, baseDelayMs * 2 ** (attempt - 1)));
+    }
+  }
+  throw lastError;
+};
 
 const OPENAPI_SCHEMA_PROMPT = `You are an API documentation expert. Generate a complete, valid OpenAPI 3.0.3 YAML specification for the e-commerce REST API described below.
 
@@ -212,6 +236,32 @@ export default function OnboardingFlow() {
   const back = () => { setError(''); setStep((current) => Math.max(3, current - 1)); };
   const setField = (setter) => (event) => setter((current) => ({ ...current, [event.target.name]: event.target.value }));
 
+  const finishOnboarding = async () => {
+    const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');
+    if (storeId) {
+      try {
+        await storesApi.syncOldRevenue(storeId);
+      } catch (syncErr) {
+        console.warn('Sync old revenue before dashboard warning:', syncErr);
+      }
+    }
+    localStorage.removeItem(ONBOARDING_STATE_KEY);
+    navigate('/merchant/dashboard');
+  };
+
+  // Derive a minimal auth_config from the raw OpenAPI spec's securitySchemes.
+  const authConfigFromSpec = (spec) => {
+    const schemes = spec?.components?.securitySchemes || spec?.securityDefinitions || {};
+    const first = Object.values(schemes)[0] || {};
+    if (first.type === 'http' && /bearer/i.test(first.scheme || '')) {
+      return { type: 'bearer', credentials_location: 'header', scheme: 'Bearer', name: 'Authorization' };
+    }
+    if (first.type === 'apiKey') {
+      return { type: 'apiKey', credentials_location: first.in || 'header', name: first.name || 'X-API-Key' };
+    }
+    return { type: 'bearer', credentials_location: 'header', scheme: 'Bearer', name: 'Authorization' };
+  };
+
   const uploadSchema = async (file) => {
     if (!file) return;
     const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');
@@ -223,14 +273,67 @@ export default function OnboardingFlow() {
       const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
-      // Schema upload must only validate and analyze the document. agent-sync
-      // also tries to call the merchant API immediately, which fails before
-      // store-specific credentials are configured.
-      const { data } = await integrationApi.parseSchema(platformName, rawSpec);
-      if (data?.error || data?.user_friendly_error) throw new Error(data.user_friendly_error || data.error);
+
+      // Step 1 – analyze the spec with the AI agent (retries on transient errors)
+      const { data: parseResult } = await withRetry(
+        () => integrationApi.agentParseSchema(platformName, rawSpec),
+        {
+          maxAttempts: 3,
+          baseDelayMs: 2000,
+          onRetry: (attempt, maxAttempts) => {
+            setError(`The AI service is busy. Retrying (attempt ${attempt} of ${maxAttempts})\u2026`);
+          },
+        },
+      );
+      setError('');
+
+      // If the AI itself reported a hard error, surface it and stop.
+      if (parseResult?.user_friendly_error && (!parseResult?.entities || parseResult.entities.length === 0)) {
+        throw new Error(parseResult.user_friendly_error);
+      }
+
+      // Step 2 – create the integration connection using the parsed result
+      const entityMappings = (parseResult?.entities || []).map((e) => ({
+        entity_type: e.entity_type,
+        list_path: e.list_path || null,
+        list_method: e.list_method || 'GET',
+        detail_path: e.detail_path || null,
+        detail_method: e.detail_method || 'GET',
+        id_field: e.id_field || 'id',
+        pagination: e.pagination || { style: 'none' },
+        field_mappings: (e.field_mappings || []).map((fm) => ({
+          source: fm.source,
+          target: fm.target,
+          transformer: fm.transformer || null,
+          required: fm.required || false,
+        })),
+      }));
+
+      await withRetry(
+        () => integrationApi.createConnection({
+          store_id: storeId,
+          name: platformName,
+          platform_name: platformName,
+          raw_spec: rawSpec,
+          auth_config: authConfigFromSpec(rawSpec),
+          credentials: {},
+          entity_mappings: entityMappings,
+        }),
+        { maxAttempts: 2, baseDelayMs: 1500 },
+      );
+
       setIntegrationProgress((current) => ({ ...current, schema: true }));
+
+      // Non-blocking background call for sync-old-revenue
+      void storesApi.syncOldRevenue(storeId).catch((syncErr) => {
+        console.warn('Sync old revenue after schema upload warning:', syncErr);
+      });
     } catch (requestError) {
-      setError(requestError instanceof SyntaxError ? 'Please upload a valid OpenAPI JSON or YAML schema.' : messageFor(requestError, 'Could not analyze the OpenAPI schema.'));
+      setError(requestError instanceof SyntaxError
+        ? 'Please upload a valid OpenAPI JSON or YAML schema.'
+        : requestError?.message?.length < 200 && !/[{}[\]]/.test(requestError.message)
+          ? requestError.message
+          : messageFor(requestError, 'Could not analyze the OpenAPI schema. The AI service may be temporarily busy \u2014 please try again.'));
     } finally { setIntegrationLoading((current) => ({ ...current, schema: false })); }
   };
 
@@ -262,7 +365,7 @@ export default function OnboardingFlow() {
       {step === 5 && <SchemaGuideStep onBack={back} onContinue={() => setStep(6)} onAskDeveloper={() => setDeveloperModalOpen(true)} />}
       {step === 6 && <SchemaUploadStep complete={integrationProgress.schema} loading={integrationLoading.schema} onBack={back} onUpload={uploadSchema} onContinue={() => setStep(7)} />}
       {step === 7 && <PoliciesUploadStep complete={integrationProgress.policies} loading={integrationLoading.policies} onBack={back} onUpload={uploadPolicies} onContinue={() => setStep(8)} />}
-      {step === 8 && <WidgetSetupStep onBack={back} onFinish={() => { localStorage.removeItem(ONBOARDING_STATE_KEY); navigate('/merchant/dashboard'); }} />}
+      {step === 8 && <WidgetSetupStep onBack={back} onFinish={finishOnboarding} />}
     </section>
     {selectedPlan && <PlanModal plan={selectedPlan} trialStatus={trialStatus} hasUsedFreeTrial={hasUsedFreeTrial} loading={loading} onClose={() => { setSelectedPlan(null); setError(''); }} onStartFreeTrial={startFreeTrial} onCheckout={createCheckoutSession} />}
     {developerModalOpen && <DeveloperModal plans={plans} store={store} onClose={() => setDeveloperModalOpen(false)} />}

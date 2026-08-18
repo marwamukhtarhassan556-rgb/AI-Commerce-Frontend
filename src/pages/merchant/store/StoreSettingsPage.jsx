@@ -15,17 +15,20 @@ export default function StoreSettingsPage() {
   const [savingDailyLimit, setSavingDailyLimit] = useState(false);
   const [adminInfo, setAdminInfo] = useState({ adminEmail: '', adminPassword: '' });
   const [dailyAllowedMessage, setDailyAllowedMessage] = useState('10');
+  const [limitError, setLimitError] = useState('');
+  const [limitSuccess, setLimitSuccess] = useState('');
   const [message, setMessage] = useState(storeId ? '' : 'Select a store before managing its settings.');
 
   useEffect(() => {
     if (!storeId) return;
     let mounted = true;
-    Promise.all([storesApi.getById(storeId), analyticsApi.getDailyMessageLimit().catch(() => null)])
+    Promise.all([storesApi.getById(storeId), storesApi.getDailyAllowedMessage(storeId).catch(() => null)])
       .then(([storeResponse, limitResponse]) => {
         if (!mounted) return;
         const storeData = storeResponse.data;
         setStore({ ...emptyStore, ...storeData });
-        setDailyAllowedMessage(String(limitResponse?.data?.daily_allowed_message ?? storeData?.dailyAllowedMessage ?? 10));
+        const limitVal = limitResponse?.data?.dailyAllowedMessage ?? limitResponse?.data?.DailyAllowedMessage ?? storeData?.dailyAllowedMessage ?? 10;
+        setDailyAllowedMessage(String(limitVal));
       })
       .catch(() => mounted && setMessage('Store details could not be loaded.'))
       .finally(() => mounted && setLoading(false));
@@ -61,16 +64,21 @@ export default function StoreSettingsPage() {
   const saveDailyMessageLimit = async () => {
     const limit = Number(dailyAllowedMessage);
     if (!storeId || !Number.isInteger(limit) || limit < 1) {
-      setMessage('Enter a whole number of at least 1 message per customer, per day.');
+      setLimitError('Enter a whole number of at least 1 message per customer, per day.');
+      setLimitSuccess('');
       return;
     }
-    setSavingDailyLimit(true); setMessage('');
+    setSavingDailyLimit(true); setLimitError(''); setLimitSuccess('');
     try {
-      const { data } = await analyticsApi.updateConsumerDailyLimit(limit);
-      setDailyAllowedMessage(String(data?.consumer_daily_message_limit ?? limit));
-      setMessage('Daily customer message limit saved and applied to the AI widget.');
-    } catch (error) { setMessage(getUserErrorMessage(error, 'The daily message limit could not be saved. Please try again.')); }
-    finally { setSavingDailyLimit(false); }
+      await storesApi.updateDailyAllowedMessage(storeId, limit);
+      const freshLimitRes = await storesApi.getDailyAllowedMessage(storeId).catch(() => null);
+      const updatedLimit = freshLimitRes?.data?.dailyAllowedMessage ?? freshLimitRes?.data?.DailyAllowedMessage ?? limit;
+      setDailyAllowedMessage(String(updatedLimit));
+      setLimitSuccess('Daily customer message limit saved successfully.');
+    } catch (error) {
+      const errorText = error.response?.data?.message || error.response?.data?.detail || error.response?.data?.Message || getUserErrorMessage(error, 'The daily message limit could not be saved. Please try again.');
+      setLimitError(errorText);
+    } finally { setSavingDailyLimit(false); }
   };
 
   const saveAdminInfo = async () => {
@@ -123,8 +131,42 @@ export default function StoreSettingsPage() {
 
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <SectionTitle icon={<MessageCircle className="h-5 w-5" />} title="Customer message limit" iconClass="bg-blue-100 text-blue-700" />
-            <div className="grid gap-5 p-6 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end"><div><h4 className="text-sm font-bold">Daily messages per customer</h4><p className="mt-1 text-sm text-gray-500">Set how many messages one customer can send to the storefront AI widget in one day. This helps prevent chat misuse.</p></div><Field label="Messages per day"><input type="number" min="1" step="1" value={dailyAllowedMessage} onChange={(event) => setDailyAllowedMessage(event.target.value)} className="store-input" /></Field></div>
-            <div className="flex justify-end border-t border-gray-200 px-6 py-4"><button onClick={saveDailyMessageLimit} disabled={savingDailyLimit || !storeId} className="store-primary-button"><Save className="h-4 w-4" />{savingDailyLimit ? 'Saving…' : 'Save message limit'}</button></div>
+            {limitError && (
+              <div className="mx-6 mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">
+                ⚠️ {limitError}
+              </div>
+            )}
+            {limitSuccess && (
+              <div className="mx-6 mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-700" role="status">
+                ✓ {limitSuccess}
+              </div>
+            )}
+            <div className="grid gap-5 p-6 md:grid-cols-[minmax(0,1fr)_14rem] md:items-end">
+              <div>
+                <h4 className="text-sm font-bold">Daily messages per customer</h4>
+                <p className="mt-1 text-sm text-gray-500">Set how many messages one customer can send to the storefront AI widget in one day. This helps prevent chat misuse.</p>
+              </div>
+              <Field label="Messages per day">
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={dailyAllowedMessage}
+                  onChange={(event) => {
+                    setDailyAllowedMessage(event.target.value);
+                    setLimitError('');
+                    setLimitSuccess('');
+                  }}
+                  className="store-input"
+                />
+              </Field>
+            </div>
+            <div className="flex justify-end border-t border-gray-200 px-6 py-4">
+              <button onClick={saveDailyMessageLimit} disabled={savingDailyLimit || !storeId} className="store-primary-button">
+                <Save className="h-4 w-4" />
+                {savingDailyLimit ? 'Saving…' : 'Save message limit'}
+              </button>
+            </div>
           </section>
 
           <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">

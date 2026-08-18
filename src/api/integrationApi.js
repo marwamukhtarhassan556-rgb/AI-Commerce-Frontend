@@ -129,6 +129,10 @@ export const storesApi = {
   updateSettings: (storeId, { currency, language, timezone }) =>
     api.put(`/api/stores/${storeId}/settings`, { currency, language, timezone }),
 
+  // GET /api/stores/{storeId}/daily-allowed-message
+  getDailyAllowedMessage: (storeId) =>
+    api.get(`/api/stores/${storeId}/daily-allowed-message`),
+
   // PUT /api/stores/{storeId}/update-daily-allowed-message
   updateDailyAllowedMessage: (storeId, dailyAllowedMessage) =>
     api.put(`/api/stores/${storeId}/update-daily-allowed-message`, { dailyAllowedMessage }),
@@ -136,6 +140,9 @@ export const storesApi = {
   // PUT /api/stores/{id}/admin-info
   updateAdminInfo: (storeId, { adminEmail, adminPassword }) =>
     api.put(`/api/stores/${storeId}/admin-info`, { adminEmail, adminPassword }),
+
+  // POST /api/stores/{storeId}/sync-old-revenue
+  syncOldRevenue: (storeId) => api.post(`/api/stores/${storeId}/sync-old-revenue`),
 
   // DELETE /api/stores/{id}
   delete: (storeId) => api.delete(`/api/stores/${storeId}`),
