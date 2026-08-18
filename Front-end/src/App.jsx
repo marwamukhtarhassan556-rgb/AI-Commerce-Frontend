@@ -20,6 +20,8 @@ import StoreSettingsPage from './pages/merchant/store/StoreSettingsPage';
 import KnowledgeBasePage from './pages/merchant/knowledge/KnowledgeBasePage';
 import CheckoutSuccessPage from './pages/checkout/CheckoutSuccessPage';
 import CheckoutCancelPage from './pages/checkout/CheckoutCancelPage';
+import SubscriptionDetailsPage from './pages/merchant/subscription/SubscriptionDetailsPage';
+import BundlesPage from './pages/merchant/bundles/BundlesPage';
 
 // Layout & Route Wrappers
 import MerchantLayout from './components/layout/MerchantLayout';
@@ -98,14 +100,13 @@ function App() {
           <Route path="/merchant/tickets" element={<TicketsPage />} />
           <Route path="/merchant/store" element={<StoreSettingsPage />} />
           <Route path="/merchant/knowledge" element={<KnowledgeBasePage />} />
+          <Route path="/merchant/subscription" element={<SubscriptionDetailsPage />} />
+          <Route path="/merchant/bundles" element={<BundlesPage />} />
         </Route>
 
         {/* باقي الـ Dashboards */}
-        <Route path="/admin/dashboard" element={
-          <ProtectedRoute allowedRoles={['admin']}>
-            <Dashboard />
-          </ProtectedRoute>
-        } />
+        {/* Legacy admin dashboard was a bare overview page and could surface from browser history. */}
+        <Route path="/admin/dashboard" element={<Navigate to="/merchant/dashboard" replace />} />
         <Route path="/dashboard" element={
           <ProtectedRoute allowedRoles={['user', 'seller', 'merchant', 'admin']}>
             <Dashboard />

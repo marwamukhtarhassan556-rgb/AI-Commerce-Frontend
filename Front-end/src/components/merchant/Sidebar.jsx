@@ -5,6 +5,8 @@ import {
   Store, 
   Ticket, 
   BookOpen,
+  CreditCard,
+  Gift,
   UserCircle 
 } from 'lucide-react';
 
@@ -14,6 +16,8 @@ const navItems = [
   { name: 'My Store', path: '/merchant/store', icon: Store },
   { name: 'Tickets', path: '/merchant/tickets', icon: Ticket },
   { name: 'AI Knowledge', path: '/merchant/knowledge', icon: BookOpen },
+  { name: 'Bundles', path: '/merchant/bundles', icon: Gift },
+  { name: 'Subscription', path: '/merchant/subscription', icon: CreditCard },
 ];
 
 const Sidebar = () => {
@@ -53,7 +57,7 @@ const Sidebar = () => {
         <div className="flex items-center gap-3 p-4 rounded-xl bg-surface-container-highest/50">
           <UserCircle className="w-8 h-8 text-primary" />
           <div className="flex flex-col">
-            <span className="text-xs font-bold text-on-surface">Alex Merchant</span>
+            <span className="text-xs font-bold text-on-surface">{(() => { try { const profile = JSON.parse(localStorage.getItem('merchantProfile') || '{}'); return [profile.firstName, profile.lastName].filter(Boolean).join(' ') || profile.name || profile.email || 'Merchant'; } catch { return 'Merchant'; } })()}</span>
             <span className="text-[10px] uppercase tracking-wider text-outline">Manage Account</span>
           </div>
         </div>
