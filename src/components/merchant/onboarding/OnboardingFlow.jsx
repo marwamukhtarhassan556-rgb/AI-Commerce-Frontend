@@ -207,16 +207,10 @@ export default function OnboardingFlow() {
       const rawSpec = replacePlaceholderServer(parsedSpec, store.shopDomain);
       if (!rawSpec || typeof rawSpec !== 'object') throw new Error('The OpenAPI schema is empty or invalid.');
       const platformName = rawSpec?.info?.title || rawSpec?.title || 'Custom store';
-      const accessToken = localStorage.getItem('token');
-      if (!accessToken) throw new Error('Your session is missing an access token. Please sign in again.');
-      const { data } = await integrationApi.agentSync({
-        platform_name: platformName,
-        raw_spec: rawSpec,
-        store_id: storeId,
-        name: `${platformName} connection`,
-        credentials: { Authorization: `Bearer ${accessToken}` },
-        auto_sync: true,
-      });
+      // Schema upload must only validate and analyze the document. agent-sync
+      // also tries to call the merchant API immediately, which fails before
+      // store-specific credentials are configured.
+      const { data } = await integrationApi.parseSchema(platformName, rawSpec);
       if (data?.error || data?.user_friendly_error) throw new Error(data.user_friendly_error || data.error);
       setIntegrationProgress((current) => ({ ...current, schema: true }));
     } catch (requestError) {
