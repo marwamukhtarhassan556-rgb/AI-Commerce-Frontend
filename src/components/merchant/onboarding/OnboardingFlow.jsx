@@ -9,6 +9,14 @@ import { getUserErrorMessage } from '../../../utils/errorMessage';
 import WidgetAccessPanel from '../../merchant/WidgetAccessPanel';
 
 const initialStore = { name: '', description: '', platform: 'custom', shopDomain: '', ecommerceEmail: '', ecommercePassword: '', currency: 'USD', language: 'en', timezone: 'UTC' };
+const ONBOARDING_STATE_KEY = 'merchantOnboardingState';
+
+const savedOnboardingState = () => {
+  try {
+    const state = JSON.parse(localStorage.getItem(ONBOARDING_STATE_KEY) || '{}');
+    return state && typeof state === 'object' ? state : {};
+  } catch { return {}; }
+};
 
 const messageFor = (error, fallback) => getUserErrorMessage(error, fallback);
 
@@ -74,18 +82,26 @@ export default function OnboardingFlow() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const requestedStep = Number(searchParams.get('step'));
-  const [step, setStep] = useState(() => ([3, 4, 5, 6, 7, 8].includes(requestedStep) ? requestedStep : 3));
-  const [store, setStore] = useState(initialStore);
+  const [step, setStep] = useState(() => {
+    const saved = savedOnboardingState();
+    return [3, 4, 5, 6, 7, 8].includes(requestedStep) ? requestedStep : ([3, 4, 5, 6, 7, 8].includes(saved.step) ? saved.step : 3);
+  });
+  const [store, setStore] = useState(() => ({ ...initialStore, ...savedOnboardingState().store, ecommercePassword: '' }));
   const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(() => savedOnboardingState().selectedPlan || null);
   const [trialStatus, setTrialStatus] = useState(null);
   const [hasUsedFreeTrial, setHasUsedFreeTrial] = useState(null);
   const [loading, setLoading] = useState(false);
   const [plansLoading, setPlansLoading] = useState(false);
-  const [integrationProgress, setIntegrationProgress] = useState({ schema: false, policies: false, widget: false });
+  const [integrationProgress, setIntegrationProgress] = useState(() => ({ schema: false, policies: false, widget: false, ...savedOnboardingState().integrationProgress }));
   const [integrationLoading, setIntegrationLoading] = useState({ schema: false, policies: false });
   const [developerModalOpen, setDeveloperModalOpen] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const { ecommercePassword, ...safeStore } = store;
+    localStorage.setItem(ONBOARDING_STATE_KEY, JSON.stringify({ step, store: safeStore, selectedPlan, integrationProgress }));
+  }, [step, store, selectedPlan, integrationProgress]);
 
   useEffect(() => {
     if (!localStorage.getItem('token') || requestedStep === 1 || requestedStep === 2) {
@@ -246,7 +262,7 @@ export default function OnboardingFlow() {
       {step === 5 && <SchemaGuideStep onBack={back} onContinue={() => setStep(6)} onAskDeveloper={() => setDeveloperModalOpen(true)} />}
       {step === 6 && <SchemaUploadStep complete={integrationProgress.schema} loading={integrationLoading.schema} onBack={back} onUpload={uploadSchema} onContinue={() => setStep(7)} />}
       {step === 7 && <PoliciesUploadStep complete={integrationProgress.policies} loading={integrationLoading.policies} onBack={back} onUpload={uploadPolicies} onContinue={() => setStep(8)} />}
-      {step === 8 && <WidgetSetupStep onBack={back} onFinish={() => navigate('/merchant/dashboard')} />}
+      {step === 8 && <WidgetSetupStep onBack={back} onFinish={() => { localStorage.removeItem(ONBOARDING_STATE_KEY); navigate('/merchant/dashboard'); }} />}
     </section>
     {selectedPlan && <PlanModal plan={selectedPlan} trialStatus={trialStatus} hasUsedFreeTrial={hasUsedFreeTrial} loading={loading} onClose={() => { setSelectedPlan(null); setError(''); }} onStartFreeTrial={startFreeTrial} onCheckout={createCheckoutSession} />}
     {developerModalOpen && <DeveloperModal plans={plans} store={store} onClose={() => setDeveloperModalOpen(false)} />}
