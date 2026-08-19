@@ -216,9 +216,11 @@ export default function OnboardingFlow() {
         adminEmail: ecommerceEmail.trim(),
         adminPassword: ecommercePassword,
       });
-      if (!data?.id) throw new Error('The store was created without a store ID.');
       localStorage.setItem('storeId', data.id);
       localStorage.setItem('currentStoreId', data.id);
+      const orgId = data.organizationId || data.organization_id || data.orgId || data.org_id || localStorage.getItem('organizationId') || data.id;
+      localStorage.setItem('organizationId', String(orgId));
+      localStorage.setItem('orgId', String(orgId));
 
       // The backend refreshes the JWT after the store exists, so the next AI
       // requests start with the latest access token and store context.

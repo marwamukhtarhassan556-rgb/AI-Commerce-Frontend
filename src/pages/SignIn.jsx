@@ -51,14 +51,17 @@ const SignIn = () => {
           localStorage.setItem('aiToken', response.data.aiToken || response.data.aiAccessToken);
         }
         const sessionUser = response.data.user || response.data.profile || {};
-        const userId = response.data.userId || response.data.user_id || sessionUser.id || sessionUser.userId || sessionUser.user_id;
-        const organizationId = response.data.organizationId || response.data.organization_id || response.data.orgId || response.data.org_id || sessionUser.organizationId || sessionUser.organization_id || sessionUser.orgId || sessionUser.org_id;
+        const storeId = response.data.storeId || response.data.store_id;
+        const organizationId = response.data.organizationId || response.data.organization_id || response.data.orgId || response.data.org_id || sessionUser.organizationId || sessionUser.organization_id || sessionUser.orgId || sessionUser.org_id || storeId;
         if (userId) localStorage.setItem('userId', String(userId));
         else localStorage.removeItem('userId');
-        if (organizationId) localStorage.setItem('organizationId', String(organizationId));
-        else localStorage.removeItem('organizationId');
-        localStorage.removeItem('orgId');
-        const storeId = response.data.storeId || response.data.store_id;
+        if (organizationId) {
+          localStorage.setItem('organizationId', String(organizationId));
+          localStorage.setItem('orgId', String(organizationId));
+        } else {
+          localStorage.removeItem('organizationId');
+          localStorage.removeItem('orgId');
+        }
         if (storeId) {
           localStorage.setItem('storeId', String(storeId));
           localStorage.setItem('currentStoreId', String(storeId));

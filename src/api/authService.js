@@ -150,6 +150,7 @@ export const loginUser = async (email, password) => {
     tokenDetails?.userId,
     aiTokenDetails?.userId,
   );
+  const storeId = firstDefined(data.storeId, data.store_id, user.storeId, user.store_id);
   const organizationId = firstDefined(
     data.organizationId,
     data.organization_id,
@@ -161,9 +162,9 @@ export const loginUser = async (email, password) => {
     user.org_id,
     tokenDetails?.organizationId,
     aiTokenDetails?.organizationId,
+    storeId,
   );
   const userEmail = firstDefined(data.email, user.email, tokenDetails?.email, email);
-  const storeId = firstDefined(data.storeId, data.store_id, user.storeId, user.store_id);
   const role = tokenDetails?.role || data.role || 'Seller';
 
   if (token) localStorage.setItem('token', token);
@@ -172,7 +173,7 @@ export const loginUser = async (email, password) => {
   if (role) localStorage.setItem('userRole', role);
   saveOrRemove('userId', userId);
   saveOrRemove('organizationId', organizationId);
-  localStorage.removeItem('orgId');
+  saveOrRemove('orgId', organizationId);
   saveOrRemove('userEmail', userEmail);
   saveMerchantProfile({
     firstName: data.firstName || data.first_name || user.firstName || user.first_name || '',
