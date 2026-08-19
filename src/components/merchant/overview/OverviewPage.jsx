@@ -39,7 +39,7 @@ export default function OverviewPage() {
     return () => { disposed = true; void stopConnection?.(); };
   }, [storeId]);
 
-  const totalRevenue = Number(data.revenue?.totalRevenue || 0);
+  const totalRevenue = Number(data.revenue?.metadata?.total_revenue ?? data.revenue?.totalRevenue ?? 0);
   const growth = Number(data.growth?.growthPercentage || 0);
   const resolutionRate = Number(data.tickets?.resolution_rate || 0);
 
