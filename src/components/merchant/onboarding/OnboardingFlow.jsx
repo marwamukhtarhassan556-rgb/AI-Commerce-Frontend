@@ -352,10 +352,15 @@ export default function OnboardingFlow() {
       return null;
     };
 
+    const merchantProfile = (() => {
+      try { return JSON.parse(localStorage.getItem('merchantProfile') || '{}'); } catch { return {}; }
+    })();
+
     const organizationId =
       localStorage.getItem('organizationId') ||
       localStorage.getItem('orgId') ||
-      decodeJwtField(['organizationId', 'organization_id', 'orgId', 'org_id', 'tenantId', 'tenant_id']);
+      decodeJwtField(['organizationId', 'organization_id', 'orgId', 'org_id', 'tenantId', 'tenant_id']) ||
+      storeId;
 
     const uploadedBy =
       localStorage.getItem('userId') ||
@@ -364,9 +369,11 @@ export default function OnboardingFlow() {
       decodeJwtField([
         'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
         'nameid', 'userId', 'user_id', 'sub',
-      ]);
+      ]) ||
+      merchantProfile.email ||
+      'merchant';
 
-    if (!storeId || !organizationId || !uploadedBy) return setError('Your store session is incomplete. Please log in again.');
+    if (!storeId) return setError('Create your store before uploading policies.');
     setIntegrationLoading((current) => ({ ...current, policies: true })); setError('');
     try {
       const { data } = await knowledgeApi.upload(file, { storeId, organizationId, uploadedBy, knowledgeScope: 'general' });
