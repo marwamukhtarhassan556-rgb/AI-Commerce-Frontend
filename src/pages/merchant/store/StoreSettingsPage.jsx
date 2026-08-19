@@ -22,16 +22,28 @@ export default function StoreSettingsPage() {
   useEffect(() => {
     if (!storeId) return;
     let mounted = true;
-    Promise.all([storesApi.getById(storeId), storesApi.getDailyAllowedMessage(storeId).catch(() => null)])
-      .then(([storeResponse, limitResponse]) => {
+
+    storesApi.getById(storeId)
+      .then((storeResponse) => {
         if (!mounted) return;
-        const storeData = storeResponse.data;
-        setStore({ ...emptyStore, ...storeData });
-        const limitVal = limitResponse?.data?.dailyAllowedMessage ?? limitResponse?.data?.DailyAllowedMessage ?? storeData?.dailyAllowedMessage ?? 10;
-        setDailyAllowedMessage(String(limitVal));
+        setStore({ ...emptyStore, ...storeResponse.data });
       })
       .catch(() => mounted && setMessage('Store details could not be loaded.'))
       .finally(() => mounted && setLoading(false));
+
+    storesApi.getDailyAllowedMessage(storeId)
+      .then((limitResponse) => {
+        if (!mounted) return;
+        const limitVal = limitResponse?.data?.dailyAllowedMessage ?? limitResponse?.data?.DailyAllowedMessage ?? 10;
+        setDailyAllowedMessage(String(limitVal));
+        setLimitError('');
+      })
+      .catch((err) => {
+        if (!mounted) return;
+        const errText = err.response?.data?.message || err.response?.data?.detail || err.response?.data?.Message || getUserErrorMessage(err, 'Could not load message limit.');
+        setLimitError(errText);
+      });
+
     return () => { mounted = false; };
   }, [storeId]);
 
