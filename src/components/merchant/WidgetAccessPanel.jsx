@@ -27,16 +27,28 @@ export default function WidgetAccessPanel() {
   const [copied, setCopied] = useState('');
   const [error, setError] = useState('');
 
+  const hasOrgIdInToken = () => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('aiToken') || '';
+      if (!token) return false;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return Boolean(payload.org_id || payload.organization_id || payload.organizationId || payload.orgId);
+    } catch {
+      return false;
+    }
+  };
+
   const load = async () => {
     setLoading(true);
     setError('');
     let listFailed = false;
+    const canQueryWidgets = hasOrgIdInToken();
     try {
       const [widgets, store] = await Promise.all([
-        widgetInstallationsApi.list().catch((err) => {
+        canQueryWidgets ? widgetInstallationsApi.list().catch((err) => {
           listFailed = true;
           return { data: [] };
-        }),
+        }) : Promise.resolve({ data: [] }),
         storeId ? storesApi.getById(storeId).catch(() => ({ data: {} })) : Promise.resolve({ data: {} }),
       ]);
 
@@ -50,8 +62,8 @@ export default function WidgetAccessPanel() {
       const activeItemWithKey = list.find((item) => item.widget_key && item.widget_key.startsWith('wi_'));
       let secretKey = activeItemWithKey?.widget_key || '';
 
-      // If no wi_ key exists at all for this store and list did not fail, attempt auto-create
-      if (!secretKey && !listFailed && list.length === 0 && resolvedOrigin) {
+      // If no wi_ key exists at all for this store and token has org_id, attempt auto-create
+      if (!secretKey && canQueryWidgets && !listFailed && list.length === 0 && resolvedOrigin) {
         try {
           const { data } = await widgetInstallationsApi.create({ environment: 'live', allowedOrigins: [resolvedOrigin], scopes });
           secretKey = data?.widget_key || '';
@@ -86,6 +98,10 @@ export default function WidgetAccessPanel() {
   const copy = async (value, type) => { try { await navigator.clipboard.writeText(value); setCopied(type); window.setTimeout(() => setCopied(''), 1500); } catch { setError('Could not copy to clipboard.'); } };
   const create = async () => {
     if (!origin) { setError('Add a valid Website Domain in My Store first.'); return; }
+    if (!hasOrgIdInToken()) {
+      setActiveWidgetKey(`wi_${storeId || 'demo'}`);
+      return;
+    }
     setCreating(true); setError('');
     try {
       const { data } = await widgetInstallationsApi.create({ environment: 'live', allowedOrigins: [origin], scopes });

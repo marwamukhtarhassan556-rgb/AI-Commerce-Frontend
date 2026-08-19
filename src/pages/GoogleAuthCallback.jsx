@@ -63,14 +63,16 @@ export default function GoogleAuthCallback() {
     const userId = params.get('userId') || params.get('user_id');
     if (userId) localStorage.setItem('userId', userId);
 
-    const organizationId = params.get('organizationId') || params.get('organization_id');
-    if (organizationId) localStorage.setItem('organizationId', organizationId);
-    localStorage.removeItem('orgId');
-
     const storeId = params.get('storeId') || params.get('store_id');
     if (storeId) {
       localStorage.setItem('storeId', storeId);
       localStorage.setItem('currentStoreId', storeId);
+    }
+
+    const organizationId = params.get('organizationId') || params.get('organization_id') || params.get('orgId') || params.get('org_id') || storeId;
+    if (organizationId) {
+      localStorage.setItem('organizationId', String(organizationId));
+      localStorage.setItem('orgId', String(organizationId));
     }
 
     // ─── Role normalisation ────────────────────────────────────────────────
