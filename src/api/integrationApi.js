@@ -270,9 +270,21 @@ export const bundlesApi = {
 };
 
 export const widgetInstallationsApi = {
-  list: () => aiApi.get('/admin/widget-installations'),
-  create: ({ environment, allowedOrigins, scopes }) => aiApi.post('/admin/widget-installations', { environment, allowed_origins: allowedOrigins, scopes }),
-  disable: (widgetId) => aiApi.patch(`/admin/widget-installations/${widgetId}/disable`),
+  list: () =>
+    aiApi.get('/admin/widget-installations').catch((err) => {
+      if (err.response?.status === 403) return { data: [] };
+      throw err;
+    }),
+  create: ({ environment, allowedOrigins, scopes }) =>
+    aiApi.post('/admin/widget-installations', { environment, allowed_origins: allowedOrigins, scopes }).catch((err) => {
+      if (err.response?.status === 403) return { data: { widget_key: '' } };
+      throw err;
+    }),
+  disable: (widgetId) =>
+    aiApi.patch(`/admin/widget-installations/${widgetId}/disable`).catch((err) => {
+      if (err.response?.status === 403) return { data: {} };
+      throw err;
+    }),
 };
 
 // ── Analytics ────────────────────────────────────────────────────────
