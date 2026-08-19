@@ -340,8 +340,32 @@ export default function OnboardingFlow() {
   const uploadPolicies = async (file) => {
     if (!file) return;
     const storeId = localStorage.getItem('currentStoreId') || localStorage.getItem('storeId');
-    const organizationId = localStorage.getItem('organizationId');
-    const uploadedBy = localStorage.getItem('userId');
+
+    // Try localStorage first; fall back to decoding the stored JWT token.
+    const decodeJwtField = (keys) => {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('aiToken') || '';
+        if (!token) return null;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        for (const k of keys) if (payload[k]) return String(payload[k]);
+      } catch { /* ignore */ }
+      return null;
+    };
+
+    const organizationId =
+      localStorage.getItem('organizationId') ||
+      localStorage.getItem('orgId') ||
+      decodeJwtField(['organizationId', 'organization_id', 'orgId', 'org_id', 'tenantId', 'tenant_id']);
+
+    const uploadedBy =
+      localStorage.getItem('userId') ||
+      localStorage.getItem('user_id') ||
+      localStorage.getItem('id') ||
+      decodeJwtField([
+        'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier',
+        'nameid', 'userId', 'user_id', 'sub',
+      ]);
+
     if (!storeId || !organizationId || !uploadedBy) return setError('Your store session is incomplete. Please log in again.');
     setIntegrationLoading((current) => ({ ...current, policies: true })); setError('');
     try {

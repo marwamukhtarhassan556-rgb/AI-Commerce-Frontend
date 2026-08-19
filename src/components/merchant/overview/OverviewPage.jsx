@@ -10,15 +10,25 @@ export default function OverviewPage() {
   const [error, setError] = useState(storeId ? '' : 'Select a store before viewing the dashboard.');
   const [liveStatus, setLiveStatus] = useState('connecting');
 
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Listen for the Sync button's 'dashboard-refresh' event and re-fetch data
+  useEffect(() => {
+    const onRefresh = () => setRefreshKey((k) => k + 1);
+    window.addEventListener('dashboard-refresh', onRefresh);
+    return () => window.removeEventListener('dashboard-refresh', onRefresh);
+  }, []);
+
   useEffect(() => {
     if (!storeId) return;
     let mounted = true;
+    setLoading(true);
     Promise.all([dashboardApi.getOverviewStats(storeId), storesApi.getById(storeId).catch(() => ({ data: {} }))])
       .then(([stats, storeResponse]) => mounted && setData({ ...stats, currency: storeResponse.data?.currency || '' }))
       .catch(() => mounted && setError('Dashboard metrics could not be loaded.'))
       .finally(() => mounted && setLoading(false));
     return () => { mounted = false; };
-  }, [storeId]);
+  }, [storeId, refreshKey]);
 
   useEffect(() => {
     if (!storeId) return undefined;

@@ -119,7 +119,8 @@ export default function TopBar() {
       const connectionId = connection?.id || connection?.connection_id;
       if (!connectionId) { window.alert('No store connection is ready to sync.'); return; }
       await integrationApi.syncConnection(connectionId);
-      window.alert('Sync started successfully.');
+      // Notify the dashboard to re-fetch its data without a full page reload
+      window.dispatchEvent(new CustomEvent('dashboard-refresh'));
     } catch (error) {
       console.error('Sync failed:', error.response?.data || error);
       window.alert(getUserErrorMessage(error, 'We could not start the sync. Please try again.'));
