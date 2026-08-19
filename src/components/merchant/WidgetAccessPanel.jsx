@@ -30,9 +30,13 @@ export default function WidgetAccessPanel() {
   const load = async () => {
     setLoading(true);
     setError('');
+    let listFailed = false;
     try {
       const [widgets, store] = await Promise.all([
-        widgetInstallationsApi.list().catch(() => ({ data: [] })),
+        widgetInstallationsApi.list().catch((err) => {
+          listFailed = true;
+          return { data: [] };
+        }),
         storeId ? storesApi.getById(storeId).catch(() => ({ data: {} })) : Promise.resolve({ data: {} }),
       ]);
 
@@ -46,8 +50,8 @@ export default function WidgetAccessPanel() {
       const activeItemWithKey = list.find((item) => item.widget_key && item.widget_key.startsWith('wi_'));
       let secretKey = activeItemWithKey?.widget_key || '';
 
-      // If no wi_ key exists at all for this store, automatically attempt to create one
-      if (!secretKey && list.length === 0 && resolvedOrigin) {
+      // If no wi_ key exists at all for this store and list did not fail, attempt auto-create
+      if (!secretKey && !listFailed && list.length === 0 && resolvedOrigin) {
         try {
           const { data } = await widgetInstallationsApi.create({ environment: 'live', allowedOrigins: [resolvedOrigin], scopes });
           secretKey = data?.widget_key || '';

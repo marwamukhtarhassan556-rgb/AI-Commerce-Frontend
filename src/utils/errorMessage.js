@@ -21,7 +21,7 @@ export const getUserErrorMessage = (error, fallback = 'We could not complete tha
   if (context === 'registration' && /(already exists|already registered|duplicate|email.*exist)/.test(message)) return 'An account with this email address already exists. Try signing in instead.';
   if (/(no|without).*(active|current).*(plan|subscription)|(plan|subscription).*(not|isn.t).*(active|found)/.test(message)) return 'You do not have an active plan yet. Choose a plan to continue.';
   if (/(shop|store).*(domain).*(already|exist|used)|domain.*(already|exist|used)/.test(message)) return 'This website domain is already connected to a store. Use a different domain, or update the existing store.';
-  if (/no store associated|store.*not found|store session is incomplete/.test(message)) return 'Your store is still being prepared. Please sign in again, then try once more.';
+  if (/no (store|organization) associated|organization.*not found|store.*not found|store session is incomplete/.test(message)) return 'Your store session is being prepared. Please sign in again, then try once more.';
   if (/duplicate.*(upload|document|file)|already uploaded/.test(message)) return 'This file has already been uploaded to your store.';
   if (status === 401) return 'Your session has expired. Please sign in again.';
   if (status === 403) return 'You do not have permission to do this action.';
